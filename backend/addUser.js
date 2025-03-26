@@ -12,25 +12,90 @@ mongoose
   .then(async () => {
     console.log("✅ Connected to MongoDB");
 
-    // Check if user already exists
-    const existingUser = await User.findOne({ email: "john@example.com" });
-    if (existingUser) {
-      console.log("⚠️ User already exists. Deleting and re-adding...");
-      await User.deleteOne({ email: "john@example.com" });
+    // Define Users
+    const users = [
+      {
+        name: "Fabio Castel Garcia",
+        email: "fabio.castelgarcia.2@mnsu.edu",
+        password: "password0000",
+        role: "admin",
+        position: "Visual Production Director",
+      },
+      {
+        name: "Nahom Atnafu",
+        email: "nahom.atnafu@mnsu.edu",
+        password: "password0000",
+        role: "admin",
+        position: "student",
+      },
+      {
+        name: "Kathryn Petzel",
+        email: "kathryn.petzel@mnsu.edu",
+        password: "password0000",
+        role: "admin",
+        position: "student",
+      },
+      {
+        name: "Amy Linde",
+        email: "amy.linde@mnsu.edu",
+        password: "password0000",
+        role: "admin",
+        position: "Communication and Media Director",
+      },
+      {
+        name: "Isabelle Linden",
+        email: "isabelle.linden@mnsu.edu",
+        password: "password0000",
+        role: "admin",
+        position: "student",
+      },
+      {
+        name: "Derick Franklin",
+        email: "derick.franklin@mnsu.edu",
+        password: "password0000",
+        role: "student",
+        position: "student",
+      },
+      {
+        name: "Omar Elkenawy",
+        email: "omar.elkenawy@mnsu.edu",
+        password: "password0000",
+        role: "student",
+        position: "student",
+      },
+      {
+        name: "Connor Kulas",
+        email: "connor.kulas@mnsu.edu",
+        password: "password0000",
+        role: "student",
+        position: "student",
+      },
+      {
+        name: "Lilly Anderson",
+        email: "lilly.anderson@mnsu.edu",
+        password: "password0000",
+        role: "student",
+        position: "student",
+      },
+      {
+        name: "Rajesh Karki",
+        email: "rajesh.karki@mnsu.edu",
+        password: "password0000",
+        role: "student",
+        position: "student",
+      },
+    ];
+
+    // Hash passwords before inserting users
+    for (let user of users) {
+      const salt = await bcrypt.genSalt(10);
+      user.password = await bcrypt.hash(user.password, salt);
     }
 
-    // Hash the password before saving
-    const hashedPassword = await bcrypt.hash("password123", 10);
+    // Insert users into database
+    await User.insertMany(users);
+    console.log("✅ Users added successfully");
 
-    const user = new User({
-      name: "John Doe",
-      email: "john@example.com",
-      password: hashedPassword, // Store hashed password
-      role: "student",
-    });
-
-    await user.save();
-    console.log("✅ User added successfully with a hashed password.");
-    mongoose.connection.close();
+    mongoose.connection.close(); // Close DB connection
   })
   .catch((err) => console.log("❌ MongoDB Connection Failed:", err));
