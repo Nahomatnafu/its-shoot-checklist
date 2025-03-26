@@ -5,13 +5,13 @@ const checklistRoutes = require("./routes/checklistRoutes"); // Import checklist
 const cors = require("cors");
 require("dotenv").config();
 
-
-
-
 const app = express();
 
 // Connect to MongoDB
-connectDB();
+connectDB().catch((error) => {
+  console.error("❌ MongoDB Connection Failed:", error.message);
+  process.exit(1);
+});
 
 // Middleware
 app.use(express.json());

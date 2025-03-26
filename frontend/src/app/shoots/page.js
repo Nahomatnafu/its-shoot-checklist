@@ -23,14 +23,20 @@ export default function Shoots() {
                 {shoot.title} ({shoot.date})
               </strong>
               <ul className="mt-2">
-                {Object.entries(shoot.checklist).map(([item, checked]) => (
-                  <li
-                    key={item}
-                    className={checked ? "text-green-600" : "text-red-600"}
-                  >
-                    {checked ? "✅" : "❌"} {item}
+                {Object.keys(shoot.checklist).length > 0 ? (
+                  Object.entries(shoot.checklist).map(([item, checked]) => (
+                    <li
+                      key={item}
+                      className={checked ? "text-green-600" : "text-red-600"}
+                    >
+                      {checked ? "✅" : "❌"} {item}
+                    </li>
+                  ))
+                ) : (
+                  <li className="text-gray-500">
+                    No checklist items were checked.
                   </li>
-                ))}
+                )}
               </ul>
             </li>
           ))}

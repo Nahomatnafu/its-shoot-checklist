@@ -41,7 +41,12 @@ UserSchema.pre("save", async function (next) {
 
 // Compare entered password with hashed password
 UserSchema.methods.matchPassword = async function (enteredPassword) {
-  return await bcrypt.compare(enteredPassword, this.password);
+  try {
+    return await bcrypt.compare(enteredPassword, this.password);
+  } catch (error) {
+    console.error("❌ Password comparison error:", error);
+    return false;
+  }
 };
 
 // Export the model

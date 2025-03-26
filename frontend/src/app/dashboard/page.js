@@ -1,4 +1,4 @@
-"use client"; // ✅ Mark this as a client component
+"use client";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation"; // ✅ Use router.replace()
@@ -36,22 +36,23 @@ const shootTypes = [
 export default function Dashboard() {
   const router = useRouter();
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true); // ✅ Track if we're still checking auth
+  const [authChecked, setAuthChecked] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("authToken");
     const userData = localStorage.getItem("user");
 
     if (!token || !userData) {
-      router.replace("/login"); // ✅ Instantly redirect before rendering UI
-    } else {
-      setUser(JSON.parse(userData)); // ✅ Store user data
-      setLoading(false); // ✅ Mark authentication as checked
+      router.replace("/login"); // ✅ Redirect before rendering UI
+      return;
     }
+
+    setUser(JSON.parse(userData)); // ✅ Store user data
+    setAuthChecked(true); // ✅ Mark authentication as checked
   }, []);
 
-  // 🔥 Prevents ANY rendering (including Header) until authentication is checked
-  if (loading) return null;
+  // 🔥 Prevent rendering until authentication is checked
+  if (!authChecked) return null;
 
   return (
     <>
@@ -78,18 +79,6 @@ export default function Dashboard() {
             </div>
           ))}
         </div>
-
-        {/* 🔹 Logout Button */}
-        {/* <button
-          className={styles.logoutButton}
-          onClick={() => {
-            localStorage.removeItem("authToken");
-            localStorage.removeItem("user");
-            router.replace("/login"); // ✅ Redirect instantly on logout
-          }}
-        >
-          Logout
-        </button> */}
       </main>
       <Footer />
     </>

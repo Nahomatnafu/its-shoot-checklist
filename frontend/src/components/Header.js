@@ -1,4 +1,5 @@
 "use client";
+import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
@@ -6,6 +7,7 @@ import Image from "next/image";
 import styles from "./Header.module.css";
 
 export default function Header() {
+  const router = useRouter();
   const pathname = usePathname();
   if (pathname === "/login") return null;
 
@@ -91,8 +93,9 @@ export default function Header() {
         <button
           className={styles.logoutButton}
           onClick={() => {
-            localStorage.removeItem("userToken");
-            window.location.href = "/login";
+            localStorage.removeItem("authToken");
+            localStorage.removeItem("user");
+            router.replace("/login"); // ✅ Redirect instead of full reload
           }}
         >
           Logout
