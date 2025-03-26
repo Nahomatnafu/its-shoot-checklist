@@ -1,0 +1,159 @@
+.header {
+  background-color: #49306e; /* Purple */
+  color: white;
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 1.2rem;
+}
+
+/* 📌 Title (ITS Shoot-Checklist) */
+.titleContainer {
+  flex: 1; /* Takes up space to push logo to the center */
+  display: flex;
+  justify-content: flex-start; /* Aligns title to the left */
+}
+
+.title {
+  font-family: "Kanit", sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: white;
+  /* -webkit-text-stroke: 0.2px white; */
+}
+
+/* ✅ Make Title Clickable */
+.titleLink {
+  text-decoration: none;
+  color: white;
+  transition: opacity 0.2s;
+}
+
+.titleLink:hover {
+  opacity: 0.8;
+}
+
+/* 📌 Logo Container */
+.logoContainer {
+  flex: 1; /* Allows the logo to stay centered */
+  display: flex;
+  justify-content: center; /* Centers the logo */
+}
+.logoContainer a {
+  display: flex;
+  justify-content: center;
+  margin-right: 160px;
+}
+.logo {
+  max-width: 55px;
+  height: auto;
+  transition: box-shadow 0.3s ease-in-out;
+}
+
+.logoContainer a:hover .logo {
+  filter: drop-shadow(0px 4px 6px rgba(255, 166, 0, 0.68)); /* ✅ Orange glow */
+  transition: filter 0.3s ease-in-out;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-right: 60px;
+
+}
+
+/* 📌 Dropdown */
+.dropdownContainer {
+  position: relative;
+}
+
+.navButton {
+  background-color: #febd11; /* Yellow */
+  color: #49306e;
+  padding: 0.25rem 1rem;
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+  border-radius: 25px;
+  font-weight: lighter;
+  font-size: 18px;
+  box-shadow: 0px 2px 2px 4px rgba(0, 0, 0, 0.078);
+  cursor: pointer;
+  border: none;
+  transition: background 0.2s;
+}
+
+.navButton:hover {
+  background-color: #f1ac00;
+}
+
+.dropdownMenu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: #ffe8b5;
+  border-radius: 5px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  width: 200px;
+  z-index: 10;
+  margin-top: 10px;
+}
+
+.dropdownItem {
+  display: block;
+  padding: 0.35rem 0.95rem;
+  text-decoration: none;
+  color: #ffa600;
+  font-family: "Kanit", sans-serif;
+  font-weight: 500;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.078);
+  transition: background 0.2s;
+  -webkit-text-stroke: 0.2px black;
+}
+
+.dropdownItem:hover {
+  background-color: #594379;
+}
+
+/* 📌 Logout Button */
+.logoutButton {
+  background: transparent;
+  color: white;
+  border: 2px solid rgb(241, 161, 13);
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+  font-weight: lighter;
+  font-size: 18px;
+  padding: 0.25rem 1rem;
+  border-radius: 25px;
+  box-shadow: 0px 4px 2px 4px rgba(0, 0, 0, 0.078);
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.logoutButton:hover {
+  background: #de9e28;
+  color: #49306e;
+}
+
+/* ✅ Profile Image Next to Logout */
+.userProfile {
+  display: flex;
+  align-items: center;
+  margin-left: auto; /* ✅ Pushes elements to the right */
+}
+
+/* ✅ Fix Stretched Image */
+.userImage {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid white;
+  transition: transform 0.2s ease-in-out;
+}
+
+.userImage:hover {
+  transform: scale(1.1);
+}

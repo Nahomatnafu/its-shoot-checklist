@@ -1,0 +1,162 @@
+.container {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.heading {
+  font-family: "Kanit", sans-serif;
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: black;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.394);
+  margin-bottom: 25px;
+}
+
+/* 📌 Two-column layout */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+/* 📌 Wrapper to group each category with its items */
+.categoryWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ✅ Category Title with "Select All" Circular Checkbox */
+.category {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem; /* Space between checkbox and title */
+  padding: 0.7rem 1.2rem;
+  border-radius: 35px;
+  text-align: center;
+  width: 100%;
+}
+
+/* ✅ Style the Category Checkbox (Make it Circular) */
+.categoryCheckbox {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%; /* ✅ Makes it circular */
+  border: 2px solid white; /* ✅ Adds border to match text */
+  background-color: transparent;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  appearance: none; /* ✅ Hides default checkbox */
+  display: inline-block;
+}
+
+/* ✅ When checked, change background */
+.categoryCheckbox:checked {
+  background-color: white; /* ✅ Fills it white */
+  border: 2px solid #febd11; /* ✅ Yellow outline when checked */
+  box-shadow: 0px 0px 6px rgba(255, 189, 17, 0.7); /* ✅ Subtle glow effect */
+}
+
+/* ✅ Style the Radio Button */
+.categoryRadio {
+  width: 14px;
+  height: 14px;
+  accent-color: white; /* ✅ Match category color */
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.categoryRadio:checked {
+  transform: scale(1.1); /* ✅ Slight scale effect */
+}
+
+.yellow {
+  background-color: #febd11;
+  color: black;
+}
+
+.purple {
+  background-color: #49306e;
+  color: white;
+}
+
+.categoryTitle {
+  font-family: "Kanit", sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  /* -webkit-text-stroke: 1.2px black; */
+}
+
+/* 📌 Items section (white background) */
+.items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: white;
+  width: 100%;
+  border-radius: 5px;
+}
+
+/* 📌 Each equipment item (radio button + text) */
+.item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  background: white;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+}
+
+/* 📌 Radio button styling */
+.checkbox {
+  accent-color: #49306e;
+  transform: scale(1.2);
+  cursor: pointer;
+}
+
+/* 📌 Black text for all items */
+.itemText {
+  color: black;
+  font-weight: 500;
+}
+
+.optional {
+  font-size: 0.9rem;
+  color: gray;
+}
+
+/* ✅ Save Button Inside Container */
+.saveButton {
+  position: absolute; /* Instead of fixed */
+  bottom: 2rem; /* Push away from bottom */
+  right: 2rem; /* Push away from right */
+  padding: 0.75rem 2rem;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: white;
+  background-color: #49306e; /* Purple */
+  border: 1.5px solid #febd11; /* Yellow Border */
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+  box-shadow: 1px 2px 9px rgba(0, 0, 0, 0.2);
+}
+
+.saveButton:hover {
+  background-color: #5b3a8a;
+  transform: scale(1.05);
+}
+
+/* ✅ Ensure Parent Container is Relative */
+.container {
+  position: relative; /* Needed for absolute positioning inside */
+  padding-bottom: 5rem; /* Ensure space for button */
+}

@@ -1,0 +1,12 @@
+.footer {
+    background-color: #321d50; /* ✅ Dark Purple */
+    color: #f1a10d;
+    text-align: center;
+    padding: 1rem;
+    font-size: 1rem;
+    font-weight: 500;
+    /* margin-top: 2rem; */
+    position: relative;
+    width: 100%;
+  }
+  
