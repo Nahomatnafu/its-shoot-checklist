@@ -1,0 +1,149 @@
+.editButton {
+  background-color: #febd11; /* Orange */
+  color: #49306e;
+  padding: 0.5rem 1rem;
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+  border-radius: 25px;
+  font-weight: lighter;
+  transition: background 0.2s;
+}
+
+.editButton:hover {
+  background-color: #e0a400; /* Darker Orange */
+}
+
+.deleteButton {
+  background-color: hsl(0, 87%, 67%); /* Red */
+  color: #49306e;
+
+  padding: 0.5rem 1rem;
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+  border-radius: 25px;
+  font-weight: lighter;
+  transition: background 0.2s;
+}
+
+.deleteButton:hover {
+  background-color: #ffb5b5; /* Darker Red */
+}
+
+.usersHeading {
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+  font-size: 36px;
+  color: #49306e;
+}
+.userName {
+  font-family: "Franklin Gothic Light", "Arial", sans-serif;
+  font-size: 18px;
+}
+
+.saveButton {
+  background-color: #22c55e; /* Green */
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  transition: background 0.2s;
+}
+
+.saveButton:hover {
+  background-color: #16a34a; /* Darker Green */
+}
+
+.cancelButton {
+  background-color: #6b7280; /* Gray */
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  transition: background 0.2s;
+}
+
+.cancelButton:hover {
+  background-color: #4b5563; /* Darker Gray */
+}
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background-color: #49306e;
+  background-image: url("/pattern.svg");
+  background-size: 5%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modalCard {
+  background: #704da6;
+  padding: 2rem;
+  border-radius: 1rem;
+  max-width: 400px;
+  width: 100%;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.modalTitle {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  text-align: center;
+  color: #febd11;
+}
+
+.modalForm input,
+.modalForm select {
+
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 0.375rem;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  width: 100%;
+}
+
+.modalForm .buttonGroup {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.modalForm button {
+  flex: 1;
+  padding: 0.5rem;
+  border: none;
+  border-radius: 0.375rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.modalForm button[type="submit"] {
+  background: #febd11;
+  color: white;
+}
+
+.modalForm button[type="submit"]:hover {
+  background: #307a4b;
+}
+
+.modalForm button[type="button"] {
+  background: #ff7174; /* gray */
+  color: white;
+}
+
+.modalForm button[type="button"]:hover {
+  background: #6b7280;
+}
+.selectDropdown {
+  background-color: #fff;
+  color: #000;
+  border-radius: 6px;
+  padding: 0.5rem;
+  border: none;
+  outline: none;
+  font-weight: 500;
+}
+
+.selectDropdown option {
+  background-color: #febd11; /* Purple background */
+  color: white;
+}

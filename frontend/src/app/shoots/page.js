@@ -1,43 +1,41 @@
 "use client";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
-export default function Shoots() {
+export default function ShootsPage() {
   const [shoots, setShoots] = useState([]);
+  const router = useRouter();
 
   useEffect(() => {
     const storedShoots = JSON.parse(localStorage.getItem("savedShoots")) || [];
     setShoots(storedShoots);
   }, []);
 
+  const handleShootClick = (index) => {
+    router.push(`/shoots/${index}`);
+  };
+
   return (
     <main className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Saved Shoots</h1>
+      <h1
+        className="text-3xl font-bold mb-6"
+        style={{ fontFamily: "Franklin Gothic Medium" }}
+      >
+        Saved Shoots
+      </h1>
 
       {shoots.length === 0 ? (
-        <p>No shoots saved yet.</p>
+        <p className="text-gray-500">No shoots saved yet.</p>
       ) : (
-        <ul>
+        <ul className="space-y-3">
           {shoots.map((shoot, index) => (
-            <li key={index} className="p-4 bg-gray-100 rounded mb-2">
-              <strong>
-                {shoot.title} ({shoot.date})
-              </strong>
-              <ul className="mt-2">
-                {Object.keys(shoot.checklist).length > 0 ? (
-                  Object.entries(shoot.checklist).map(([item, checked]) => (
-                    <li
-                      key={item}
-                      className={checked ? "text-green-600" : "text-red-600"}
-                    >
-                      {checked ? "✅" : "❌"} {item}
-                    </li>
-                  ))
-                ) : (
-                  <li className="text-gray-500">
-                    No checklist items were checked.
-                  </li>
-                )}
-              </ul>
+            <li
+              key={index}
+              onClick={() => handleShootClick(index)}
+              className="bg-yellow-100 text-purple-900 font-semibold rounded-lg p-4 cursor-pointer hover:bg-yellow-200 shadow-md transition"
+            >
+              📸 {shoot.title}{" "}
+              <span className="text-sm text-gray-600">({shoot.date})</span>
             </li>
           ))}
         </ul>

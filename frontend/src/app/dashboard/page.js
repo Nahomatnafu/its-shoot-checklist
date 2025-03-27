@@ -1,8 +1,9 @@
 "use client";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation"; // ✅ Use router.replace()
-import styles from "./Dashboard.module.css";
+import { useRouter } from "next/navigation";
+import styles from "../../../styles/Dashboard.module.css";
+
 import Footer from "@/components/Footer";
 
 const shootTypes = [

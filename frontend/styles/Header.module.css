@@ -43,7 +43,7 @@
 .logoContainer a {
   display: flex;
   justify-content: center;
-  margin-right: 160px;
+  margin-right: 50px;
 }
 .logo {
   max-width: 55px;
@@ -60,7 +60,7 @@
   display: flex;
   align-items: center;
   gap: 1rem;
-  margin-right: 60px;
+  /* margin-right: 60px; */
 
 }
 

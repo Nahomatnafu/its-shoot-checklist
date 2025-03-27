@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
-import styles from "./ShootTypePage.module.css";
+import styles from "../../styles/ShootTypePage.module.css";
 
 export default function ShootTypePage({ title, categories }) {
   const [checkedItems, setCheckedItems] = useState({});

@@ -4,6 +4,7 @@ import checklists from "@/data/checklists";
 import ShootTypePage from "@/components/ShootTypePage";
 import Footer from "@/components/Footer";
 
+
 export default function ShootTypeChecklistPage() {
   const { type } = useParams();
   const checklist = checklists[type];

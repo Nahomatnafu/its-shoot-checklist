@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import styles from "./Login.module.css";
+import styles from "../../../styles/Login.module.css";
 import { FiEye, FiEyeOff } from "react-icons/fi"; // 👁️
 
 export default function LoginPage() {

@@ -4,12 +4,21 @@ import { usePathname } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import styles from "./Header.module.css";
+import styles from "../../styles/Header.module.css";
 
 export default function Header() {
+  //
   const router = useRouter();
   const pathname = usePathname();
-  if (pathname === "/login") return null;
+
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
@@ -36,12 +45,14 @@ export default function Header() {
     };
   }, []);
 
+  if (pathname === "/login") return null;
+
   return (
     <header className={styles.header}>
       {/* ✅ Left: ITS Shoot-Checklist Title */}
       <div className={styles.titleContainer}>
         <Link href="/dashboard" className={styles.titleLink}>
-          <h1 className={styles.title}>ITS Shoot Checklist_V01</h1>
+          <h1 className={styles.title}>ITS Shoot Checklist</h1>
         </Link>
       </div>
 
@@ -58,7 +69,7 @@ export default function Header() {
         </Link>
       </div>
 
-      {/* ✅ Right: Shoots Button, Shoot Type Dropdown, Logout, User Profile */}
+      {/* ✅ Right: Shoots Button, Shoot Type Dropdown, Admin Icon, Logout, User Profile */}
       <nav className={styles.nav}>
         {/* 🔹 NEW: Shoots Button */}
         <Link href="/shoots" className={styles.navButton}>
@@ -89,13 +100,24 @@ export default function Header() {
           )}
         </div>
 
+        {/* 🔥 Admin Button (Only visible to admins) */}
+        {user?.role === "admin" && (
+          <button
+            className={styles.adminButton}
+            onClick={() => router.push("/admin")}
+            title="Admin Panel"
+          >
+            ⚡
+          </button>
+        )}
+
         {/* ✅ Logout Button */}
         <button
           className={styles.logoutButton}
           onClick={() => {
             localStorage.removeItem("authToken");
             localStorage.removeItem("user");
-            router.replace("/login"); // ✅ Redirect instead of full reload
+            router.replace("/login");
           }}
         >
           Logout

@@ -19,7 +19,7 @@ const UserSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["student", "admin"], // Users can be either a student or faculty
+      enum: ["student", "admin", "its-staff"], // Users can be either a student or faculty
       default: "student",
     },
   },
