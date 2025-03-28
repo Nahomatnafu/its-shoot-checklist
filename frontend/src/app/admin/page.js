@@ -1,10 +1,12 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import styles from "../../../styles/Admin.module.css";
 
 export default function AdminPage() {
   const router = useRouter();
+
+  const [isAuthorized, setIsAuthorized] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -12,12 +14,21 @@ export default function AdminPage() {
     role: "student",
   });
 
-  // ✅ Handle input changes
+  useEffect(() => {
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    if (!storedUser || storedUser.role !== "admin") {
+      router.replace("/dashboard");
+    } else {
+      setIsAuthorized(true);
+    }
+  }, []);
+
+  if (!isAuthorized) return null;
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // ✅ Handle form submission (Add user)
   const handleSubmit = async (e) => {
     e.preventDefault();
     const newUser = { ...formData, password: "password0000" };
@@ -25,9 +36,7 @@ export default function AdminPage() {
     try {
       const res = await fetch("http://localhost:5000/api/auth/register", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newUser),
       });
 
@@ -90,7 +99,6 @@ export default function AdminPage() {
           <button className={styles.button}>Add User</button>
         </form>
 
-        {/* 🔹 Users Button to Navigate to Users List */}
         <button
           className={styles.secondaryButton}
           onClick={() => router.push("/admin/users")}

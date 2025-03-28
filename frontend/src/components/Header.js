@@ -1,25 +1,16 @@
 "use client";
-import { useRouter } from "next/navigation";
-import { usePathname } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import styles from "../../styles/Header.module.css";
 
 export default function Header() {
-  //
   const router = useRouter();
   const pathname = usePathname();
 
   const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-  }, []);
-
+  const [isLoading, setIsLoading] = useState(true); // ✅ new loading state
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
@@ -30,6 +21,28 @@ export default function Header() {
     { name: "B-Roll Shoot (Coverage)", path: "/shoot-types/coverage" },
     { name: "Photoshoot", path: "/shoot-types/photoshoot" },
   ];
+
+  // ✅ Fetch user on load and watch for localStorage changes
+  useEffect(() => {
+    const loadUser = () => {
+      const storedUser = localStorage.getItem("user");
+      if (storedUser) {
+        setUser(JSON.parse(storedUser));
+      } else {
+        setUser(null);
+      }
+      setIsLoading(false);
+    };
+
+    loadUser();
+
+    // ✅ Listen for changes to localStorage (e.g. after login/logout)
+    window.addEventListener("storage", loadUser);
+
+    return () => {
+      window.removeEventListener("storage", loadUser);
+    };
+  }, []);
 
   // ✅ Close dropdown when clicking outside
   useEffect(() => {
@@ -45,7 +58,8 @@ export default function Header() {
     };
   }, []);
 
-  if (pathname === "/login") return null;
+  // ✅ Don't show header while loading OR on login page
+  if (pathname === "/login" || isLoading) return null;
 
   return (
     <header className={styles.header}>
@@ -69,14 +83,13 @@ export default function Header() {
         </Link>
       </div>
 
-      {/* ✅ Right: Shoots Button, Shoot Type Dropdown, Admin Icon, Logout, User Profile */}
+      {/* ✅ Right Nav */}
       <nav className={styles.nav}>
-        {/* 🔹 NEW: Shoots Button */}
         <Link href="/shoots" className={styles.navButton}>
           Shoots
         </Link>
 
-        {/* ✅ Shoot Type Dropdown */}
+        {/* ✅ Dropdown */}
         <div className={styles.dropdownContainer} ref={dropdownRef}>
           <button
             className={styles.navButton}
@@ -100,7 +113,7 @@ export default function Header() {
           )}
         </div>
 
-        {/* 🔥 Admin Button (Only visible to admins) */}
+        {/* 🔥 Admin Icon */}
         {user?.role === "admin" && (
           <button
             className={styles.adminButton}
@@ -111,7 +124,7 @@ export default function Header() {
           </button>
         )}
 
-        {/* ✅ Logout Button */}
+        {/* ✅ Logout */}
         <button
           className={styles.logoutButton}
           onClick={() => {
@@ -123,7 +136,7 @@ export default function Header() {
           Logout
         </button>
 
-        {/* ✅ User Profile Image */}
+        {/* ✅ Avatar */}
         <div className={styles.userProfile}>
           <Image
             src="/quentin.png"

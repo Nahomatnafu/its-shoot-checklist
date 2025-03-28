@@ -1,14 +1,29 @@
 "use client";
 import styles from "../../../../styles/Users.module.css";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function UsersPage() {
+  const router = useRouter();
+  const [isAuthorized, setIsAuthorized] = useState(false); // ✅ auth check
   const [users, setUsers] = useState([]);
-  const [editUser, setEditUser] = useState(null); // ✅ Track user being edited
-  const [updatedUser, setUpdatedUser] = useState({}); // ✅ Store updated data
+  const [editUser, setEditUser] = useState(null);
+  const [updatedUser, setUpdatedUser] = useState({});
 
-  // ✅ Fetch all users
+  // ✅ Role protection check
   useEffect(() => {
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    if (!storedUser || storedUser.role !== "admin") {
+      router.replace("/dashboard"); // send unauthorized users away
+    } else {
+      setIsAuthorized(true);
+    }
+  }, []);
+
+  // ✅ Fetch users after auth check passes
+  useEffect(() => {
+    if (!isAuthorized) return;
+
     const fetchUsers = async () => {
       try {
         const res = await fetch("http://localhost:5000/api/auth/users");
@@ -20,9 +35,11 @@ export default function UsersPage() {
     };
 
     fetchUsers();
-  }, []);
+  }, [isAuthorized]);
 
-  // ✅ Handle user deletion
+  if (!isAuthorized) return null;
+
+  // ✅ Delete user
   const handleDelete = async (userId) => {
     if (!confirm("Are you sure you want to delete this user?")) return;
 
@@ -45,7 +62,6 @@ export default function UsersPage() {
     }
   };
 
-  // ✅ Open edit form with selected user data
   const handleEdit = (user) => {
     setEditUser(user);
     setUpdatedUser({
@@ -56,12 +72,10 @@ export default function UsersPage() {
     });
   };
 
-  // ✅ Handle input changes in edit form
   const handleChange = (e) => {
     setUpdatedUser({ ...updatedUser, [e.target.name]: e.target.value });
   };
 
-  // ✅ Handle update submission
   const handleUpdate = async (e) => {
     e.preventDefault();
 
@@ -86,7 +100,7 @@ export default function UsersPage() {
             u._id === editUser._id ? { ...u, ...updatedUser } : u
           )
         );
-        setEditUser(null); // ✅ Close modal
+        setEditUser(null);
       } else {
         alert("❌ " + (data.message || "Failed to update user"));
       }
@@ -107,15 +121,12 @@ export default function UsersPage() {
             <span className={styles.userName}>{user.name}</span>
 
             <div className="flex gap-3">
-              {/* 🖊️ Edit Button */}
               <button
                 onClick={() => handleEdit(user)}
                 className={styles.editButton}
               >
                 Edit
               </button>
-
-              {/* 🗑️ Delete Button */}
               <button
                 onClick={() => handleDelete(user._id)}
                 className={styles.deleteButton}
@@ -127,7 +138,6 @@ export default function UsersPage() {
         ))}
       </ul>
 
-      {/* 🔹 Edit Modal */}
       {editUser && (
         <div className={styles.modalOverlay}>
           <div className={styles.modalCard}>
@@ -157,7 +167,6 @@ export default function UsersPage() {
                 onChange={handleChange}
                 className="p-2 border rounded"
               />
-
               <select
                 name="role"
                 value={updatedUser.role}

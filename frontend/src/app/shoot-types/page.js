@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 
+
 export default function ShootTypePage({ title, categories }) {
   const [checkedItems, setCheckedItems] = useState({});
 
@@ -12,21 +13,37 @@ export default function ShootTypePage({ title, categories }) {
   };
 
   const handleSave = () => {
-    console.log("📌 Save button clicked"); // ✅ Log when the function runs
-
-    const shootTitle = window.prompt("Enter a title for this shoot:");
-    console.log("📌 Shoot Title Entered:", shootTitle); // ✅ Log the entered title
-
-    if (!shootTitle) {
-      console.log("❌ No title entered, saving cancelled.");
-      return; // If user cancels, do nothing
-    }
+    const shootTitle = prompt("Enter a title for this shoot:");
+    if (!shootTitle) return;
+  
+    const storedShoots = JSON.parse(localStorage.getItem("savedShoots")) || [];
+  
+    const newShoot = {
+      title: shootTitle,
+      date: new Date().toLocaleDateString(),
+      type, // <- keep track of the shoot type
+      checklist: checkedItems, // ✅ user-selected checkboxes
+      template: categories,    // ✅ full shoot type template (with all categories & items)
+    };
+  
+    localStorage.setItem(
+      "savedShoots",
+      JSON.stringify([...storedShoots, newShoot])
+    );
+  
+    alert("✅ Shoot saved successfully!");
+    router.push("/shoots");
+  };
+  
+  
 
     const storedShoots = JSON.parse(localStorage.getItem("savedShoots")) || [];
     const newShoot = {
       title: shootTitle,
       date: new Date().toLocaleDateString(),
-      checklist: checkedItems, // Save checked items
+      type, // ← from useParams()
+      checklist: checkedItems, // Only checked items
+      template: categories, // Full template with all categories and items
     };
 
     localStorage.setItem(

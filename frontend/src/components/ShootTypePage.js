@@ -46,26 +46,25 @@ export default function ShootTypePage({ title, categories }) {
 
   const handleSave = () => {
     const shootTitle = prompt("Enter a title for this shoot:");
-    if (!shootTitle) return; // If user cancels, do nothing
-
-    // ✅ Retrieve existing shoots from localStorage or initialize empty array
+    if (!shootTitle) return;
+  
     const storedShoots = JSON.parse(localStorage.getItem("savedShoots")) || [];
-
-    // ✅ Store new shoot with title, date, and checked items
+  
     const newShoot = {
       title: shootTitle,
       date: new Date().toLocaleDateString(),
-      checklist: checkedItems, // Save all checked items
+      type, // <- keep track of the shoot type
+      checklist: checkedItems, // ✅ user-selected checkboxes
+      template: categories,    // ✅ full shoot type template (with all categories & items)
     };
-
-    // ✅ Save updated shoots list in localStorage
+  
     localStorage.setItem(
       "savedShoots",
       JSON.stringify([...storedShoots, newShoot])
     );
-
-    alert("Shoot saved successfully!"); // ✅ Show success message
-    router.push("/shoots"); // ✅ Redirect to Shoots page
+  
+    alert("✅ Shoot saved successfully!");
+    router.push("/shoots");
   };
 
   return (
