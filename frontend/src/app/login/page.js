@@ -32,7 +32,8 @@ export default function LoginPage() {
         // 🔹 Store the token in localStorage
         localStorage.setItem("authToken", data.token);
         localStorage.setItem("user", JSON.stringify(data.user)); // Store user details
-
+        // Force Header to re-check user state
+        window.dispatchEvent(new Event("storage"));
         setTimeout(() => {
           router.push("/dashboard"); // Redirect to dashboard after login
         }, 1000);

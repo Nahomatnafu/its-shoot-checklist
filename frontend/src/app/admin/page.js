@@ -15,15 +15,19 @@ export default function AdminPage() {
   });
 
   useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem("user"));
-    if (!storedUser || storedUser.role !== "admin") {
-      router.replace("/dashboard");
-    } else {
-      setIsAuthorized(true);
+    const token = localStorage.getItem("authToken");
+    const userData = localStorage.getItem("user");
+
+    if (!token || !userData) {
+      router.replace("/login");
+      return;
     }
+
+    setUser(JSON.parse(userData));
+    setAuthChecked(true);
   }, []);
 
-  if (!isAuthorized) return null;
+  if (!authChecked) return null;
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });

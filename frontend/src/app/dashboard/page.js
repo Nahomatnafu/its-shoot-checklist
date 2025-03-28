@@ -44,12 +44,12 @@ export default function Dashboard() {
     const userData = localStorage.getItem("user");
 
     if (!token || !userData) {
-      router.replace("/login"); // ✅ Redirect before rendering UI
+      router.replace("/login");
       return;
     }
 
-    setUser(JSON.parse(userData)); // ✅ Store user data
-    setAuthChecked(true); // ✅ Mark authentication as checked
+    setUser(JSON.parse(userData));
+    setAuthChecked(true);
   }, []);
 
   // 🔥 Prevent rendering until authentication is checked

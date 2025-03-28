@@ -22,22 +22,19 @@ export default function UsersPage() {
 
   // ✅ Fetch users after auth check passes
   useEffect(() => {
-    if (!isAuthorized) return;
+    const token = localStorage.getItem("authToken");
+    const userData = localStorage.getItem("user");
 
-    const fetchUsers = async () => {
-      try {
-        const res = await fetch("http://localhost:5000/api/auth/users");
-        const data = await res.json();
-        setUsers(data);
-      } catch (error) {
-        console.error("❌ Error fetching users:", error);
-      }
-    };
+    if (!token || !userData) {
+      router.replace("/login");
+      return;
+    }
 
-    fetchUsers();
-  }, [isAuthorized]);
+    setUser(JSON.parse(userData));
+    setAuthChecked(true);
+  }, []);
 
-  if (!isAuthorized) return null;
+  if (!authChecked) return null;
 
   // ✅ Delete user
   const handleDelete = async (userId) => {
