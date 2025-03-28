@@ -23,11 +23,15 @@ export default function AdminPage() {
       return;
     }
 
-    setUser(JSON.parse(userData));
-    setAuthChecked(true);
+    const user = JSON.parse(userData);
+    if (user.role !== "admin") {
+      router.replace("/dashboard");
+    } else {
+      setIsAuthorized(true);
+    }
   }, []);
 
-  if (!authChecked) return null;
+  if (!isAuthorized) return null;
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });

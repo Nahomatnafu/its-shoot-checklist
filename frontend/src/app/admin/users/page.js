@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 
 export default function UsersPage() {
   const router = useRouter();
-  const [isAuthorized, setIsAuthorized] = useState(false); // ✅ auth check
+  const [isAuthorized, setIsAuthorized] = useState(false);
   const [users, setUsers] = useState([]);
   const [editUser, setEditUser] = useState(null);
   const [updatedUser, setUpdatedUser] = useState({});
@@ -14,27 +14,30 @@ export default function UsersPage() {
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
     if (!storedUser || storedUser.role !== "admin") {
-      router.replace("/dashboard"); // send unauthorized users away
+      router.replace("/dashboard");
     } else {
       setIsAuthorized(true);
     }
   }, []);
 
-  // ✅ Fetch users after auth check passes
+  // ✅ Fetch users if authorized
   useEffect(() => {
-    const token = localStorage.getItem("authToken");
-    const userData = localStorage.getItem("user");
+    if (!isAuthorized) return;
 
-    if (!token || !userData) {
-      router.replace("/login");
-      return;
-    }
+    const fetchUsers = async () => {
+      try {
+        const res = await fetch("http://localhost:5000/api/auth/users");
+        const data = await res.json();
+        setUsers(data);
+      } catch (error) {
+        console.error("❌ Error fetching users:", error);
+      }
+    };
 
-    setUser(JSON.parse(userData));
-    setAuthChecked(true);
-  }, []);
+    fetchUsers();
+  }, [isAuthorized]);
 
-  if (!authChecked) return null;
+  if (!isAuthorized) return null;
 
   // ✅ Delete user
   const handleDelete = async (userId) => {
@@ -116,7 +119,6 @@ export default function UsersPage() {
             className="flex justify-between items-center p-2 border-b"
           >
             <span className={styles.userName}>{user.name}</span>
-
             <div className="flex gap-3">
               <button
                 onClick={() => handleEdit(user)}
