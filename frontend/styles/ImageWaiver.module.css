@@ -1,0 +1,127 @@
+.logoContainer {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 10px;
+}
+
+.logo {
+  height: 80px;
+  width: auto;
+}
+
+.waiverContainer {
+  max-width: 900px;
+  margin: 20px auto;
+  padding: 40px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  font-family: Arial, sans-serif;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.subTitle {
+  font-size: 18px;
+  font-weight: bold;
+  margin: 20px 0 10px;
+}
+
+.paragraph {
+  margin: 20px 20px;
+  line-height: 1.5;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.input,
+.cityInput,
+.stateInput,
+.zipInput {
+  width: 60%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.cityInput {
+  flex: 2;
+}
+
+.stateInput {
+  flex: 1;
+}
+
+.zipInput {
+  flex: 1.5;
+}
+
+.row {
+  display: flex;
+  gap: 8px;
+}
+
+.submitButton {
+  padding: 10px;
+  background-color: #49306e;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 15px;
+}
+
+.submitButton:hover {
+  background-color: #402e63;
+}
+
+.separator {
+  margin: 20px 0;
+  border: 1px solid #ddd;
+}
+
+.container {
+  padding: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+}
+
+.buttonContainer {
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.waiverWrapper {
+  position: relative;
+}
+
+.topLeftButtonContainer {
+  position: absolute;
+  top: 50px;
+  right: 50px; /* Move further to the left */
+}
+
+.viewButton {
+  padding: 0.5rem 1rem;
+  background-color: #febd11;
+  color: #49306e;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.viewButton:hover {
+  background-color: #f1ac00;
+}

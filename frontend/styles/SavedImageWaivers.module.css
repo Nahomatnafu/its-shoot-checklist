@@ -1,0 +1,97 @@
+/* 📦 Layout & Typography */
+.container {
+  padding: 1rem;
+  max-width: 800px;
+  margin: 0 auto;
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+}
+
+.heading {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #f1b40e;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+/* 📋 Waiver List */
+.waiverList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.waiverCard {
+  background-color: #fff3c4;
+  border: 1px solid #fed74a;
+  border-radius: 0.6rem;
+  padding: 1rem 1.5rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+  color: #49306e;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.waiverCard:hover {
+  background-color: #ffe272;
+}
+
+.waiverInfo {
+  flex: 1;
+}
+
+.deleteButton {
+  background-color: #ff4d4d;
+  color: white;
+  padding: 0.4rem 1rem;
+  border-radius: 0.4rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  border: none;
+  margin-left: 1rem;
+  transition: background 0.2s ease;
+}
+
+.deleteButton:hover {
+  background-color: #e60000;
+}
+
+.backButton {
+  margin-top: 0.5rem;
+  padding: 0.5rem 1rem;
+  background-color: #49306e;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.backButton:hover {
+  background-color: #402e63;
+}
+
+/* ❌ No Results */
+.noWaivers {
+  text-align: center;
+  font-size: 1.1rem;
+  color: #999;
+}
+.details {
+  background-color: #fff3c4;
+  border: 1px solid #fed74a;
+  border-radius: 0.6rem;
+  padding: 1.5rem;
+  margin: 1rem 0;
+  font-size: 1.1rem;
+  color: #49306e;
+}
+
+.details p {
+  margin: 0.5rem 0;
+}

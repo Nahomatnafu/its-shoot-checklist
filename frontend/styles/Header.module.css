@@ -1,5 +1,5 @@
 .header {
-  background-color: #49306e; /* Purple */
+  background-color: #49306e;
   color: white;
   padding: 1rem 2rem;
   display: flex;
@@ -8,11 +8,23 @@
   font-size: 1.2rem;
 }
 
-/* 📌 Title (ITS Shoot-Checklist) */
-.titleContainer {
-  flex: 1; /* Takes up space to push logo to the center */
+/* Left Container with Title and Nav */
+.leftContainer {
   display: flex;
-  justify-content: flex-start; /* Aligns title to the left */
+  align-items: center;
+  gap: 1rem;
+  flex: 1;
+}
+
+.titleContainer {
+  display: flex;
+  align-items: center;
+}
+
+.leftNav {
+  display: flex;
+  gap: 1rem;
+  margin-left: 1rem;
 }
 
 .title {
@@ -20,10 +32,8 @@
   font-size: 1.25rem;
   font-weight: 700;
   color: white;
-  /* -webkit-text-stroke: 0.2px white; */
 }
 
-/* ✅ Make Title Clickable */
 .titleLink {
   text-decoration: none;
   color: white;
@@ -34,50 +44,42 @@
   opacity: 0.8;
 }
 
-/* 📌 Logo Container */
+/* ✅ Centered Logo Container */
 .logoContainer {
-  flex: 1; /* Allows the logo to stay centered */
-  display: flex;
-  justify-content: center; /* Centers the logo */
-}
-.logoContainer a {
   display: flex;
   justify-content: center;
-  margin-right: 50px;
+  align-items: center;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
 }
+
 .logo {
   max-width: 55px;
   height: auto;
-  transition: box-shadow 0.3s ease-in-out;
-}
-
-.logoContainer a:hover .logo {
-  filter: drop-shadow(0px 4px 6px rgba(255, 166, 0, 0.68)); /* ✅ Orange glow */
   transition: filter 0.3s ease-in-out;
 }
 
-.nav {
+.logo:hover {
+  filter: drop-shadow(0px 4px 6px rgba(255, 189, 17, 0.7)); /* ✅ Golden Glow */
+}
+
+/* Right Navigation */
+.rightNav {
   display: flex;
   align-items: center;
   gap: 1rem;
-  /* margin-right: 60px; */
-
+  margin-left: auto;
 }
 
-/* 📌 Dropdown */
-.dropdownContainer {
-  position: relative;
-}
-
+/* 🔗 Navigation Button */
 .navButton {
-  background-color: #febd11; /* Yellow */
+  background-color: #febd11;
   color: #49306e;
   padding: 0.25rem 1rem;
-  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
   border-radius: 25px;
-  font-weight: lighter;
   font-size: 18px;
-  box-shadow: 0px 2px 2px 4px rgba(0, 0, 0, 0.078);
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
   cursor: pointer;
   border: none;
   transition: background 0.2s;
@@ -85,6 +87,11 @@
 
 .navButton:hover {
   background-color: #f1ac00;
+}
+
+/* 📌 Dropdown */
+.dropdownContainer {
+  position: relative;
 }
 
 .dropdownMenu {
@@ -141,7 +148,7 @@
 .userProfile {
   display: flex;
   align-items: center;
-  margin-left: auto; /* ✅ Pushes elements to the right */
+  margin-left: auto;
 }
 
 /* ✅ Fix Stretched Image */

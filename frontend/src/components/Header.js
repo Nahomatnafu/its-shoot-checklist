@@ -8,9 +8,8 @@ import styles from "../../styles/Header.module.css";
 export default function Header() {
   const router = useRouter();
   const pathname = usePathname();
-
   const [user, setUser] = useState(null);
-  const [isLoading, setIsLoading] = useState(true); // ✅ new loading state
+  const [isLoading, setIsLoading] = useState(true);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
@@ -22,7 +21,6 @@ export default function Header() {
     { name: "Photoshoot", path: "/shoot-types/photoshoot" },
   ];
 
-  // ✅ Fetch user on load and watch for localStorage changes
   useEffect(() => {
     const loadUser = () => {
       const storedUser = localStorage.getItem("user");
@@ -35,42 +33,44 @@ export default function Header() {
     };
 
     loadUser();
-
-    // ✅ Listen for changes to localStorage (e.g. after login/logout)
     window.addEventListener("storage", loadUser);
-
     return () => {
       window.removeEventListener("storage", loadUser);
     };
   }, []);
 
-  // ✅ Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setDropdownOpen(false);
       }
     }
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
-  // ✅ Don't show header while loading OR on login page
   if (pathname === "/login" || isLoading) return null;
 
   return (
     <header className={styles.header}>
-      {/* ✅ Left: ITS Shoot-Checklist Title */}
-      <div className={styles.titleContainer}>
+      {/* Left Side: Title and Nav */}
+      <div className={styles.leftContainer}>
         <Link href="/dashboard" className={styles.titleLink}>
           <h1 className={styles.title}>ITS Shoot Checklist</h1>
         </Link>
+        <div className={styles.leftNav}>
+          <Link href="/shoots" className={styles.navButton}>
+            Shoots
+          </Link>
+          <Link href="/image-waiver" className={styles.navButton}>
+            Image Waiver
+          </Link>
+        </div>
       </div>
 
-      {/* ✅ Centered MSU Logo */}
+      {/* Centered MSU Logo */}
       <div className={styles.logoContainer}>
         <Link href="/dashboard">
           <Image
@@ -83,13 +83,8 @@ export default function Header() {
         </Link>
       </div>
 
-      {/* ✅ Right Nav */}
-      <nav className={styles.nav}>
-        <Link href="/shoots" className={styles.navButton}>
-          Shoots
-        </Link>
-
-        {/* ✅ Dropdown */}
+      {/* Right Side: Nav, Admin, Logout, Profile */}
+      <nav className={styles.rightNav}>
         <div className={styles.dropdownContainer} ref={dropdownRef}>
           <button
             className={styles.navButton}
@@ -113,7 +108,6 @@ export default function Header() {
           )}
         </div>
 
-        {/* 🔥 Admin Icon */}
         {user?.role === "admin" && (
           <button
             className={styles.adminButton}
@@ -124,7 +118,6 @@ export default function Header() {
           </button>
         )}
 
-        {/* ✅ Logout */}
         <button
           className={styles.logoutButton}
           onClick={() => {
@@ -136,7 +129,6 @@ export default function Header() {
           Logout
         </button>
 
-        {/* ✅ Avatar */}
         <div className={styles.userProfile}>
           <Image
             src="/quentin.png"
