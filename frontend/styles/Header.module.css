@@ -89,6 +89,19 @@
   background-color: #f1ac00;
 }
 
+.adminButton {
+  background-color: transparent;
+  color: #febd11;
+  border: none;
+  cursor: pointer;
+  font-size: 1.5rem;
+  transition: transform 0.2s ease-in-out;
+}
+
+.adminButton:hover {
+  transform: scale(1.1); /* Slightly increase the size */
+}
+
 /* 📌 Dropdown */
 .dropdownContainer {
   position: relative;

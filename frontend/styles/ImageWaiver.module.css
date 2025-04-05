@@ -104,24 +104,3 @@
 .waiverWrapper {
   position: relative;
 }
-
-.topLeftButtonContainer {
-  position: absolute;
-  top: 50px;
-  right: 50px; /* Move further to the left */
-}
-
-.viewButton {
-  padding: 0.5rem 1rem;
-  background-color: #febd11;
-  color: #49306e;
-  border: none;
-  border-radius: 0.5rem;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.viewButton:hover {
-  background-color: #f1ac00;
-}

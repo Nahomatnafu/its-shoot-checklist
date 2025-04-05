@@ -1,15 +1,12 @@
 "use client";
 import styles from "../../styles/ImageWaiver.module.css";
 import React, { useState } from "react";
-import { useRouter } from "next/navigation";
 
 export default function ImageWaiverForm({
   onSave,
   formData = {},
   readOnly = false,
 }) {
-  const router = useRouter();
-
   const [formState, setFormState] = useState({
     projectName: "",
     projectDate: "",
@@ -42,15 +39,6 @@ export default function ImageWaiverForm({
 
   return (
     <div className={styles.waiverWrapper}>
-      <div className={styles.topLeftButtonContainer}>
-        <button
-          className={styles.viewButton}
-          onClick={() => router.push("/saved-image-waivers")}
-        >
-          View Saved
-        </button>
-      </div>
-
       <div className={styles.waiverContainer}>
         <div className={styles.logoContainer}>
           <img
@@ -217,7 +205,6 @@ export default function ImageWaiverForm({
             className={styles.input}
             readOnly={readOnly}
           />
-
           {!readOnly && (
             <button type="submit" className={styles.submitButton}>
               Submit Waiver

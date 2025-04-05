@@ -10,8 +10,10 @@ export default function Header() {
   const pathname = usePathname();
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const dropdownRef = useRef(null);
+  const [waiverDropdownOpen, setWaiverDropdownOpen] = useState(false);
+  const [shootDropdownOpen, setShootDropdownOpen] = useState(false);
+  const waiverDropdownRef = useRef(null);
+  const shootDropdownRef = useRef(null);
 
   const shootTypes = [
     { name: "A-Roll Shoot (Teleprompter)", path: "/shoot-types/teleprompter" },
@@ -41,8 +43,17 @@ export default function Header() {
 
   useEffect(() => {
     function handleClickOutside(event) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setDropdownOpen(false);
+      if (
+        waiverDropdownRef.current &&
+        !waiverDropdownRef.current.contains(event.target)
+      ) {
+        setWaiverDropdownOpen(false);
+      }
+      if (
+        shootDropdownRef.current &&
+        !shootDropdownRef.current.contains(event.target)
+      ) {
+        setShootDropdownOpen(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -64,9 +75,33 @@ export default function Header() {
           <Link href="/shoots" className={styles.navButton}>
             Shoots
           </Link>
-          <Link href="/image-waiver" className={styles.navButton}>
-            Image Waiver
-          </Link>
+          {/* Image Waiver Dropdown */}
+          <div className={styles.dropdownContainer} ref={waiverDropdownRef}>
+            <button
+              className={styles.navButton}
+              onClick={() => setWaiverDropdownOpen((prev) => !prev)}
+            >
+              Image Waiver ▼
+            </button>
+            {waiverDropdownOpen && (
+              <div className={styles.dropdownMenu}>
+                <Link
+                  href="/image-waiver"
+                  className={styles.dropdownItem}
+                  onClick={() => setWaiverDropdownOpen(false)}
+                >
+                  Create New
+                </Link>
+                <Link
+                  href="/saved-image-waivers"
+                  className={styles.dropdownItem}
+                  onClick={() => setWaiverDropdownOpen(false)}
+                >
+                  View Saved
+                </Link>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -85,21 +120,22 @@ export default function Header() {
 
       {/* Right Side: Nav, Admin, Logout, Profile */}
       <nav className={styles.rightNav}>
-        <div className={styles.dropdownContainer} ref={dropdownRef}>
+        {/* Shoot Type Dropdown */}
+        <div className={styles.dropdownContainer} ref={shootDropdownRef}>
           <button
             className={styles.navButton}
-            onClick={() => setDropdownOpen((prev) => !prev)}
+            onClick={() => setShootDropdownOpen((prev) => !prev)}
           >
             Shoot Type ▼
           </button>
-          {dropdownOpen && (
+          {shootDropdownOpen && (
             <div className={styles.dropdownMenu}>
               {shootTypes.map((shoot) => (
                 <Link
                   key={shoot.name}
                   href={shoot.path}
                   className={styles.dropdownItem}
-                  onClick={() => setDropdownOpen(false)}
+                  onClick={() => setShootDropdownOpen(false)}
                 >
                   {shoot.name}
                 </Link>
