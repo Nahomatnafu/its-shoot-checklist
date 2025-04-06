@@ -1,0 +1,175 @@
+.creditsWrapper {
+  max-width: 900px;
+  margin: 20px auto;
+  padding: 30px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  font-family: Arial, sans-serif;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  text-align: center;
+  color: #49306e;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.rolesContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: space-between;
+}
+
+.roleItem {
+  flex: 1 1 45%;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 10px;
+  margin-bottom: 10px;
+  position: relative;
+}
+
+.roleHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.roleButtons {
+  display: flex;
+  gap: 5px;
+}
+
+/* Input with icons inside */
+.inputWithIcons {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.inputWithIcons input {
+  width: 100%;
+  padding-right: 200px;
+}
+
+.iconButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 20px;
+  margin-left: 8px;
+  color: #49306e;
+  transition: color 0.2s;
+}
+
+.iconButton:hover {
+  color: #402e63;
+}
+
+.addPersonIcon,
+.removePersonIcon,
+.removeRoleIcon {
+  margin-left: 5px;
+  font-size: 20px;
+}
+
+/* Person Container */
+.personContainer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 5px 0;
+  position: relative;
+}
+
+.personIcons {
+  display: flex;
+  gap: 5px;
+}
+
+.addPersonIcon,
+.removePersonIcon {
+  margin-left: 5px;
+  font-size: 20px;
+}
+
+.addPersonIcon:hover,
+.removePersonIcon:hover {
+  color: #402e63;
+}
+
+/* Icon Placement Inside Input */
+.inputWithIcons .iconButton {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.inputWithIcons .addPersonIcon {
+  right: 40px;
+}
+
+.inputWithIcons .removePersonIcon {
+  right: 15px;
+  color: #d9534f;
+  font-size: 24px;
+}
+
+.inputWithIcons .removePersonIcon:hover {
+  color: #c9302c;
+}
+
+.addPersonIcon:hover,
+.removePersonIcon:hover {
+  color: #402e63;
+}
+
+.removeRoleIcon {
+  position: absolute;
+  right: 5px;
+  top: 5px;
+  color: #d9534f;
+}
+
+.removeRoleIcon:hover {
+  color: #c9302c;
+}
+
+.submitButton {
+  padding: 10px;
+  background-color: #49306e;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 15px;
+}
+
+.submitButton:hover {
+  background-color: #402e63;
+}
+
+.saveMessage {
+  text-align: center;
+  color: #28a745;
+  font-size: 18px;
+}

@@ -12,8 +12,12 @@ export default function Header() {
   const [isLoading, setIsLoading] = useState(true);
   const [waiverDropdownOpen, setWaiverDropdownOpen] = useState(false);
   const [shootDropdownOpen, setShootDropdownOpen] = useState(false);
-  const waiverDropdownRef = useRef(null);
-  const shootDropdownRef = useRef(null);
+  const [creditsDropdownOpen, setCreditsDropdownOpen] = useState(false);
+
+  // Separate refs for each dropdown
+  const waiverRef = useRef(null);
+  const shootRef = useRef(null);
+  const creditsRef = useRef(null);
 
   const shootTypes = [
     { name: "A-Roll Shoot (Teleprompter)", path: "/shoot-types/teleprompter" },
@@ -43,19 +47,17 @@ export default function Header() {
 
   useEffect(() => {
     function handleClickOutside(event) {
-      if (
-        waiverDropdownRef.current &&
-        !waiverDropdownRef.current.contains(event.target)
-      ) {
+      if (waiverRef.current && !waiverRef.current.contains(event.target)) {
         setWaiverDropdownOpen(false);
       }
-      if (
-        shootDropdownRef.current &&
-        !shootDropdownRef.current.contains(event.target)
-      ) {
+      if (shootRef.current && !shootRef.current.contains(event.target)) {
         setShootDropdownOpen(false);
       }
+      if (creditsRef.current && !creditsRef.current.contains(event.target)) {
+        setCreditsDropdownOpen(false);
+      }
     }
+
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
@@ -76,7 +78,7 @@ export default function Header() {
             Shoots
           </Link>
           {/* Image Waiver Dropdown */}
-          <div className={styles.dropdownContainer} ref={waiverDropdownRef}>
+          <div className={styles.dropdownContainer} ref={waiverRef}>
             <button
               className={styles.navButton}
               onClick={() => setWaiverDropdownOpen((prev) => !prev)}
@@ -121,7 +123,7 @@ export default function Header() {
       {/* Right Side: Nav, Admin, Logout, Profile */}
       <nav className={styles.rightNav}>
         {/* Shoot Type Dropdown */}
-        <div className={styles.dropdownContainer} ref={shootDropdownRef}>
+        <div className={styles.dropdownContainer} ref={shootRef}>
           <button
             className={styles.navButton}
             onClick={() => setShootDropdownOpen((prev) => !prev)}
@@ -140,6 +142,34 @@ export default function Header() {
                   {shoot.name}
                 </Link>
               ))}
+            </div>
+          )}
+        </div>
+
+        {/* Credits Dropdown */}
+        <div className={styles.dropdownContainer} ref={creditsRef}>
+          <button
+            className={styles.navButton}
+            onClick={() => setCreditsDropdownOpen((prev) => !prev)}
+          >
+            Credits ▼
+          </button>
+          {creditsDropdownOpen && (
+            <div className={styles.dropdownMenu}>
+              <Link
+                href="/credits/create"
+                className={styles.dropdownItem}
+                onClick={() => setCreditsDropdownOpen(false)}
+              >
+                Create New
+              </Link>
+              <Link
+                href="/credits"
+                className={styles.dropdownItem}
+                onClick={() => setCreditsDropdownOpen(false)}
+              >
+                View Saved
+              </Link>
             </div>
           )}
         </div>
