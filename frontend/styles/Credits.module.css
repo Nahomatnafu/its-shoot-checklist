@@ -173,3 +173,88 @@
   color: #28a745;
   font-size: 18px;
 }
+
+/* 📦 Layout & Typography */
+.container {
+  padding: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+}
+
+.heading {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #49306e;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+/* 🔍 Filter Bar */
+.filterBar {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.searchInput {
+  flex: 1;
+  padding: 0.6rem 1rem;
+  border: 1px solid #ccc;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+}
+
+/* 🎬 Credit List */
+.creditList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.creditCard {
+  background-color: #fff3c4;
+  border: 1px solid #fed74a;
+  border-radius: 0.6rem;
+  padding: 1rem 1.5rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+  color: #49306e;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.creditCard:hover {
+  background-color: #ffe272;
+}
+
+.creditInfo {
+  flex: 1;
+}
+
+.deleteButton {
+  background-color: #ff4d4d;
+  color: white;
+  padding: 0.4rem 1rem;
+  border-radius: 0.4rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  border: none;
+  margin-left: 1rem;
+  transition: background 0.2s ease;
+}
+
+.deleteButton:hover {
+  background-color: #e60000;
+}
+
+/* ❌ No Results */
+.noCredits {
+  text-align: center;
+  font-size: 1.1rem;
+  color: #999;
+}
