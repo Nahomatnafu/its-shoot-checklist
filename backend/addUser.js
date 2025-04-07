@@ -26,14 +26,14 @@ mongoose
         email: "nahom.atnafu@mnsu.edu",
         password: "password0000",
         role: "admin",
-        position: "student",
+        position: "Visual Content Producer",
       },
       {
         name: "Kathryn Petzel",
         email: "kathryn.petzel@mnsu.edu",
         password: "password0000",
         role: "admin",
-        position: "student",
+        position: "Visual Content Producer",
       },
       {
         name: "Amy Linde",
@@ -47,42 +47,42 @@ mongoose
         email: "isabelle.linden@mnsu.edu",
         password: "password0000",
         role: "admin",
-        position: "student",
+        position: "Visual Content Producer",
       },
       {
         name: "Derick Franklin",
         email: "derick.franklin@mnsu.edu",
         password: "password0000",
         role: "student",
-        position: "student",
+        position: "Visual Content Producer", // Updated default position
       },
       {
         name: "Omar Elkenawy",
         email: "omar.elkenawy@mnsu.edu",
         password: "password0000",
         role: "student",
-        position: "student",
+        position: "Visual Content Producer", // Updated default position
       },
       {
         name: "Connor Kulas",
         email: "connor.kulas@mnsu.edu",
         password: "password0000",
         role: "student",
-        position: "student",
+        position: "Visual Content Producer", // Updated default position
       },
       {
         name: "Lilly Anderson",
         email: "lilly.anderson@mnsu.edu",
         password: "password0000",
         role: "student",
-        position: "student",
+        position: "Visual Content Producer", // Updated default position
       },
       {
         name: "Rajesh Karki",
         email: "rajesh.karki@mnsu.edu",
         password: "password0000",
         role: "student",
-        position: "student",
+        position: "Visual Content Producer", // Updated default position
       },
     ];
 

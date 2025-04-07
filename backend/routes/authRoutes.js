@@ -79,6 +79,7 @@ router.post("/login", async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        position: user.position, // Include the position here
       },
     });
   } catch (error) {
@@ -143,4 +144,16 @@ router.put("/users/:id", async (req, res) => {
   }
 });
 
+router.get("/user/:email", async (req, res) => {
+  try {
+    const user = await User.findOne({ email: req.params.email });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.json(user);
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
 module.exports = router;

@@ -3,6 +3,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import ProfileModal from "../components/ProfileModal";
 import styles from "../../styles/Header.module.css";
 
 export default function Header() {
@@ -13,6 +14,7 @@ export default function Header() {
   const [waiverDropdownOpen, setWaiverDropdownOpen] = useState(false);
   const [shootDropdownOpen, setShootDropdownOpen] = useState(false);
   const [creditsDropdownOpen, setCreditsDropdownOpen] = useState(false);
+  const [profileModalOpen, setProfileModalOpen] = useState(false);
 
   // Separate refs for each dropdown
   const waiverRef = useRef(null);
@@ -28,14 +30,30 @@ export default function Header() {
   ];
 
   useEffect(() => {
-    const loadUser = () => {
-      const storedUser = localStorage.getItem("user");
-      if (storedUser) {
-        setUser(JSON.parse(storedUser));
-      } else {
-        setUser(null);
+    const loadUser = async () => {
+      try {
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+          const parsedUser = JSON.parse(storedUser);
+
+          // Fetch the latest user data from the backend
+          const response = await fetch(`/api/auth/user/${parsedUser.email}`);
+          if (response.ok) {
+            const updatedUser = await response.json();
+            // Update localStorage with the latest user data
+            localStorage.setItem("user", JSON.stringify(updatedUser));
+            setUser(updatedUser);
+          } else {
+            setUser(parsedUser); // Use localStorage if backend fails
+          }
+        } else {
+          setUser(null);
+        }
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Failed to load user:", error);
+        setIsLoading(false);
       }
-      setIsLoading(false);
     };
 
     loadUser();
@@ -67,144 +85,160 @@ export default function Header() {
   if (pathname === "/login" || isLoading) return null;
 
   return (
-    <header className={styles.header}>
-      {/* Left Side: Title and Nav */}
-      <div className={styles.leftContainer}>
-        <Link href="/dashboard" className={styles.titleLink}>
-          <h1 className={styles.title}>ITS Shoot Checklist</h1>
-        </Link>
-        <div className={styles.leftNav}>
-          <Link href="/shoots" className={styles.navButton}>
-            Shoots
+    <>
+      <header className={styles.header}>
+        {/* Left Side: Title and Nav */}
+        <div className={styles.leftContainer}>
+          <Link href="/dashboard" className={styles.titleLink}>
+            <h1 className={styles.title}>ITS Shoot Checklist</h1>
           </Link>
-          {/* Image Waiver Dropdown */}
-          <div className={styles.dropdownContainer} ref={waiverRef}>
+          <div className={styles.leftNav}>
+            <Link href="/shoots" className={styles.navButton}>
+              Shoots
+            </Link>
+            {/* Image Waiver Dropdown */}
+            <div className={styles.dropdownContainer} ref={waiverRef}>
+              <button
+                className={styles.navButton}
+                onClick={() => setWaiverDropdownOpen((prev) => !prev)}
+              >
+                Image Waiver ▼
+              </button>
+              {waiverDropdownOpen && (
+                <div className={styles.dropdownMenu}>
+                  <Link
+                    href="/image-waiver"
+                    className={styles.dropdownItem}
+                    onClick={() => setWaiverDropdownOpen(false)}
+                  >
+                    Create New
+                  </Link>
+                  <Link
+                    href="/saved-image-waivers"
+                    className={styles.dropdownItem}
+                    onClick={() => setWaiverDropdownOpen(false)}
+                  >
+                    View Saved
+                  </Link>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Centered MSU Logo */}
+        <div className={styles.logoContainer}>
+          <Link href="/dashboard">
+            <Image
+              src="/MSU_newLogo.png"
+              alt="MSU Logo"
+              width={90}
+              height={90}
+              className={styles.logo}
+            />
+          </Link>
+        </div>
+
+        {/* Right Side: Nav, Admin, Logout, Profile */}
+        <nav className={styles.rightNav}>
+          {/* Shoot Type Dropdown */}
+          <div className={styles.dropdownContainer} ref={shootRef}>
             <button
               className={styles.navButton}
-              onClick={() => setWaiverDropdownOpen((prev) => !prev)}
+              onClick={() => setShootDropdownOpen((prev) => !prev)}
             >
-              Image Waiver ▼
+              Shoot Type ▼
             </button>
-            {waiverDropdownOpen && (
+            {shootDropdownOpen && (
+              <div className={styles.dropdownMenu}>
+                {shootTypes.map((shoot) => (
+                  <Link
+                    key={shoot.name}
+                    href={shoot.path}
+                    className={styles.dropdownItem}
+                    onClick={() => setShootDropdownOpen(false)}
+                  >
+                    {shoot.name}
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Credits Dropdown */}
+          <div className={styles.dropdownContainer} ref={creditsRef}>
+            <button
+              className={styles.navButton}
+              onClick={() => setCreditsDropdownOpen((prev) => !prev)}
+            >
+              Credits ▼
+            </button>
+            {creditsDropdownOpen && (
               <div className={styles.dropdownMenu}>
                 <Link
-                  href="/image-waiver"
+                  href="/credits/create"
                   className={styles.dropdownItem}
-                  onClick={() => setWaiverDropdownOpen(false)}
+                  onClick={() => setCreditsDropdownOpen(false)}
                 >
                   Create New
                 </Link>
                 <Link
-                  href="/saved-image-waivers"
+                  href="/credits"
                   className={styles.dropdownItem}
-                  onClick={() => setWaiverDropdownOpen(false)}
+                  onClick={() => setCreditsDropdownOpen(false)}
                 >
                   View Saved
                 </Link>
               </div>
             )}
           </div>
-        </div>
-      </div>
 
-      {/* Centered MSU Logo */}
-      <div className={styles.logoContainer}>
-        <Link href="/dashboard">
-          <Image
-            src="/MSU_newLogo.png"
-            alt="MSU Logo"
-            width={90}
-            height={90}
-            className={styles.logo}
-          />
-        </Link>
-      </div>
-
-      {/* Right Side: Nav, Admin, Logout, Profile */}
-      <nav className={styles.rightNav}>
-        {/* Shoot Type Dropdown */}
-        <div className={styles.dropdownContainer} ref={shootRef}>
-          <button
-            className={styles.navButton}
-            onClick={() => setShootDropdownOpen((prev) => !prev)}
-          >
-            Shoot Type ▼
-          </button>
-          {shootDropdownOpen && (
-            <div className={styles.dropdownMenu}>
-              {shootTypes.map((shoot) => (
-                <Link
-                  key={shoot.name}
-                  href={shoot.path}
-                  className={styles.dropdownItem}
-                  onClick={() => setShootDropdownOpen(false)}
-                >
-                  {shoot.name}
-                </Link>
-              ))}
-            </div>
+          {user?.role === "admin" && (
+            <button
+              className={styles.adminButton}
+              onClick={() => router.push("/admin")}
+              title="Admin Panel"
+            >
+              ⚡
+            </button>
           )}
-        </div>
 
-        {/* Credits Dropdown */}
-        <div className={styles.dropdownContainer} ref={creditsRef}>
           <button
-            className={styles.navButton}
-            onClick={() => setCreditsDropdownOpen((prev) => !prev)}
+            className={styles.logoutButton}
+            onClick={() => {
+              localStorage.removeItem("authToken");
+              localStorage.removeItem("user");
+              router.replace("/login");
+            }}
           >
-            Credits ▼
+            Logout
           </button>
-          {creditsDropdownOpen && (
-            <div className={styles.dropdownMenu}>
-              <Link
-                href="/credits/create"
-                className={styles.dropdownItem}
-                onClick={() => setCreditsDropdownOpen(false)}
-              >
-                Create New
-              </Link>
-              <Link
-                href="/credits"
-                className={styles.dropdownItem}
-                onClick={() => setCreditsDropdownOpen(false)}
-              >
-                View Saved
-              </Link>
-            </div>
-          )}
-        </div>
 
-        {user?.role === "admin" && (
-          <button
-            className={styles.adminButton}
-            onClick={() => router.push("/admin")}
-            title="Admin Panel"
-          >
-            ⚡
-          </button>
-        )}
-
-        <button
-          className={styles.logoutButton}
-          onClick={() => {
-            localStorage.removeItem("authToken");
-            localStorage.removeItem("user");
-            router.replace("/login");
-          }}
-        >
-          Logout
-        </button>
-
-        <div className={styles.userProfile}>
-          <Image
-            src="/quentin.png"
-            alt="User Profile"
-            width={40}
-            height={40}
-            className={styles.userImage}
-          />
-        </div>
-      </nav>
-    </header>
+          <div className={styles.userProfile}>
+            <Image
+              src={user?.profilePic || "/quentin.png"}
+              alt="User Profile"
+              width={40}
+              height={40}
+              className={styles.userImage}
+              onClick={() => {
+                const updatedUser = JSON.parse(localStorage.getItem("user"));
+                setUser(updatedUser); // Refresh user from localStorage
+                setProfileModalOpen(true);
+              }}
+            />
+          </div>
+        </nav>
+      </header>
+      <ProfileModal
+        isOpen={profileModalOpen}
+        onClose={() => setProfileModalOpen(false)}
+        user={user}
+        onUpdate={(updatedUser) => {
+          localStorage.setItem("user", JSON.stringify(updatedUser));
+          setUser(updatedUser);
+        }}
+      />
+    </>
   );
 }

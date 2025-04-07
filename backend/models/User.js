@@ -22,9 +22,13 @@ const UserSchema = new mongoose.Schema(
       enum: ["student", "admin", "its-staff"], // Users can be either a student or faculty
       default: "student",
     },
+    position: {
+      type: String,
+      default: "Visual Content Producer", // ✅ Add position field with default value
+    },
   },
-  { timestamps: true }
-); // Adds createdAt and updatedAt timestamps automatically
+  { timestamps: true } // Adds createdAt and updatedAt timestamps automatically
+);
 
 // Hash password before saving (Prevent Double Hashing)
 UserSchema.pre("save", async function (next) {
