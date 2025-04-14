@@ -10,9 +10,6 @@
   background-position: center; 
 }
 
-
-
-
 .card {
   background: #704da6; /* university purple */
   color: white;
@@ -22,6 +19,26 @@
   max-width: 400px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
 }
+
+.logoWrapper {
+  position: absolute;
+  top: 80px;
+  left: 5px;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.logo {
+  width: 100px;
+  height: auto;
+  transition: filter 0.3s ease-in-out;
+}
+
+.logo:hover {
+  filter: drop-shadow(0px 4px 6px rgba(255, 189, 17, 0.7)); /* ✅ Golden Glow */
+}
+
 
 .heading {
   font-size: 1.75rem;

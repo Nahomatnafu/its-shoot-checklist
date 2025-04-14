@@ -26,7 +26,19 @@ export default function ImageWaiverForm({
 
   const handleChange = (e) => {
     if (!readOnly) {
-      setFormState({ ...formState, [e.target.name]: e.target.value });
+      let { name, value } = e.target;
+
+      // 📞 Auto-format phone number: 5078008901 → 507-800-8901
+      if (name === "phone") {
+        value = value.replace(/\D/g, "").slice(0, 10); // Only digits, max 10
+        if (value.length >= 7) {
+          value = `${value.slice(0, 3)}-${value.slice(3, 6)}-${value.slice(6)}`;
+        } else if (value.length >= 4) {
+          value = `${value.slice(0, 3)}-${value.slice(3)}`;
+        }
+      }
+
+      setFormState((prev) => ({ ...prev, [name]: value }));
     }
   };
 
@@ -106,6 +118,7 @@ export default function ImageWaiverForm({
             readOnly={readOnly}
           />
           <input
+            type="date" // 🔁 change from type="text"
             name="projectDate"
             value={formState.projectDate}
             onChange={handleChange}

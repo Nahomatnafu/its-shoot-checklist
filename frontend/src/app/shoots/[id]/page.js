@@ -1,17 +1,21 @@
 "use client";
+
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import useShootStore from "../../store/useShootStore";
 import styles from "../../../../styles/ShootTypePage.module.css";
 
 export default function ShootDetailPage() {
   const { id } = useParams();
+  const { getShootById } = useShootStore();
   const [shoot, setShoot] = useState(null);
 
   useEffect(() => {
-    const storedShoots = JSON.parse(localStorage.getItem("savedShoots")) || [];
-    const selectedShoot = storedShoots[parseInt(id)];
-    setShoot(selectedShoot);
-  }, [id]);
+    if (id) {
+      const found = getShootById(id);
+      setShoot(found);
+    }
+  }, [id, getShootById]);
 
   if (!shoot) {
     return (
@@ -28,7 +32,6 @@ export default function ShootDetailPage() {
       <div className={styles.grid}>
         {shoot.template?.map((category, index) => (
           <div key={index} className={styles.categoryWrapper}>
-            {/* ✅ Category Header */}
             <div
               className={`${styles.category} ${
                 index % 2 === 0 ? styles.yellow : styles.purple
@@ -37,15 +40,13 @@ export default function ShootDetailPage() {
               <h2 className={styles.categoryTitle}>{category.name}</h2>
             </div>
 
-            {/* ✅ Equipment Items */}
             <div className={styles.items}>
-              {category.items.map((item, itemIndex) => {
+              {category.items.map((item, i) => {
                 const isChecked =
                   shoot.checklist?.[item.name]?.takeOut || false;
-
                 return (
                   <div
-                    key={itemIndex}
+                    key={i}
                     className={`${styles.item} ${
                       isChecked ? "text-green-600" : "text-red-600"
                     }`}

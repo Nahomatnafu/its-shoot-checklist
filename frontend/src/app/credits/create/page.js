@@ -1,9 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import styles from "../../../../styles/Credits.module.css";
+import useCreditStore from "../../store/useCreditStore";
 
 export default function CreateCredits() {
+  const router = useRouter();
+  const { addCredit } = useCreditStore();
+
   const [projectName, setProjectName] = useState("");
   const [roles, setRoles] = useState([
     { role: "Director/Coordinator", people: [""] },
@@ -54,17 +59,15 @@ export default function CreateCredits() {
   };
 
   const handleSubmit = () => {
-    const newCredits = { projectName, roles };
-    const savedCredits = JSON.parse(localStorage.getItem("credits")) || [];
-    savedCredits.push(newCredits);
-    localStorage.setItem("credits", JSON.stringify(savedCredits));
+    const newCredit = { projectName, roles };
+    addCredit(newCredit);
     setSaveMessage("Credits saved successfully!");
+    setTimeout(() => router.push("/credits"), 1000);
   };
 
   return (
     <div className={styles.creditsWrapper}>
       <h2 className={styles.title}>Create New Credits</h2>
-
       {saveMessage && <p className={styles.saveMessage}>{saveMessage}</p>}
 
       <div className={styles.form}>
@@ -83,7 +86,7 @@ export default function CreateCredits() {
                 <div className={styles.inputWithIcons}>
                   <input
                     type="text"
-                    placeholder="Role (e.g., Director)"
+                    placeholder="Role"
                     value={role.role}
                     onChange={(e) =>
                       handleRoleChange(roleIndex, e.target.value)
@@ -104,6 +107,7 @@ export default function CreateCredits() {
                   <div className={styles.inputWithIcons}>
                     <input
                       type="text"
+                      list="contributors"
                       placeholder="Person"
                       value={person}
                       onChange={(e) =>
@@ -115,6 +119,7 @@ export default function CreateCredits() {
                       }
                       className={styles.input}
                     />
+
                     <button
                       className={`${styles.iconButton} ${styles.addPersonIcon}`}
                       onClick={() => addPerson(roleIndex)}
@@ -142,6 +147,23 @@ export default function CreateCredits() {
         <button className={styles.submitButton} onClick={handleSubmit}>
           Save Credits
         </button>
+        <datalist id="contributors">
+          {[
+            "Connor Kulas",
+            "Derick Franklin",
+            "Fabio Castel Garcia",
+            "Isabelle Linden",
+            "Kathryn Petzel",
+            "Lilly Anderson",
+            "Nahom Atnafu",
+            "Omar Elkenawy",
+            "Rajesh Karki",
+          ]
+            .sort()
+            .map((name) => (
+              <option key={name} value={name} />
+            ))}
+        </datalist>
       </div>
     </div>
   );

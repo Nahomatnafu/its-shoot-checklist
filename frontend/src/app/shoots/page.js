@@ -1,53 +1,47 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import useShootStore from "../store/useShootStore";
 import styles from "../../../styles/ShootsPage.module.css";
 
 export default function ShootsPage() {
-  const [shoots, setShoots] = useState([]);
+  const router = useRouter();
+  const { shoots, setShoots, deleteShoot } = useShootStore();
   const [filteredShoots, setFilteredShoots] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedYear, setSelectedYear] = useState("All");
-  const router = useRouter();
 
   useEffect(() => {
-    const storedShoots = JSON.parse(localStorage.getItem("savedShoots")) || [];
-    setShoots(storedShoots);
-    setFilteredShoots(storedShoots);
-  }, []);
+    const stored = JSON.parse(localStorage.getItem("savedShoots")) || [];
+    setShoots(stored);
+    setFilteredShoots(stored);
+  }, [setShoots]);
 
   useEffect(() => {
-    let filtered = shoots;
+    let filtered = [...shoots];
 
     if (selectedYear !== "All") {
-      filtered = filtered.filter((shoot) => shoot.date.includes(selectedYear));
+      filtered = filtered.filter((s) => s.date.includes(selectedYear));
     }
 
-    if (searchTerm.trim() !== "") {
-      filtered = filtered.filter((shoot) =>
-        shoot.title.toLowerCase().includes(searchTerm.toLowerCase())
+    if (searchTerm.trim()) {
+      filtered = filtered.filter((s) =>
+        s.title.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
     setFilteredShoots(filtered);
   }, [searchTerm, selectedYear, shoots]);
 
-  const handleShootClick = (shoot) => {
-    const index = shoots.findIndex(
-      (s) => s.title === shoot.title && s.date === shoot.date
-    );
-    if (index !== -1) {
-      router.push(`/shoots/${index}`);
-    }
+  const handleShootClick = (id) => {
+    router.push(`/shoots/${id}`);
   };
 
-  const handleDelete = (indexToDelete) => {
-    if (!confirm("Are you sure you want to delete this shoot?")) return;
-
-    const updatedShoots = shoots.filter((_, i) => i !== indexToDelete);
-    localStorage.setItem("savedShoots", JSON.stringify(updatedShoots));
-    setShoots(updatedShoots);
+  const handleDelete = (id) => {
+    if (confirm("Are you sure you want to delete this shoot?")) {
+      deleteShoot(id);
+    }
   };
 
   const getAvailableYears = () => {
@@ -67,7 +61,6 @@ export default function ShootsPage() {
           onChange={(e) => setSearchTerm(e.target.value)}
           className={styles.searchInput}
         />
-
         <select
           value={selectedYear}
           onChange={(e) => setSelectedYear(e.target.value)}
@@ -86,24 +79,20 @@ export default function ShootsPage() {
         <p className={styles.noShoots}>No shoots match your criteria.</p>
       ) : (
         <ul className={styles.shootList}>
-          {filteredShoots.map((shoot, index) => (
-            <li key={index} className={styles.shootCard}>
+          {filteredShoots.map((shoot) => (
+            <li key={shoot.id} className={styles.shootCard}>
               <div
-                onClick={() => handleShootClick(shoot)}
+                onClick={() => handleShootClick(shoot.id)}
                 className={styles.shootInfo}
               >
                 📸 {shoot.title}
                 <span className={styles.shootDate}>({shoot.date})</span>
               </div>
-
               <button
-                onClick={() =>
-                  handleDelete(
-                    shoots.findIndex(
-                      (s) => s.title === shoot.title && s.date === shoot.date
-                    )
-                  )
-                }
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDelete(shoot.id);
+                }}
                 className={styles.deleteButton}
               >
                 🗑 Delete

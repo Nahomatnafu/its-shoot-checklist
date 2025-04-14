@@ -1,42 +1,47 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import useCreditStore from "../store/useCreditStore";
 import styles from "../../../styles/Credits.module.css";
 
 export default function SavedCreditsPage() {
-  const [credits, setCredits] = useState([]);
+  const router = useRouter();
+  const { credits, setCredits, deleteCreditById } = useCreditStore();
+
   const [filteredCredits, setFilteredCredits] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const router = useRouter();
+  const [selectedYear, setSelectedYear] = useState("All");
 
   useEffect(() => {
-    const savedCredits = JSON.parse(localStorage.getItem("credits")) || [];
-    setCredits(savedCredits);
-    setFilteredCredits(savedCredits);
-  }, []);
+    const stored = JSON.parse(localStorage.getItem("credits")) || [];
+    setCredits(stored);
+    setFilteredCredits(stored);
+  }, [setCredits]);
 
   useEffect(() => {
-    if (searchTerm.trim() !== "") {
-      const filtered = credits.filter((credit) =>
-        credit.projectName.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-      setFilteredCredits(filtered);
-    } else {
-      setFilteredCredits(credits);
+    let filtered = [...credits];
+
+    if (selectedYear !== "All") {
+      filtered = filtered.filter((c) => c.projectName?.includes(selectedYear)); // Optional: You can add a "date" field later to improve this
     }
-  }, [searchTerm, credits]);
 
-  const handleCreditClick = (index) => {
-    router.push(`/credits/${index}`);
+    if (searchTerm.trim()) {
+      filtered = filtered.filter((c) =>
+        c.projectName.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    setFilteredCredits(filtered);
+  }, [searchTerm, selectedYear, credits]);
+
+  const getAvailableYears = () => {
+    const years = credits.map((c) => c.date?.split("/")?.[2]).filter(Boolean);
+    return Array.from(new Set(years)).sort((a, b) => b - a);
   };
 
-  const handleDelete = (index) => {
-    if (confirm("Are you sure you want to delete this credit?")) {
-      const updatedCredits = credits.filter((_, i) => i !== index);
-      localStorage.setItem("credits", JSON.stringify(updatedCredits));
-      setCredits(updatedCredits);
-    }
+  const handleClick = (id) => {
+    router.push(`/credits/${id}`);
   };
 
   return (
@@ -51,22 +56,37 @@ export default function SavedCreditsPage() {
           onChange={(e) => setSearchTerm(e.target.value)}
           className={styles.searchInput}
         />
+        <select
+          value={selectedYear}
+          onChange={(e) => setSelectedYear(e.target.value)}
+          className={styles.yearDropdown}
+        >
+          <option value="All">All Years</option>
+          {getAvailableYears().map((year) => (
+            <option key={year} value={year}>
+              {year}
+            </option>
+          ))}
+        </select>
       </div>
 
       {filteredCredits.length === 0 ? (
         <p className={styles.noCredits}>No credits match your criteria.</p>
       ) : (
         <ul className={styles.creditList}>
-          {filteredCredits.map((credit, index) => (
-            <li key={index} className={styles.creditCard}>
+          {filteredCredits.map((credit) => (
+            <li key={credit.id} className={styles.creditCard}>
               <div
-                onClick={() => handleCreditClick(index)}
+                onClick={() => handleClick(credit.id)}
                 className={styles.creditInfo}
               >
                 🎬 {credit.projectName}
               </div>
               <button
-                onClick={() => handleDelete(index)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  deleteCreditById(credit.id);
+                }}
                 className={styles.deleteButton}
               >
                 🗑 Delete

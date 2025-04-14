@@ -1,20 +1,21 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter, useParams } from "next/navigation";
-import ImageWaiverForm from "@/components/ImageWaiverForm";
+import { useEffect, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import useWaiverStore from "../../store/useWaiverStore";
+import ImageWaiverForm from "../../../components/ImageWaiverForm";
 import styles from "../../../../styles/SavedImageWaivers.module.css";
 
 export default function WaiverDetailPage() {
-  const [waiver, setWaiver] = useState(null);
-  const router = useRouter();
   const { id } = useParams();
+  const router = useRouter();
+  const { getWaiverById } = useWaiverStore();
+  const [waiver, setWaiver] = useState(null);
 
   useEffect(() => {
-    const savedWaivers = JSON.parse(localStorage.getItem("savedWaivers")) || [];
-    const selectedWaiver = savedWaivers[parseInt(id)];
-    if (selectedWaiver) {
-      setWaiver(selectedWaiver);
+    const waiverData = getWaiverById(id);
+    if (waiverData) {
+      setWaiver(waiverData);
     } else {
       router.push("/saved-image-waivers");
     }

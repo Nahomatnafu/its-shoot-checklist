@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import styles from "../../styles/ShootTypePage.module.css";
+import saveShootToLocalStorage from "../app/utils/saveShootToLocalStorage";
 
 export default function ShootTypePage({ title, categories }) {
   const [checkedItems, setCheckedItems] = useState({});
@@ -9,7 +10,6 @@ export default function ShootTypePage({ title, categories }) {
   const router = useRouter();
   const { type } = useParams();
 
-  // ✅ Reset checkboxes when the page changes
   useEffect(() => {
     setCheckedItems({});
     setCheckedCategories({});
@@ -22,49 +22,34 @@ export default function ShootTypePage({ title, categories }) {
     }));
   };
 
-  // ✅ Toggle all items in a category
   const handleCategoryToggle = (categoryName, items) => {
-    const isCategoryChecked = checkedCategories[categoryName] || false;
-    const newCheckedState = !isCategoryChecked;
-
-    // ✅ Update category selection state
+    const newCheckedState = !checkedCategories[categoryName];
     setCheckedCategories((prev) => ({
       ...prev,
       [categoryName]: newCheckedState,
     }));
 
-    // ✅ Update all checkboxes in the category
     setCheckedItems((prev) => {
-      const updatedItems = { ...prev };
+      const updated = { ...prev };
       items.forEach((item) => {
-        updatedItems[item.name] = { takeOut: newCheckedState };
+        updated[item.name] = { takeOut: newCheckedState };
       });
-
-      return updatedItems; // ✅ Ensure toggle works properly
+      return updated;
     });
   };
 
   const handleSave = () => {
     const shootTitle = prompt("Enter a title for this shoot:");
     if (!shootTitle) return;
-  
-    const storedShoots = JSON.parse(localStorage.getItem("savedShoots")) || [];
-  
-    const newShoot = {
-      title: shootTitle,
-      date: new Date().toLocaleDateString(),
-      type, // <- keep track of the shoot type
-      checklist: checkedItems, // ✅ user-selected checkboxes
-      template: categories,    // ✅ full shoot type template (with all categories & items)
-    };
-  
-    localStorage.setItem(
-      "savedShoots",
-      JSON.stringify([...storedShoots, newShoot])
+
+    const shootId = saveShootToLocalStorage(
+      shootTitle,
+      type,
+      checkedItems,
+      categories
     );
-  
-    alert("✅ Shoot saved successfully!");
-    router.push("/shoots");
+
+    router.push(`/shoots/${shootId}`);
   };
 
   return (
@@ -74,7 +59,6 @@ export default function ShootTypePage({ title, categories }) {
       <div className={styles.grid}>
         {categories.map((category, index) => (
           <div key={category.name} className={styles.categoryWrapper}>
-            {/* ✅ Category Title + Select All Checkbox */}
             <div
               className={`${styles.category} ${
                 index % 2 === 0 ? styles.yellow : styles.purple
@@ -91,7 +75,6 @@ export default function ShootTypePage({ title, categories }) {
               <h2 className={styles.categoryTitle}>{category.name}</h2>
             </div>
 
-            {/* ✅ Equipment Items */}
             <div className={styles.items}>
               {category.items.map((item, itemIndex) => (
                 <label
@@ -116,7 +99,6 @@ export default function ShootTypePage({ title, categories }) {
         ))}
       </div>
 
-      {/* ✅ Save Button at Bottom Right */}
       <button className={styles.saveButton} onClick={handleSave}>
         Save Shoot
       </button>

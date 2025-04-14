@@ -2,9 +2,8 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import styles from "../../../styles/Dashboard.module.css";
-
 import Footer from "@/components/Footer";
+import styles from "../../../styles/Dashboard.module.css";
 
 const shootTypes = [
   {
@@ -50,9 +49,8 @@ export default function Dashboard() {
 
     setUser(JSON.parse(userData));
     setAuthChecked(true);
-  }, []);
+  }, [router]);
 
-  // 🔥 Prevent rendering until authentication is checked
   if (!authChecked) return null;
 
   return (
@@ -74,7 +72,6 @@ export default function Dashboard() {
                 width={300}
                 height={500}
                 className={styles.thumbnail}
-                style={{ objectFit: "cover" }}
               />
               <h2 className={styles.cardTitle}>{shoot.name}</h2>
             </div>

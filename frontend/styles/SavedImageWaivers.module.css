@@ -1,6 +1,6 @@
 /* 📦 Layout & Typography */
 .container {
-  padding: 1rem;
+  padding: 2rem;
   max-width: 800px;
   margin: 0 auto;
   font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
@@ -94,4 +94,25 @@
 
 .details p {
   margin: 0.5rem 0;
+}
+
+.filterBar {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+.searchInput {
+  flex: 1;
+  padding: 0.6rem 1rem;
+  border: 1px solid #ccc;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+}
+.yearDropdown {
+  padding: 0.6rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  background-color: #f9f9f9;
+  border: 1px solid #ccc;
 }

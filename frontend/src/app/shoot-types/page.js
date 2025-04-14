@@ -85,4 +85,4 @@ export default function ShootTypePage({ title, categories }) {
       </button>
     </main>
   );
-}
+

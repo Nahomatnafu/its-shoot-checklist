@@ -258,3 +258,31 @@
   font-size: 1.1rem;
   color: #999;
 }
+.yearDropdown {
+  padding: 0.6rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  background-color: #f9f9f9;
+  border: 1px solid #ccc;
+}
+
+/* ✅ This targets your actual input with the list */
+.inputWithIcons input[list="contributors"] {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  background: none;
+  border: 1px solid #ccc;
+
+  outline: none;
+  width: 100%; /* Make sure it expands fully */
+  box-sizing: border-box;
+}
+
+/* ✅ Optional: Hide any internal buttons from browser */
+.inputWithIcons input[list="contributors"]::-webkit-calendar-picker-indicator,
+.inputWithIcons input[list="contributors"]::-webkit-search-cancel-button,
+.inputWithIcons input[list="contributors"]::-webkit-clear-button {
+  display: none !important;
+}

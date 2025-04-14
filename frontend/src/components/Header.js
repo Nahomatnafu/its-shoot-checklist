@@ -16,7 +16,6 @@ export default function Header() {
   const [creditsDropdownOpen, setCreditsDropdownOpen] = useState(false);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
 
-  // Separate refs for each dropdown
   const waiverRef = useRef(null);
   const shootRef = useRef(null);
   const creditsRef = useRef(null);
@@ -35,36 +34,31 @@ export default function Header() {
         const storedUser = localStorage.getItem("user");
         if (storedUser) {
           const parsedUser = JSON.parse(storedUser);
-
-          // Fetch the latest user data from the backend
           const response = await fetch(`/api/auth/user/${parsedUser.email}`);
           if (response.ok) {
             const updatedUser = await response.json();
-            // Update localStorage with the latest user data
             localStorage.setItem("user", JSON.stringify(updatedUser));
             setUser(updatedUser);
           } else {
-            setUser(parsedUser); // Use localStorage if backend fails
+            setUser(parsedUser);
           }
         } else {
           setUser(null);
         }
-        setIsLoading(false);
-      } catch (error) {
-        console.error("Failed to load user:", error);
+      } catch {
+        setUser(null);
+      } finally {
         setIsLoading(false);
       }
     };
 
     loadUser();
     window.addEventListener("storage", loadUser);
-    return () => {
-      window.removeEventListener("storage", loadUser);
-    };
+    return () => window.removeEventListener("storage", loadUser);
   }, []);
 
   useEffect(() => {
-    function handleClickOutside(event) {
+    const handleClickOutside = (event) => {
       if (waiverRef.current && !waiverRef.current.contains(event.target)) {
         setWaiverDropdownOpen(false);
       }
@@ -74,12 +68,10 @@ export default function Header() {
       if (creditsRef.current && !creditsRef.current.contains(event.target)) {
         setCreditsDropdownOpen(false);
       }
-    }
+    };
 
     document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   if (pathname === "/login" || isLoading) return null;
@@ -87,16 +79,11 @@ export default function Header() {
   return (
     <>
       <header className={styles.header}>
-        {/* Left Side: Title and Nav */}
         <div className={styles.leftContainer}>
-          <Link href="/dashboard" className={styles.titleLink}>
-            <h1 className={styles.title}>ITS Shoot Checklist</h1>
-          </Link>
           <div className={styles.leftNav}>
             <Link href="/shoots" className={styles.navButton}>
               Shoots
             </Link>
-            {/* Image Waiver Dropdown */}
             <div className={styles.dropdownContainer} ref={waiverRef}>
               <button
                 className={styles.navButton}
@@ -126,7 +113,6 @@ export default function Header() {
           </div>
         </div>
 
-        {/* Centered MSU Logo */}
         <div className={styles.logoContainer}>
           <Link href="/dashboard">
             <Image
@@ -139,9 +125,7 @@ export default function Header() {
           </Link>
         </div>
 
-        {/* Right Side: Nav, Admin, Logout, Profile */}
         <nav className={styles.rightNav}>
-          {/* Shoot Type Dropdown */}
           <div className={styles.dropdownContainer} ref={shootRef}>
             <button
               className={styles.navButton}
@@ -165,7 +149,6 @@ export default function Header() {
             )}
           </div>
 
-          {/* Credits Dropdown */}
           <div className={styles.dropdownContainer} ref={creditsRef}>
             <button
               className={styles.navButton}
@@ -199,7 +182,11 @@ export default function Header() {
               onClick={() => router.push("/admin")}
               title="Admin Panel"
             >
-              ⚡
+              <img
+                src="/MSU_Logo5.png"
+                alt="Admin"
+                className={styles.adminIcon}
+              />
             </button>
           )}
 
@@ -223,13 +210,14 @@ export default function Header() {
               className={styles.userImage}
               onClick={() => {
                 const updatedUser = JSON.parse(localStorage.getItem("user"));
-                setUser(updatedUser); // Refresh user from localStorage
+                setUser(updatedUser);
                 setProfileModalOpen(true);
               }}
             />
           </div>
         </nav>
       </header>
+
       <ProfileModal
         isOpen={profileModalOpen}
         onClose={() => setProfileModalOpen(false)}
