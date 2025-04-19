@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import useWaiverStore from "../store/useWaiverStore";
+import PopUpModal from "@/components/PopUpModal"; // ✅ Add import
 import styles from "../../../styles/SavedImageWaivers.module.css";
 
 export default function SavedImageWaivers() {
@@ -11,6 +12,9 @@ export default function SavedImageWaivers() {
   const [filteredWaivers, setFilteredWaivers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedYear, setSelectedYear] = useState("All");
+
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [selectedId, setSelectedId] = useState(null);
 
   useEffect(() => {
     const stored = JSON.parse(localStorage.getItem("savedWaivers")) || [];
@@ -34,10 +38,15 @@ export default function SavedImageWaivers() {
     setFilteredWaivers(filtered);
   }, [searchTerm, selectedYear, waivers]);
 
-  const handleDelete = (id) => {
-    if (confirm("Are you sure you want to delete this waiver?")) {
-      deleteWaiverById(id);
-    }
+  const handleDeleteRequest = (id) => {
+    setSelectedId(id);
+    setShowConfirm(true);
+  };
+
+  const confirmDelete = () => {
+    if (selectedId) deleteWaiverById(selectedId);
+    setShowConfirm(false);
+    setSelectedId(null);
   };
 
   const getAvailableYears = () => {
@@ -51,7 +60,6 @@ export default function SavedImageWaivers() {
     <main className={styles.container}>
       <h1 className={styles.heading}>Saved Image Waivers</h1>
 
-      {/* 🔍 Filter Bar */}
       <div className={styles.filterBar}>
         <input
           type="text"
@@ -90,7 +98,7 @@ export default function SavedImageWaivers() {
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  handleDelete(waiver.id);
+                  handleDeleteRequest(waiver.id); // ✅ custom confirm
                 }}
                 className={styles.deleteButton}
               >
@@ -100,12 +108,22 @@ export default function SavedImageWaivers() {
           ))}
         </ul>
       )}
+
       <button
         onClick={() => router.push("/image-waiver")}
         className={styles.backButton}
       >
         Back
       </button>
+
+      {/* ✅ Delete Confirm Modal */}
+      {showConfirm && (
+        <PopUpModal
+          message="Are you sure you want to delete this waiver?"
+          onConfirm={confirmDelete}
+          onCancel={() => setShowConfirm(false)}
+        />
+      )}
     </main>
   );
 }

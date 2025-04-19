@@ -3,14 +3,19 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import useShootStore from "../store/useShootStore";
+import PopUpModal from "../../components/PopUpModal";
 import styles from "../../../styles/ShootsPage.module.css";
 
 export default function ShootsPage() {
   const router = useRouter();
   const { shoots, setShoots, deleteShoot } = useShootStore();
+
   const [filteredShoots, setFilteredShoots] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedYear, setSelectedYear] = useState("All");
+
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [selectedId, setSelectedId] = useState(null);
 
   useEffect(() => {
     const stored = JSON.parse(localStorage.getItem("savedShoots")) || [];
@@ -38,10 +43,15 @@ export default function ShootsPage() {
     router.push(`/shoots/${id}`);
   };
 
-  const handleDelete = (id) => {
-    if (confirm("Are you sure you want to delete this shoot?")) {
-      deleteShoot(id);
-    }
+  const handleDeleteRequest = (id) => {
+    setSelectedId(id);
+    setShowConfirm(true);
+  };
+
+  const confirmDelete = () => {
+    if (selectedId) deleteShoot(selectedId);
+    setShowConfirm(false);
+    setSelectedId(null);
   };
 
   const getAvailableYears = () => {
@@ -91,7 +101,7 @@ export default function ShootsPage() {
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  handleDelete(shoot.id);
+                  handleDeleteRequest(shoot.id);
                 }}
                 className={styles.deleteButton}
               >
@@ -100,6 +110,20 @@ export default function ShootsPage() {
             </li>
           ))}
         </ul>
+      )}
+
+      {/* 🔙 Back Button */}
+      <button onClick={() => router.push("/dashboard")} className={styles.backButton}>
+        Back
+      </button>
+
+      {/* 🧠 Confirmation Modal */}
+      {showConfirm && (
+        <PopUpModal
+          message="Are you sure you want to delete this shoot?"
+          onConfirm={confirmDelete}
+          onCancel={() => setShowConfirm(false)}
+        />
       )}
     </main>
   );

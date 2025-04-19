@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import styles from "../../../../styles/Credits.module.css";
 import useCreditStore from "../../store/useCreditStore";
+import PopUpModal from "../../../components/PopUpModal";
 
 export default function CreateCredits() {
   const router = useRouter();
@@ -22,7 +23,8 @@ export default function CreateCredits() {
     { role: "Colorist", people: [""] },
     { role: "Captioned by", people: [""] },
   ]);
-  const [saveMessage, setSaveMessage] = useState("");
+
+  const [showModal, setShowModal] = useState(false); // ✅ For success modal
 
   const addRole = () => {
     setRoles([...roles, { role: "", people: [""] }]);
@@ -61,15 +63,18 @@ export default function CreateCredits() {
   const handleSubmit = () => {
     const newCredit = { projectName, roles };
     addCredit(newCredit);
-    setSaveMessage("Credits saved successfully!");
-    setTimeout(() => router.push("/credits"), 1000);
+    setShowModal(true); // ✅ Show modal and wait
+  };
+
+  // When user clicks "Save" in the modal
+  const confirmAndRedirect = () => {
+    setShowModal(false);
+    router.push("/credits"); // ✅ Redirect manually after confirmation
   };
 
   return (
     <div className={styles.creditsWrapper}>
       <h2 className={styles.title}>Create New Credits</h2>
-      {saveMessage && <p className={styles.saveMessage}>{saveMessage}</p>}
-
       <div className={styles.form}>
         <input
           type="text"
@@ -119,7 +124,6 @@ export default function CreateCredits() {
                       }
                       className={styles.input}
                     />
-
                     <button
                       className={`${styles.iconButton} ${styles.addPersonIcon}`}
                       onClick={() => addPerson(roleIndex)}
@@ -147,6 +151,7 @@ export default function CreateCredits() {
         <button className={styles.submitButton} onClick={handleSubmit}>
           Save Credits
         </button>
+
         <datalist id="contributors">
           {[
             "Connor Kulas",
@@ -165,6 +170,13 @@ export default function CreateCredits() {
             ))}
         </datalist>
       </div>
+      {showModal && (
+        <PopUpModal
+          message="Credits saved successfully!"
+          onConfirm={confirmAndRedirect}
+          onCancel={() => setShowModal(false)}
+        />
+      )}
     </div>
   );
 }

@@ -286,3 +286,17 @@
 .inputWithIcons input[list="contributors"]::-webkit-clear-button {
   display: none !important;
 }
+.backButton {
+  background-color: #49306e;
+  color: white;
+  padding: 0.6rem 1.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  margin-top: 2rem;
+  border: 2px solid #febd11;
+  cursor: pointer;
+}
+
+.backButton:hover {
+  background-color: #5b3a8a;
+}

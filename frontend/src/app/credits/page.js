@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import useCreditStore from "../store/useCreditStore";
+import PopUpModal from "../../components/PopUpModal"; // ✅ Import the modal
 import styles from "../../../styles/Credits.module.css";
 
 export default function SavedCreditsPage() {
@@ -12,6 +13,10 @@ export default function SavedCreditsPage() {
   const [filteredCredits, setFilteredCredits] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedYear, setSelectedYear] = useState("All");
+
+  // ✅ Modal state
+  const [showModal, setShowModal] = useState(false);
+  const [selectedId, setSelectedId] = useState(null);
 
   useEffect(() => {
     const stored = JSON.parse(localStorage.getItem("credits")) || [];
@@ -23,7 +28,7 @@ export default function SavedCreditsPage() {
     let filtered = [...credits];
 
     if (selectedYear !== "All") {
-      filtered = filtered.filter((c) => c.projectName?.includes(selectedYear)); // Optional: You can add a "date" field later to improve this
+      filtered = filtered.filter((c) => c.projectName?.includes(selectedYear));
     }
 
     if (searchTerm.trim()) {
@@ -42,6 +47,17 @@ export default function SavedCreditsPage() {
 
   const handleClick = (id) => {
     router.push(`/credits/${id}`);
+  };
+
+  const handleDeleteRequest = (id) => {
+    setSelectedId(id);
+    setShowModal(true);
+  };
+
+  const confirmDelete = () => {
+    if (selectedId) deleteCreditById(selectedId);
+    setShowModal(false);
+    setSelectedId(null);
   };
 
   return (
@@ -85,7 +101,7 @@ export default function SavedCreditsPage() {
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  deleteCreditById(credit.id);
+                  handleDeleteRequest(credit.id);
                 }}
                 className={styles.deleteButton}
               >
@@ -94,6 +110,23 @@ export default function SavedCreditsPage() {
             </li>
           ))}
         </ul>
+      )}
+
+      {/* 🔙 Back to create new credits */}
+      <button
+        onClick={() => router.push("/credits/create")}
+        className={styles.backButton}
+      >
+        Back
+      </button>
+
+      {/* 🧠 Confirmation Modal */}
+      {showModal && (
+        <PopUpModal
+          message="Are you sure you want to delete this credit?"
+          onConfirm={confirmDelete}
+          onCancel={() => setShowModal(false)}
+        />
       )}
     </main>
   );

@@ -3,10 +3,14 @@ import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import styles from "../../styles/ShootTypePage.module.css";
 import saveShootToLocalStorage from "../app/utils/saveShootToLocalStorage";
+import PopUpModal from "../components/PopUpModal"; 
 
 export default function ShootTypePage({ title, categories }) {
   const [checkedItems, setCheckedItems] = useState({});
   const [checkedCategories, setCheckedCategories] = useState({});
+  const [shootTitle, setShootTitle] = useState("");
+  const [showModal, setShowModal] = useState(false); // ✅ Modal control
+
   const router = useRouter();
   const { type } = useParams();
 
@@ -38,17 +42,15 @@ export default function ShootTypePage({ title, categories }) {
     });
   };
 
-  const handleSave = () => {
-    const shootTitle = prompt("Enter a title for this shoot:");
-    if (!shootTitle) return;
-
+  const confirmSave = () => {
+    if (!shootTitle.trim()) return;
     const shootId = saveShootToLocalStorage(
-      shootTitle,
+      shootTitle.trim(),
       type,
       checkedItems,
       categories
     );
-
+    setShowModal(false);
     router.push(`/shoots/${shootId}`);
   };
 
@@ -99,9 +101,21 @@ export default function ShootTypePage({ title, categories }) {
         ))}
       </div>
 
-      <button className={styles.saveButton} onClick={handleSave}>
+      <button className={styles.saveButton} onClick={() => setShowModal(true)}>
         Save Shoot
       </button>
+
+      {/* ✅ Modal to enter title */}
+      {showModal && (
+        <PopUpModal
+          message="Enter a title for this shoot:"
+          showInput
+          inputValue={shootTitle}
+          onInputChange={(val) => setShootTitle(val)}
+          onConfirm={confirmSave}
+          onCancel={() => setShowModal(false)}
+        />
+      )}
     </main>
   );
 }
