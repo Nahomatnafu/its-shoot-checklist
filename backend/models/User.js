@@ -1,33 +1,44 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 
-// Define User Schema
 const UserSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: true,
+      required: [true, "Name is required"],
+      trim: true,
+      minlength: [2, "Name must be at least 2 characters long"],
     },
     email: {
       type: String,
-      required: true,
+      required: [true, "Email is required"],
       unique: true,
+      trim: true,
+      lowercase: true,
+      match: [
+        /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
+        "Please enter a valid email address",
+      ],
     },
     password: {
       type: String,
-      required: true,
+      required: [true, "Password is required"],
+      minlength: [8, "Password must be at least 8 characters long"],
     },
     role: {
       type: String,
-      enum: ["student", "admin", "its-staff"], // Users can be either a student or faculty
+      enum: {
+        values: ["student", "admin", "its-staff"],
+        message: "{VALUE} is not a valid role",
+      },
       default: "student",
     },
     position: {
       type: String,
-      default: "Visual Content Producer", // ✅ Add position field with default value
+      default: process.env.DEFAULT_POSITION || "Visual Content Producer",
     },
   },
-  { timestamps: true } // Adds createdAt and updatedAt timestamps automatically
+  { timestamps: true }
 );
 
 // Hash password before saving (Prevent Double Hashing)
@@ -53,6 +64,4 @@ UserSchema.methods.matchPassword = async function (enteredPassword) {
   }
 };
 
-// Export the model
-const User = mongoose.model("User", UserSchema);
-module.exports = User;
+module.exports = mongoose.model("User", UserSchema);

@@ -1,36 +1,30 @@
 "use client";
 import styles from "../../../../styles/Users.module.css";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useAdminAuth } from "@/hooks/useAdminAuth";
+import PopUpModal from "@/components/PopUpModal";
 
 export default function UsersPage() {
-  const router = useRouter();
-  const [isAuthorized, setIsAuthorized] = useState(false);
+  const isAuthorized = useAdminAuth();
   const [users, setUsers] = useState([]);
   const [editUser, setEditUser] = useState(null);
   const [updatedUser, setUpdatedUser] = useState({});
+  const [showModal, setShowModal] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
+  const [pendingDeleteId, setPendingDeleteId] = useState(null);
 
-  // ✅ Role protection check
-  useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem("user"));
-    if (!storedUser || storedUser.role !== "admin") {
-      router.replace("/dashboard");
-    } else {
-      setIsAuthorized(true);
-    }
-  }, []);
-
-  // ✅ Fetch users if authorized
   useEffect(() => {
     if (!isAuthorized) return;
 
     const fetchUsers = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/auth/users");
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/users`);
+        if (!res.ok) throw new Error('Failed to fetch users');
         const data = await res.json();
         setUsers(data);
       } catch (error) {
-        console.error("❌ Error fetching users:", error);
+        setModalMessage("Failed to fetch users");
+        setShowModal(true);
       }
     };
 
@@ -39,26 +33,28 @@ export default function UsersPage() {
 
   if (!isAuthorized) return null;
 
-  // ✅ Delete user
-  const handleDelete = async (userId) => {
-    if (!confirm("Are you sure you want to delete this user?")) return;
+  const handleDelete = (userId) => {
+    setPendingDeleteId(userId);
+    setModalMessage("Are you sure you want to delete this user?");
+    setShowModal(true);
+  };
 
+  const confirmDelete = async () => {
     try {
       const res = await fetch(
-        `http://localhost:5000/api/auth/users/${userId}`,
-        {
-          method: "DELETE",
-        }
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/users/${pendingDeleteId}`,
+        { method: "DELETE" }
       );
 
-      if (res.ok) {
-        alert("✅ User deleted successfully!");
-        setUsers(users.filter((user) => user._id !== userId));
-      } else {
-        alert("❌ Failed to delete user");
-      }
+      if (!res.ok) throw new Error('Failed to delete user');
+      
+      setUsers(users.filter((user) => user._id !== pendingDeleteId));
+      setModalMessage("User deleted successfully!");
     } catch (error) {
-      console.error("❌ Error:", error);
+      setModalMessage("Failed to delete user");
+    } finally {
+      setShowModal(true);
+      setPendingDeleteId(null);
     }
   };
 
@@ -94,18 +90,35 @@ export default function UsersPage() {
       const data = await res.json();
 
       if (res.ok) {
-        alert("✅ User updated successfully!");
         setUsers(
           users.map((u) =>
             u._id === editUser._id ? { ...u, ...updatedUser } : u
           )
         );
         setEditUser(null);
+        setModalMessage("✅ User updated successfully!");
+        setShowModal(true);
       } else {
-        alert("❌ " + (data.message || "Failed to update user"));
+        setModalMessage("❌ " + (data.message || "Failed to update user"));
+        setShowModal(true);
       }
     } catch (error) {
       console.error("❌ Error:", error);
+      setModalMessage("❌ Error updating user");
+      setShowModal(true);
+    }
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setModalMessage("");
+  };
+
+  const handleModalConfirm = () => {
+    if (pendingDeleteId) {
+      confirmDelete();
+    } else {
+      handleCloseModal();
     }
   };
 
@@ -148,7 +161,7 @@ export default function UsersPage() {
                 value={updatedUser.name}
                 placeholder="Full Name"
                 onChange={handleChange}
-                className="p-2 border rounded"
+                className={`p-2 border rounded text-white bg-transparent`}
               />
               <input
                 type="email"
@@ -156,7 +169,7 @@ export default function UsersPage() {
                 value={updatedUser.email}
                 placeholder="Email"
                 onChange={handleChange}
-                className="p-2 border rounded"
+                className={`p-2 border rounded text-white bg-transparent`}
               />
               <input
                 type="text"
@@ -164,13 +177,13 @@ export default function UsersPage() {
                 value={updatedUser.position}
                 placeholder="Position"
                 onChange={handleChange}
-                className="p-2 border rounded"
+                className={`p-2 border rounded text-white bg-transparent`}
               />
               <select
                 name="role"
                 value={updatedUser.role}
                 onChange={handleChange}
-                className={styles.selectDropdown}
+                className={`p-2 border rounded bg-white text-black`}
               >
                 <option value="student">Student</option>
                 <option value="its-staff">ITS Staff</option>
@@ -180,14 +193,14 @@ export default function UsersPage() {
               <div className="flex gap-2">
                 <button
                   type="submit"
-                  className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+                  className={styles.saveButton}
                 >
                   Save
                 </button>
                 <button
                   type="button"
                   onClick={() => setEditUser(null)}
-                  className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+                  className={styles.cancelButton}
                 >
                   Cancel
                 </button>
@@ -195,6 +208,15 @@ export default function UsersPage() {
             </form>
           </div>
         </div>
+      )}
+
+      {/* PopUp Modal for messages and confirmations */}
+      {showModal && (
+        <PopUpModal
+          message={modalMessage}
+          onConfirm={handleModalConfirm}
+          onCancel={handleCloseModal}
+        />
       )}
     </main>
   );

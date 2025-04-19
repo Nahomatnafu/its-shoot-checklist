@@ -135,16 +135,17 @@
   background: #6b7280;
 }
 .selectDropdown {
-  background-color: #fff;
-  color: #000;
+  background-color: white !important;
+  color: black !important;
   border-radius: 6px;
   padding: 0.5rem;
   border: none;
   outline: none;
   font-weight: 500;
+  width: 100%;
 }
 
 .selectDropdown option {
-  background-color: #febd11; /* Purple background */
-  color: white;
+  background-color: white;
+  color: black;
 }

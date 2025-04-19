@@ -3,49 +3,54 @@ import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import styles from "../../styles/ShootTypePage.module.css";
 import saveShootToLocalStorage from "../app/utils/saveShootToLocalStorage";
-import PopUpModal from "../components/PopUpModal"; 
+import PopUpModal from "./PopUpModal";
 
 export default function ShootTypePage({ title, categories }) {
   const [checkedItems, setCheckedItems] = useState({});
   const [checkedCategories, setCheckedCategories] = useState({});
   const [shootTitle, setShootTitle] = useState("");
-  const [showModal, setShowModal] = useState(false); // ✅ Modal control
+  const [showModal, setShowModal] = useState(false);
 
   const router = useRouter();
   const { type } = useParams();
 
+  // Reset state when type changes
   useEffect(() => {
     setCheckedItems({});
     setCheckedCategories({});
+    setShootTitle("");
   }, [type]);
 
   const handleCheckboxChange = (item, type) => {
-    setCheckedItems((prev) => ({
+    setCheckedItems(prev => ({
       ...prev,
-      [item]: { ...prev[item], [type]: !prev[item]?.[type] },
+      [item]: { ...prev[item], [type]: !prev[item]?.[type] }
     }));
   };
 
   const handleCategoryToggle = (categoryName, items) => {
     const newCheckedState = !checkedCategories[categoryName];
-    setCheckedCategories((prev) => ({
+    
+    setCheckedCategories(prev => ({
       ...prev,
-      [categoryName]: newCheckedState,
+      [categoryName]: newCheckedState
     }));
 
-    setCheckedItems((prev) => {
+    setCheckedItems(prev => {
       const updated = { ...prev };
-      items.forEach((item) => {
+      items.forEach(item => {
         updated[item.name] = { takeOut: newCheckedState };
       });
       return updated;
     });
   };
 
-  const confirmSave = () => {
-    if (!shootTitle.trim()) return;
+  const handleSave = () => {
+    const trimmedTitle = shootTitle.trim();
+    if (!trimmedTitle) return;
+
     const shootId = saveShootToLocalStorage(
-      shootTitle.trim(),
+      trimmedTitle,
       type,
       checkedItems,
       categories
@@ -70,22 +75,19 @@ export default function ShootTypePage({ title, categories }) {
                 type="checkbox"
                 className={styles.categoryCheckbox}
                 checked={checkedCategories[category.name] || false}
-                onChange={() =>
-                  handleCategoryToggle(category.name, category.items)
-                }
+                onChange={() => handleCategoryToggle(category.name, category.items)}
               />
               <h2 className={styles.categoryTitle}>{category.name}</h2>
             </div>
 
             <div className={styles.items}>
-              {category.items.map((item, itemIndex) => (
+              {category.items.map(item => (
                 <label
-                  key={`${category.name}-${item.name}-${itemIndex}`}
+                  key={`${category.name}-${item.name}`}
                   className={styles.item}
                 >
                   <input
                     type="checkbox"
-                    name={category.name}
                     className={styles.checkbox}
                     checked={checkedItems[item.name]?.takeOut || false}
                     onChange={() => handleCheckboxChange(item.name, "takeOut")}
@@ -101,18 +103,20 @@ export default function ShootTypePage({ title, categories }) {
         ))}
       </div>
 
-      <button className={styles.saveButton} onClick={() => setShowModal(true)}>
+      <button 
+        className={styles.saveButton} 
+        onClick={() => setShowModal(true)}
+      >
         Save Shoot
       </button>
 
-      {/* ✅ Modal to enter title */}
       {showModal && (
         <PopUpModal
           message="Enter a title for this shoot:"
           showInput
           inputValue={shootTitle}
-          onInputChange={(val) => setShootTitle(val)}
-          onConfirm={confirmSave}
+          onInputChange={setShootTitle}
+          onConfirm={handleSave}
           onCancel={() => setShowModal(false)}
         />
       )}

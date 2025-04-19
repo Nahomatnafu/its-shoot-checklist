@@ -8,6 +8,22 @@
   --color-foreground: var(--foreground);
   --font-sans: "Kanit", sans-serif; /* ✅ Apply Kanit globally */
   --font-mono: var(--font-geist-mono);
+  --font-franklin: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+
+  /* New color variables */
+  --color-primary: #49306e;    /* Main purple */
+  --color-primary-light: #704da6; /* Light purple */
+  --color-secondary: #febd11;  /* Gold/Yellow */
+  --color-secondary-dark: #f1ac00; /* Dark gold */
+  --color-success: #22c55e;    /* Green */
+  --color-error: #ef4444;      /* Red */
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --color-gray: #6b7280;
+
+  /* Transitions */
+  --transition-base: all 0.2s ease;
+  --transition-smooth: all 0.3s ease-in-out;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -19,10 +35,13 @@
   }
 }
 
+/* Global font styles */
 body {
-  background: var(--color-background);
-  color: var(--color-foreground);
-  font-family: var(--font-sans); /* ✅ Ensure Kanit is applied */
+  font-family: var(--font-sans);
+}
+
+.franklin-font {
+  font-family: var(--font-franklin);
 }
 
 .text-shadow {
@@ -30,3 +49,15 @@ body {
     1px 1px 0 black; /* Creates an outline effect */
   font-weight: 700; /* Extra bold */
 }
+
+/* Common hover effects */
+.hover-scale {
+  transition: var(--transition-base);
+}
+
+.hover-scale:hover {
+  transform: scale(1.05);
+}
+
+
+

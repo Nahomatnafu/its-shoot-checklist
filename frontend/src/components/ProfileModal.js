@@ -4,27 +4,38 @@ import { FaUpload } from "react-icons/fa";
 import styles from "../../styles/ProfileModal.module.css";
 
 export default function ProfileModal({ isOpen, onClose, user, onUpdate }) {
-  const [activeModal, setActiveModal] = useState("main");
-  const [password, setPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [position, setPosition] = useState("");
-  const [profilePic, setProfilePic] = useState("");
+  const [formData, setFormData] = useState({
+    activeModal: "main",
+    password: "",
+    newPassword: "",
+    position: "",
+    profilePic: ""
+  });
 
   useEffect(() => {
-    setPosition(user?.position || "No Position");
+    setFormData(prev => ({
+      ...prev,
+      position: user?.position || "No Position",
+      profilePic: user?.profilePic || ""
+    }));
   }, [user]);
 
   const handleSave = () => {
     const updatedUser = {
       ...user,
-      position,
-      password: newPassword || user.password,
-      profilePic: profilePic || user.profilePic,
+      position: formData.position,
+      password: formData.newPassword || user.password,
+      profilePic: formData.profilePic || user.profilePic
     };
+    
     localStorage.setItem("user", JSON.stringify(updatedUser));
     onUpdate(updatedUser);
     onClose();
-    setActiveModal("main");
+    setFormData(prev => ({ ...prev, activeModal: "main" }));
+  };
+
+  const setActiveModal = (modalName) => {
+    setFormData(prev => ({ ...prev, activeModal: modalName }));
   };
 
   if (!isOpen) return null;
@@ -36,7 +47,7 @@ export default function ProfileModal({ isOpen, onClose, user, onUpdate }) {
         className={styles.userPosition}
         onClick={() => setActiveModal("position")}
       >
-        {position} ▼
+        {formData.position} ▼
       </p>
       <p
         className={styles.modalLink}
@@ -58,15 +69,15 @@ export default function ProfileModal({ isOpen, onClose, user, onUpdate }) {
       <input
         type="password"
         placeholder="Old Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
+        value={formData.password}
+        onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
         className={styles.input}
       />
       <input
         type="password"
         placeholder="New Password"
-        value={newPassword}
-        onChange={(e) => setNewPassword(e.target.value)}
+        value={formData.newPassword}
+        onChange={(e) => setFormData(prev => ({ ...prev, newPassword: e.target.value }))}
         className={styles.input}
       />
       <button onClick={handleSave} className={styles.saveButton}>
@@ -83,8 +94,8 @@ export default function ProfileModal({ isOpen, onClose, user, onUpdate }) {
       <input
         type="text"
         placeholder="Enter Position"
-        value={position}
-        onChange={(e) => setPosition(e.target.value)}
+        value={formData.position}
+        onChange={(e) => setFormData(prev => ({ ...prev, position: e.target.value }))}
         className={styles.input}
       />
       <button onClick={handleSave} className={styles.saveButton}>
@@ -103,7 +114,10 @@ export default function ProfileModal({ isOpen, onClose, user, onUpdate }) {
         <input
           type="file"
           onChange={(e) =>
-            setProfilePic(URL.createObjectURL(e.target.files[0]))
+            setFormData(prev => ({ 
+              ...prev, 
+              profilePic: URL.createObjectURL(e.target.files[0]) 
+            }))
           }
           className={styles.fileInput}
         />
@@ -116,10 +130,10 @@ export default function ProfileModal({ isOpen, onClose, user, onUpdate }) {
 
   return (
     <div className={styles.modalOverlay}>
-      {activeModal === "main" && renderMainContent()}
-      {activeModal === "password" && renderPasswordContent()}
-      {activeModal === "position" && renderPositionContent()}
-      {activeModal === "picture" && renderPictureContent()}
+      {formData.activeModal === "main" && renderMainContent()}
+      {formData.activeModal === "password" && renderPasswordContent()}
+      {formData.activeModal === "position" && renderPositionContent()}
+      {formData.activeModal === "picture" && renderPictureContent()}
       <button onClick={onClose} className={styles.closeButton}>
         ✖
       </button>

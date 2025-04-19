@@ -3,7 +3,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import ProfileModal from "../components/ProfileModal";
+import ProfileModal from "./ProfileModal";
 import styles from "../../styles/Header.module.css";
 
 export default function Header() {
@@ -11,14 +11,14 @@ export default function Header() {
   const pathname = usePathname();
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [waiverDropdownOpen, setWaiverDropdownOpen] = useState(false);
-  const [shootDropdownOpen, setShootDropdownOpen] = useState(false);
-  const [creditsDropdownOpen, setCreditsDropdownOpen] = useState(false);
+  const [activeDropdown, setActiveDropdown] = useState(null);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
 
-  const waiverRef = useRef(null);
-  const shootRef = useRef(null);
-  const creditsRef = useRef(null);
+  const dropdownRefs = {
+    waiver: useRef(null),
+    shoot: useRef(null),
+    credits: useRef(null)
+  };
 
   const shootTypes = [
     { name: "A-Roll Shoot (Teleprompter)", path: "/shoot-types/teleprompter" },
@@ -42,10 +42,8 @@ export default function Header() {
           } else {
             setUser(parsedUser);
           }
-        } else {
-          setUser(null);
         }
-      } catch {
+      } catch (error) {
         setUser(null);
       } finally {
         setIsLoading(false);
@@ -59,20 +57,20 @@ export default function Header() {
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (waiverRef.current && !waiverRef.current.contains(event.target)) {
-        setWaiverDropdownOpen(false);
-      }
-      if (shootRef.current && !shootRef.current.contains(event.target)) {
-        setShootDropdownOpen(false);
-      }
-      if (creditsRef.current && !creditsRef.current.contains(event.target)) {
-        setCreditsDropdownOpen(false);
+      if (!Object.values(dropdownRefs).some(ref => 
+        ref.current && ref.current.contains(event.target)
+      )) {
+        setActiveDropdown(null);
       }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  const toggleDropdown = (name) => {
+    setActiveDropdown(current => current === name ? null : name);
+  };
 
   if (pathname === "/login" || isLoading) return null;
 
@@ -84,26 +82,26 @@ export default function Header() {
             <Link href="/shoots" className={styles.navButton}>
               Shoots
             </Link>
-            <div className={styles.dropdownContainer} ref={waiverRef}>
+            <div className={styles.dropdownContainer} ref={dropdownRefs.waiver}>
               <button
                 className={styles.navButton}
-                onClick={() => setWaiverDropdownOpen((prev) => !prev)}
+                onClick={() => toggleDropdown('waiver')}
               >
                 Image Waiver ▼
               </button>
-              {waiverDropdownOpen && (
+              {activeDropdown === 'waiver' && (
                 <div className={styles.dropdownMenu}>
                   <Link
                     href="/image-waiver"
                     className={styles.dropdownItem}
-                    onClick={() => setWaiverDropdownOpen(false)}
+                    onClick={() => setActiveDropdown(null)}
                   >
                     Create New
                   </Link>
                   <Link
                     href="/saved-image-waivers"
                     className={styles.dropdownItem}
-                    onClick={() => setWaiverDropdownOpen(false)}
+                    onClick={() => setActiveDropdown(null)}
                   >
                     View Saved
                   </Link>
@@ -126,21 +124,21 @@ export default function Header() {
         </div>
 
         <nav className={styles.rightNav}>
-          <div className={styles.dropdownContainer} ref={shootRef}>
+          <div className={styles.dropdownContainer} ref={dropdownRefs.shoot}>
             <button
               className={styles.navButton}
-              onClick={() => setShootDropdownOpen((prev) => !prev)}
+              onClick={() => toggleDropdown('shoot')}
             >
               Shoot Type ▼
             </button>
-            {shootDropdownOpen && (
+            {activeDropdown === 'shoot' && (
               <div className={styles.dropdownMenu}>
                 {shootTypes.map((shoot) => (
                   <Link
                     key={shoot.name}
                     href={shoot.path}
                     className={styles.dropdownItem}
-                    onClick={() => setShootDropdownOpen(false)}
+                    onClick={() => setActiveDropdown(null)}
                   >
                     {shoot.name}
                   </Link>
@@ -149,26 +147,26 @@ export default function Header() {
             )}
           </div>
 
-          <div className={styles.dropdownContainer} ref={creditsRef}>
+          <div className={styles.dropdownContainer} ref={dropdownRefs.credits}>
             <button
               className={styles.navButton}
-              onClick={() => setCreditsDropdownOpen((prev) => !prev)}
+              onClick={() => toggleDropdown('credits')}
             >
               Credits ▼
             </button>
-            {creditsDropdownOpen && (
+            {activeDropdown === 'credits' && (
               <div className={styles.dropdownMenu}>
                 <Link
                   href="/credits/create"
                   className={styles.dropdownItem}
-                  onClick={() => setCreditsDropdownOpen(false)}
+                  onClick={() => setActiveDropdown(null)}
                 >
                   Create New
                 </Link>
                 <Link
                   href="/credits"
                   className={styles.dropdownItem}
-                  onClick={() => setCreditsDropdownOpen(false)}
+                  onClick={() => setActiveDropdown(null)}
                 >
                   View Saved
                 </Link>

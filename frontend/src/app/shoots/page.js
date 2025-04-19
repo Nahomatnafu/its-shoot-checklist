@@ -19,20 +19,22 @@ export default function ShootsPage() {
 
   useEffect(() => {
     const stored = JSON.parse(localStorage.getItem("savedShoots")) || [];
-    setShoots(stored);
-    setFilteredShoots(stored);
+    // Ensure all shoots have valid IDs
+    const validShoots = stored.filter(shoot => shoot && shoot.id);
+    setShoots(validShoots);
+    setFilteredShoots(validShoots);
   }, [setShoots]);
 
   useEffect(() => {
-    let filtered = [...shoots];
+    let filtered = [...shoots].filter(shoot => shoot && shoot.id);
 
     if (selectedYear !== "All") {
-      filtered = filtered.filter((s) => s.date.includes(selectedYear));
+      filtered = filtered.filter((s) => s.date?.includes(selectedYear));
     }
 
     if (searchTerm.trim()) {
       filtered = filtered.filter((s) =>
-        s.title.toLowerCase().includes(searchTerm.toLowerCase())
+        s.title?.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
@@ -43,13 +45,21 @@ export default function ShootsPage() {
     router.push(`/shoots/${id}`);
   };
 
-  const handleDeleteRequest = (id) => {
+  const handleDeleteRequest = (id, e) => {
+    e.preventDefault();
+    e.stopPropagation();
     setSelectedId(id);
     setShowConfirm(true);
   };
 
   const confirmDelete = () => {
-    if (selectedId) deleteShoot(selectedId);
+    if (selectedId) {
+      deleteShoot(selectedId);
+      // Update filtered shoots after deletion
+      setFilteredShoots(prevShoots => 
+        prevShoots.filter(shoot => shoot.id !== selectedId)
+      );
+    }
     setShowConfirm(false);
     setSelectedId(null);
   };
@@ -78,7 +88,7 @@ export default function ShootsPage() {
         >
           <option value="All">All Years</option>
           {getAvailableYears().map((year) => (
-            <option key={year} value={year}>
+            <option key={`year-${year}`} value={year}>
               {year}
             </option>
           ))}
@@ -90,24 +100,23 @@ export default function ShootsPage() {
       ) : (
         <ul className={styles.shootList}>
           {filteredShoots.map((shoot) => (
-            <li key={shoot.id} className={styles.shootCard}>
-              <div
-                onClick={() => handleShootClick(shoot.id)}
-                className={styles.shootInfo}
-              >
-                📸 {shoot.title}
-                <span className={styles.shootDate}>({shoot.date})</span>
-              </div>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleDeleteRequest(shoot.id);
-                }}
-                className={styles.deleteButton}
-              >
-                🗑 Delete
-              </button>
-            </li>
+            shoot && shoot.id ? (
+              <li key={`shoot-${shoot.id}`} className={styles.shootCard}>
+                <div
+                  onClick={() => handleShootClick(shoot.id)}
+                  className={styles.shootInfo}
+                >
+                  📸 {shoot.title || 'Untitled'}
+                  <span className={styles.shootDate}>({shoot.date || 'No date'})</span>
+                </div>
+                <button
+                  onClick={(e) => handleDeleteRequest(shoot.id, e)}
+                  className={styles.deleteButton}
+                >
+                  🗑 Delete
+                </button>
+              </li>
+            ) : null
           ))}
         </ul>
       )}
@@ -122,7 +131,10 @@ export default function ShootsPage() {
         <PopUpModal
           message="Are you sure you want to delete this shoot?"
           onConfirm={confirmDelete}
-          onCancel={() => setShowConfirm(false)}
+          onCancel={() => {
+            setShowConfirm(false);
+            setSelectedId(null);
+          }}
         />
       )}
     </main>

@@ -1,14 +1,15 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation"; // ✅ this line fixes the error
+import { useRouter } from "next/navigation";
 import styles from "../../../styles/Admin.module.css";
-import PopUpModal from "@/components/PopUpModal"; // ✅ if you're using PopUpModal
+import PopUpModal from "@/components/PopUpModal";
 
 export default function AdminPage() {
   const router = useRouter();
 
   const [isAuthorized, setIsAuthorized] = useState(false);
-  const [showModal, setShowModal] = useState(false); // ✅ modal state
+  const [showModal, setShowModal] = useState(false);
+  const [modalMessage, setModalMessage] = useState(""); // Add this state for dynamic messages
 
   const [formData, setFormData] = useState({
     name: "",
@@ -55,14 +56,22 @@ export default function AdminPage() {
 
       if (res.ok) {
         setFormData({ name: "", email: "", position: "", role: "student" });
-        setShowModal(true); // ✅ show modal on success
+        setModalMessage("User added successfully!");
+        setShowModal(true);
       } else {
-        alert("❌ " + (data.message || "Failed to add user"));
+        setModalMessage("❌ " + (data.message || "Failed to add user"));
+        setShowModal(true);
       }
     } catch (error) {
       console.error("❌ Error:", error);
-      alert("❌ Something went wrong. Check the console.");
+      setModalMessage("❌ Something went wrong. Check the console.");
+      setShowModal(true);
     }
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setModalMessage("");
   };
 
   return (
@@ -119,12 +128,12 @@ export default function AdminPage() {
         </button>
       </div>
 
-      {/* ✅ PopUp Modal */}
+      {/* PopUp Modal for both success and error messages */}
       {showModal && (
         <PopUpModal
-          message="User added successfully!"
-          onConfirm={() => setShowModal(false)}
-          onCancel={() => setShowModal(false)}
+          message={modalMessage}
+          onConfirm={handleCloseModal}
+          onCancel={handleCloseModal}
         />
       )}
     </main>

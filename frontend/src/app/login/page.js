@@ -7,7 +7,8 @@ import { FiEye, FiEyeOff } from "react-icons/fi";
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [message, setMessage] = useState("");
+  const [loginStatus, setLoginStatus] = useState(""); // "success", "error", or ""
+  const [errorMessage, setErrorMessage] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
@@ -27,24 +28,31 @@ export default function LoginPage() {
         localStorage.setItem("authToken", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
         window.dispatchEvent(new Event("storage")); // Let Header update
-
-        setMessage("✅ Login successful!");
+        
+        setLoginStatus("success");
+        setErrorMessage("");
         setTimeout(() => router.push("/dashboard"), 1000);
       } else {
-        setMessage(`❌ ${data.message || "Login failed"}`);
+        setLoginStatus("error");
+        setErrorMessage(data.message || "Login failed");
       }
     } catch {
-      setMessage("❌ Something went wrong. Try again later.");
+      setLoginStatus("error");
+      setErrorMessage("Something went wrong. Try again later.");
     }
   };
 
   return (
     <main className={styles.container}>
-      <div className={styles.logoWrapper}>
+      <div className={`${styles.logoWrapper} ${
+        loginStatus === "error" ? styles.logoWrapperError : ""
+      }`}>
         <img
           src="/MSU_Logo5.png"
           alt="MSU IT Solutions Logo"
-          className={styles.logo}
+          className={`${styles.logo} ${
+            loginStatus === "success" ? styles.logoSuccess : ""
+          }`}
         />
       </div>
 
@@ -78,23 +86,26 @@ export default function LoginPage() {
             </span>
           </div>
 
-          <button type="submit" className={styles.button}>
+          <button
+            type="submit"
+            className={`${styles.button} ${
+              loginStatus === "success"
+                ? styles.buttonSuccess
+                : loginStatus === "error"
+                ? styles.buttonError
+                : ""
+            }`}
+          >
             Login
           </button>
         </form>
 
-        {message && (
-          <p
-            className={
-              message.startsWith("✅")
-                ? styles.messageSuccess
-                : styles.messageError
-            }
-          >
-            {message}
-          </p>
+        {loginStatus === "error" && errorMessage && (
+          <p className={styles.messageError}>{errorMessage}</p>
         )}
       </div>
     </main>
   );
 }
+
+
