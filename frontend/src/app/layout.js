@@ -1,6 +1,5 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import styles from "../../styles/globals.css";
-import commonStyles from "../../styles/common.css";
 
 import Header from "@/components/Header";
 
@@ -31,4 +30,6 @@ export default function RootLayout({ children }) {
     </html>
   );
 }
+
+
 
