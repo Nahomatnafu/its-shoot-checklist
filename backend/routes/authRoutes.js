@@ -52,24 +52,16 @@ router.post("/login", async (req, res) => {
       return res.status(400).json({ message: "Email not found" });
     }
 
-    console.log("🔍 Stored Hashed Password:", user.password); // Log stored password
-    console.log("🔍 Entered Password:", password); // Log entered password
-
-    // Compare passwords
     const isMatch = await bcrypt.compare(password, user.password);
-    console.log("🔍 Password Match Result:", isMatch); // Log comparison result
 
     if (!isMatch) {
       return res.status(400).json({ message: "Incorrect password" });
     }
 
-    // Generate JWT Token
     const token = jwt.sign(
       { id: user._id, role: user.role },
       process.env.JWT_SECRET,
-      {
-        expiresIn: "1d",
-      }
+      { expiresIn: "1d" }
     );
 
     res.json({
@@ -79,11 +71,12 @@ router.post("/login", async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
-        position: user.position, // Include the position here
-      },
+        position: user.position
+      }
     });
   } catch (error) {
-    res.status(500).json({ message: "Server Error" });
+    console.error("Login error:", error);
+    res.status(500).json({ message: "Server error" });
   }
 });
 

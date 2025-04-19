@@ -1,6 +1,6 @@
-const jwt = require("jsonwebtoken");
-const User = require("../models/User");
-const logger = require("../utils/logger");
+const jwt = require('jsonwebtoken');
+const User = require('../models/User');
+const logger = require('../utils/logger');
 
 const protect = async (req, res, next) => {
   try {
@@ -33,9 +33,9 @@ const protect = async (req, res, next) => {
       });
     }
   } catch (error) {
-    logger.error("Authentication middleware error", error);
-    return res.status(500).json({ message: "Internal server error" });
+    logger.error("Auth middleware error", error);
+    return res.status(500).json({ message: "Server error" });
   }
 };
 
-module.exports = { protect };
+module.exports = { protect }; // Export as an object
