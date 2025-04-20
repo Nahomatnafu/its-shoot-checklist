@@ -95,3 +95,10 @@
 .fileInput {
   display: none;
 }
+
+.error {
+  color: red;
+  font-size: 0.9rem;
+  margin: 0.5rem 0;
+  text-align: center;
+}

@@ -8,37 +8,79 @@ require("dotenv").config();
 
 const app = express();
 
-// Enhanced CORS configuration
+// Simplified CORS configuration
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://127.0.0.1:3000'],
+  origin: true, // Allow all origins
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+  allowedHeaders: ['Content-Type', 'Authorization', 'Origin', 'Accept'],
+  preflightContinue: false,
+  optionsSuccessStatus: 204
 }));
 
+// Handle preflight requests
+app.options('*', cors());
+
+// Parse JSON bodies
 app.use(express.json());
 
-// Test route to verify API is working
+// Root route
+app.get('/', (req, res) => {
+  res.json({
+    message: 'ITS Shoot Checklist API',
+    status: 'Running',
+    version: '1.0.0',
+    endpoints: {
+      health: '/api/health',
+      auth: '/api/auth',
+      checklist: '/api/checklist'
+    }
+  });
+});
+
+// Health check route with more details
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'API is running' });
+  res.json({ 
+    status: 'API is running',
+    environment: process.env.NODE_ENV,
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime()
+  });
 });
 
 // Connect to MongoDB
-connectDB().catch((error) => {
-  logger.error("MongoDB Connection Failed", error.message);
-  process.exit(1);
-});
-
-// Log loaded routes
-logger.info("API Routes loaded:");
-logger.info("- /api/auth (Authentication)");
-logger.info("- /api/checklist (Checklist)");
+connectDB()
+  .then(() => {
+    logger.success("MongoDB Connected Successfully");
+  })
+  .catch((error) => {
+    logger.error("MongoDB Connection Failed", error.message);
+    process.exit(1);
+  });
 
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/checklist", checklistRoutes);
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+// Error handling middleware
+app.use((err, req, res, next) => {
+  logger.error(err.stack);
+  res.status(500).json({
+    error: 'Something broke!',
+    message: process.env.NODE_ENV === 'development' ? err.message : 'Internal server error'
+  });
+});
+
+// Handle 404
+app.use((req, res) => {
+  res.status(404).json({
+    error: 'Not Found',
+    message: `Cannot ${req.method} ${req.url}`
+  });
+});
+
+const PORT = process.env.PORT || 10000;
+app.listen(PORT, '0.0.0.0', () => {
   logger.success(`Server running on port ${PORT}`);
+  logger.info(`Environment: ${process.env.NODE_ENV}`);
 });

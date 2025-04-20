@@ -16,15 +16,12 @@ export default function LoginPage() {
     e.preventDefault();
 
     try {
-      // Make sure we're using the correct API URL
       const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
-      console.log('Attempting to connect to:', API_URL); // Debug log
       
       const res = await fetch(`${API_URL}/auth/login`, {
         method: "POST",
         headers: { 
-          "Content-Type": "application/json",
-          "Accept": "application/json"
+          "Content-Type": "application/json"
         },
         credentials: 'include',
         body: JSON.stringify({ 
@@ -33,13 +30,8 @@ export default function LoginPage() {
         }),
       });
 
-      console.log('Full API URL:', `${API_URL}/auth/login`); // Debug log
-      console.log('Request payload:', { email: email.trim(), password: '***' }); // Debug log
-      console.log('Response status:', res.status); // Debug log
-      
       const data = await res.json();
-      console.log('Response data:', data); // Debug log
-
+      
       if (res.ok) {
         localStorage.setItem("authToken", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
@@ -53,7 +45,7 @@ export default function LoginPage() {
         setErrorMessage(data.message || "Login failed");
       }
     } catch (error) {
-      console.error('Detailed login error:', error); // Enhanced error logging
+      console.error('Detailed login error:', error);
       setLoginStatus("error");
       setErrorMessage(`Connection error: ${error.message}`);
     }
@@ -124,6 +116,10 @@ export default function LoginPage() {
     </main>
   );
 }
+
+
+
+
 
 
 

@@ -6,10 +6,11 @@ import styles from "../../styles/ProfileModal.module.css";
 export default function ProfileModal({ isOpen, onClose, user, onUpdate }) {
   const [formData, setFormData] = useState({
     activeModal: "main",
-    password: "",
+    currentPassword: "",
     newPassword: "",
     position: "",
-    profilePic: ""
+    profilePic: "",
+    error: ""
   });
 
   useEffect(() => {
@@ -20,18 +21,34 @@ export default function ProfileModal({ isOpen, onClose, user, onUpdate }) {
     }));
   }, [user]);
 
-  const handleSave = () => {
-    const updatedUser = {
-      ...user,
-      position: formData.position,
-      password: formData.newPassword || user.password,
-      profilePic: formData.profilePic || user.profilePic
-    };
-    
-    localStorage.setItem("user", JSON.stringify(updatedUser));
-    onUpdate(updatedUser);
-    onClose();
-    setFormData(prev => ({ ...prev, activeModal: "main" }));
+  const handleSave = async () => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/user/profile`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: user._id,
+          currentPassword: formData.currentPassword,
+          newPassword: formData.newPassword,
+          position: formData.position,
+          profilePic: formData.profilePic
+        })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        onUpdate(data.user);
+        onClose();
+        setFormData(prev => ({ ...prev, activeModal: "main", error: "" }));
+      } else {
+        setFormData(prev => ({ ...prev, error: data.message }));
+      }
+    } catch (error) {
+      setFormData(prev => ({ ...prev, error: "Failed to update profile" }));
+    }
   };
 
   const setActiveModal = (modalName) => {
@@ -66,11 +83,12 @@ export default function ProfileModal({ isOpen, onClose, user, onUpdate }) {
       <span className={styles.backArrow} onClick={() => setActiveModal("main")}>
         ←
       </span>
+      {formData.error && <p className={styles.error}>{formData.error}</p>}
       <input
         type="password"
-        placeholder="Old Password"
-        value={formData.password}
-        onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
+        placeholder="Current Password"
+        value={formData.currentPassword}
+        onChange={(e) => setFormData(prev => ({ ...prev, currentPassword: e.target.value }))}
         className={styles.input}
       />
       <input

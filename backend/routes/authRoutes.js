@@ -149,4 +149,42 @@ router.get("/user/:email", async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
+
+// @route   PUT /api/auth/user/profile
+// @desc    Update user profile (password, position, profilePic)
+// @access  Private
+router.put("/user/profile", async (req, res) => {
+  try {
+    const { userId, currentPassword, newPassword, position, profilePic } = req.body;
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // If changing password, verify current password
+    if (newPassword) {
+      const isMatch = await user.matchPassword(currentPassword);
+      if (!isMatch) {
+        return res.status(400).json({ message: "Current password is incorrect" });
+      }
+      user.password = newPassword;
+    }
+
+    // Update other fields if provided
+    if (position) user.position = position;
+    if (profilePic) user.profilePic = profilePic;
+
+    await user.save();
+
+    // Return user without password
+    const updatedUser = user.toObject();
+    delete updatedUser.password;
+
+    res.json({ message: "Profile updated successfully", user: updatedUser });
+  } catch (error) {
+    console.error("Error updating profile:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
 module.exports = router;

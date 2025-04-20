@@ -37,6 +37,10 @@ const UserSchema = new mongoose.Schema(
       type: String,
       default: process.env.DEFAULT_POSITION || "Visual Content Producer",
     },
+    profilePic: {
+      type: String,
+      default: "/quentin.png"
+    }
   },
   { timestamps: true }
 );
