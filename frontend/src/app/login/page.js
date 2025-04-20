@@ -17,20 +17,26 @@ export default function LoginPage() {
 
     try {
       const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+      console.log('Attempting login to:', `${API_URL}/auth/login`); // Debug log
       
       const res = await fetch(`${API_URL}/auth/login`, {
         method: "POST",
         headers: { 
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
-        credentials: 'include',
+        mode: 'cors',
+        credentials: 'same-origin', // Changed from 'include' to 'same-origin'
         body: JSON.stringify({ 
           email: email.trim(),
           password 
         }),
       });
 
+      // Add debug logging
+      console.log('Response status:', res.status);
+      
       const data = await res.json();
+      console.log('Response data:', data);
       
       if (res.ok) {
         localStorage.setItem("authToken", data.token);
@@ -116,6 +122,7 @@ export default function LoginPage() {
     </main>
   );
 }
+
 
 
 
