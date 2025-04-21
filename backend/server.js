@@ -8,38 +8,44 @@ require("dotenv").config();
 
 const app = express();
 
-// Define allowed origins
 const allowedOrigins = [
   "http://localhost:3000",
-  "https://its-shoot-checklist.vercel.app"
+  "https://its-shoot-checklist.vercel.app",
 ];
 
-// Configure CORS - simplified version
-app.use(cors({
-  origin: allowedOrigins,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
-}));
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
+app.options("*", cors()); // handle preflight
 
-// Parse JSON bodies
 app.use(express.json());
 
-// Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/checklist", checklistRoutes);
 
-// Add this after your other routes
 app.get("/api/test", (req, res) => {
   res.json({ message: "CORS is working" });
 });
 
-// Error handling middleware
 app.use((err, req, res, next) => {
   logger.error(err.stack);
   res.status(500).json({
     error: "Something broke!",
-    message: process.env.NODE_ENV === "development" ? err.message : "Internal server error"
+    message:
+      process.env.NODE_ENV === "development"
+        ? err.message
+        : "Internal server error",
   });
 });
 
