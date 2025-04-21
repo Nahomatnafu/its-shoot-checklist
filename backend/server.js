@@ -11,6 +11,7 @@ const app = express();
 const allowedOrigins = [
   "http://localhost:3000",
   "https://its-shoot-checklist.vercel.app",
+  "https://its-shoot-checklist-git-main-nahom-atnafus-projects.vercel.app",
 ];
 
 app.use(
