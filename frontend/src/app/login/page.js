@@ -14,46 +14,55 @@ export default function LoginPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+    console.log('API_URL:', API_URL); // Debug log
 
     try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
-      console.log('Attempting login to:', `${API_URL}/auth/login`); // Debug log
-      
-      const res = await fetch(`${API_URL}/auth/login`, {
+      const loginUrl = `${API_URL}/auth/login`;
+      console.log('Attempting login at:', loginUrl); // Debug log
+
+      const requestBody = {
+        email: email.trim(),
+        password,
+      };
+      console.log('Request body:', requestBody); // Debug log
+
+      const response = await fetch(loginUrl, {
         method: "POST",
-        headers: { 
+        headers: {
           "Content-Type": "application/json",
         },
-        mode: 'cors',
-        credentials: 'same-origin', // Changed from 'include' to 'same-origin'
-        body: JSON.stringify({ 
-          email: email.trim(),
-          password 
-        }),
+        body: JSON.stringify(requestBody),
       });
 
-      // Add debug logging
-      console.log('Response status:', res.status);
-      
-      const data = await res.json();
-      console.log('Response data:', data);
-      
-      if (res.ok) {
-        localStorage.setItem("authToken", data.token);
-        localStorage.setItem("user", JSON.stringify(data.user));
-        window.dispatchEvent(new Event("storage")); 
-        
-        setLoginStatus("success");
-        setErrorMessage("");
-        setTimeout(() => router.push("/dashboard"), 1000);
-      } else {
-        setLoginStatus("error");
-        setErrorMessage(data.message || "Login failed");
+      console.log('Response status:', response.status); // Debug log
+      console.log('Response headers:', Object.fromEntries(response.headers)); // Debug log
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Error response:', errorData); // Debug log
+        throw new Error(errorData.message || 'Login failed');
       }
+
+      const data = await response.json();
+      console.log('Success response:', data); // Debug log
+      
+      localStorage.setItem("authToken", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+      
+      setLoginStatus("success");
+      setErrorMessage("");
+      
+      router.push("/dashboard");
     } catch (error) {
-      console.error('Detailed login error:', error);
+      console.error('Login error:', {
+        name: error.name,
+        message: error.message,
+        stack: error.stack
+      }); // Detailed error log
       setLoginStatus("error");
-      setErrorMessage(`Connection error: ${error.message}`);
+      setErrorMessage(error.message || 'Connection error');
     }
   };
 
@@ -122,6 +131,9 @@ export default function LoginPage() {
     </main>
   );
 }
+
+
+
 
 
 

@@ -2,9 +2,14 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    domains: ['your-image-domain.com'], // Add if you're using external images
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**', // This is very permissive - you might want to restrict this
+      },
+    ],
   },
-  // Removed swcMinify as it's enabled by default
 }
 
 module.exports = nextConfig
+
