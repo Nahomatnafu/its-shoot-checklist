@@ -4,6 +4,11 @@ const logger = {
       console.log(`ℹ️ ${message}`);
     }
   },
+  warn: (message) => {
+    if (process.env.NODE_ENV !== 'test') {
+      console.warn(`⚠️ ${message}`);
+    }
+  },
   error: (message, error) => {
     if (process.env.NODE_ENV !== 'test') {
       console.error(`❌ ${message}`, error);
