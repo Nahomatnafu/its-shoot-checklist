@@ -15,18 +15,17 @@ export default function LoginPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
-    console.log('API_URL:', API_URL); // Debug log
+    const API_URL = process.env.NEXT_PUBLIC_API_URL;
+    console.log('Using API URL:', API_URL); // Debug log
 
     try {
       const loginUrl = `${API_URL}/auth/login`;
-      console.log('Attempting login at:', loginUrl); // Debug log
+      console.log('Attempting login at:', loginUrl);
 
       const requestBody = {
         email: email.trim(),
         password,
       };
-      console.log('Request body:', requestBody); // Debug log
 
       const response = await fetch(loginUrl, {
         method: "POST",
@@ -34,20 +33,16 @@ export default function LoginPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(requestBody),
+        credentials: 'include',
+        mode: 'cors'
       });
-
-      console.log('Response status:', response.status); // Debug log
-      console.log('Response headers:', Object.fromEntries(response.headers)); // Debug log
 
       if (!response.ok) {
         const errorData = await response.json();
-        console.error('Error response:', errorData); // Debug log
         throw new Error(errorData.message || 'Login failed');
       }
 
       const data = await response.json();
-      console.log('Success response:', data); // Debug log
-      
       localStorage.setItem("authToken", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
       
@@ -56,11 +51,7 @@ export default function LoginPage() {
       
       router.push("/dashboard");
     } catch (error) {
-      console.error('Login error:', {
-        name: error.name,
-        message: error.message,
-        stack: error.stack
-      }); // Detailed error log
+      console.error('Detailed login error:', error);
       setLoginStatus("error");
       setErrorMessage(error.message || 'Connection error');
     }
@@ -131,6 +122,7 @@ export default function LoginPage() {
     </main>
   );
 }
+
 
 
 
