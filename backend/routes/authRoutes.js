@@ -1,41 +1,48 @@
 const express = require("express");
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
-const bcrypt = require("bcryptjs"); // Ensure bcrypt is imported
+const bcrypt = require("bcryptjs");
+const { protect } = require("../middleware/authMiddleware");
 require("dotenv").config();
 
 const router = express.Router();
 
+// Admin middleware
+const isAdmin = (req, res, next) => {
+  if (req.user && req.user.role === 'admin') {
+    next();
+  } else {
+    res.status(403).json({ message: "Access denied: Admin only" });
+  }
+};
+
 // @route   GET /api/auth/users
 // @desc    Get all users (Admin-Only)
 // @access  Admins Only
-router.get("/users", async (req, res) => {
+router.get("/users", protect, isAdmin, async (req, res) => {
   try {
-    const users = await User.find().select("-password"); // Exclude passwords
+    const users = await User.find().select("-password");
     res.json(users);
   } catch (error) {
-    console.error("❌ Error fetching users:", error);
-    res.status(500).json({ message: "❌ Server error" });
+    logger.error("Error fetching users:", error);
+    res.status(500).json({ message: "Server error" });
   }
 });
 
 // @route   DELETE /api/auth/users/:id
 // @desc    Delete a user (Admin-Only)
 // @access  Admins Only
-router.delete("/users/:id", async (req, res) => {
+router.delete("/users/:id", protect, isAdmin, async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
-
     if (!user) {
-      return res.status(404).json({ message: "❌ User not found" });
+      return res.status(404).json({ message: "User not found" });
     }
-
-    await user.deleteOne(); // Delete the user
-
-    res.json({ message: "✅ User deleted successfully" });
+    await user.deleteOne();
+    res.json({ message: "User deleted successfully" });
   } catch (error) {
-    console.error("❌ Error deleting user:", error);
-    res.status(500).json({ message: "❌ Server error" });
+    logger.error("Error deleting user:", error);
+    res.status(500).json({ message: "Server error" });
   }
 });
 
@@ -83,33 +90,18 @@ router.post("/login", async (req, res) => {
 // @route   POST /api/auth/register
 // @desc    Register a new user (Admin-Only)
 // @access  Admins Only
-router.post("/register", async (req, res) => {
+router.post("/register", protect, isAdmin, async (req, res) => {
   const { name, email, position, role, password } = req.body;
-
   try {
     let user = await User.findOne({ email });
     if (user) {
       return res.status(400).json({ message: "User already exists" });
     }
-
-    // Hash the password
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-
-    // Create new user
-    user = new User({
-      name,
-      email,
-      position,
-      role,
-      password: hashedPassword,
-    });
-
+    user = new User({ name, email, position, role, password });
     await user.save();
-
-    res.status(201).json({ message: "✅ User added successfully" });
+    res.status(201).json({ message: "User added successfully" });
   } catch (error) {
-    console.error("❌ Error adding user:", error);
+    logger.error("Error adding user:", error);
     res.status(500).json({ message: "Server error" });
   }
 });
