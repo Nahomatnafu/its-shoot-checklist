@@ -47,6 +47,9 @@ app.use(express.json({ limit: '10mb' }));
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/checklist", checklistRoutes);
+const uploadRoutes = require("./routes/uploadRoutes");
+app.use("/api/upload", uploadRoutes);
+
 
 // Health check endpoint
 app.get("/api/health", (req, res) => {

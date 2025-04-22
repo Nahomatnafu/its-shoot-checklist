@@ -131,16 +131,36 @@ export default function ProfileModal({ isOpen, onClose, user, onUpdate }) {
         <FaUpload className={styles.uploadIcon} />
         <input
           type="file"
-          onChange={(e) =>
-            setFormData(prev => ({ 
-              ...prev, 
-              profilePic: URL.createObjectURL(e.target.files[0]) 
-            }))
-          }
+          accept="image/*"
+          onChange={async (e) => {
+            const file = e.target.files[0];
+            if (file) {
+              const reader = new FileReader();
+              reader.onloadend = () => {
+                setFormData(prev => ({ 
+                  ...prev, 
+                  profilePic: reader.result 
+                }));
+              };
+              reader.readAsDataURL(file);
+            }
+          }}
           className={styles.fileInput}
         />
       </label>
-      <button onClick={handleSave} className={styles.saveButton}>
+      {formData.profilePic && (
+        <img 
+          src={formData.profilePic} 
+          alt="Preview" 
+          className={styles.previewImage}
+          style={{ width: '100px', height: '100px', objectFit: 'cover', borderRadius: '50%' }}
+        />
+      )}
+      <button 
+        onClick={handleSave} 
+        className={styles.saveButton}
+        disabled={!formData.profilePic}
+      >
         Update Picture
       </button>
     </div>

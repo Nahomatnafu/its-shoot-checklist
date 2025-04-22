@@ -5,11 +5,10 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: '**', // This is very permissive - you might want to restrict this
+        hostname: 'res.cloudinary.com',
       },
     ],
   },
 }
 
 module.exports = nextConfig
-
