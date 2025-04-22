@@ -49,7 +49,10 @@ export default function LoginPage() {
       setLoginStatus("success");
       setErrorMessage("");
       
-      router.push("/dashboard");
+      setTimeout(() => {
+        router.push("/dashboard");
+      }, 600);
+      
     } catch (error) {
       console.error('Detailed login error:', error);
       setLoginStatus("error");
