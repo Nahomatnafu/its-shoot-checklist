@@ -137,19 +137,53 @@ export default function ProfileModal({ isOpen, onClose, user, onUpdate }) {
           onChange={async (e) => {
             const file = e.target.files[0];
             if (file) {
-              const reader = new FileReader();
-              reader.onloadend = () => {
-                setFormData(prev => ({ 
-                  ...prev, 
-                  profilePic: reader.result 
-                }));
-              };
-              reader.readAsDataURL(file);
+              try {
+                // Create FormData for file upload
+                const formData = new FormData();
+                formData.append("image", file);
+
+                // Upload to Cloudinary through our backend
+                const token = localStorage.getItem('authToken');
+                const uploadResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/upload/profile`, {
+                  method: 'POST',
+                  headers: {
+                    'Authorization': `Bearer ${token}`
+                  },
+                  body: formData
+                });
+
+                if (!uploadResponse.ok) throw new Error('Upload failed');
+                
+                const uploadResult = await uploadResponse.json();
+                
+                // Update profile with the Cloudinary URL
+                const updateResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/user/profile`, {
+                  method: 'PUT',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                  },
+                  body: JSON.stringify({
+                    userId: user._id,
+                    profilePic: uploadResult.imageUrl
+                  })
+                });
+
+                if (!updateResponse.ok) throw new Error('Profile update failed');
+
+                const updateResult = await updateResponse.json();
+                onUpdate(updateResult.user);
+                onClose();
+              } catch (error) {
+                console.error('Upload error:', error);
+                setFormData(prev => ({ ...prev, error: "Failed to upload image" }));
+              }
             }
           }}
           className={styles.fileInput}
         />
       </label>
+      {formData.error && <p className={styles.error}>{formData.error}</p>}
       {formData.profilePic && (
         <img 
           src={formData.profilePic} 
@@ -158,13 +192,6 @@ export default function ProfileModal({ isOpen, onClose, user, onUpdate }) {
           style={{ width: '100px', height: '100px', objectFit: 'cover', borderRadius: '50%' }}
         />
       )}
-      <button 
-        onClick={handleSave} 
-        className={styles.saveButton}
-        disabled={!formData.profilePic}
-      >
-        Update Picture
-      </button>
     </div>
   );
 

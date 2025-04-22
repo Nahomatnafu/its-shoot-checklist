@@ -2,6 +2,7 @@ const express = require("express");
 const multer = require("multer");
 const cloudinary = require("../config/cloudinary");
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const { protect } = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
@@ -18,8 +19,12 @@ const upload = multer({ storage });
 
 // @route POST /api/upload/profile
 // @desc Upload profile picture to Cloudinary
-router.post("/profile", upload.single("image"), (req, res) => {
+router.post("/profile", protect, upload.single("image"), (req, res) => {
   try {
+    if (!req.file) {
+      return res.status(400).json({ message: "No file uploaded" });
+    }
+    
     res.json({
       imageUrl: req.file.path,
       public_id: req.file.filename,
