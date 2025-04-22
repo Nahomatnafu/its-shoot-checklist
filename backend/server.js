@@ -9,6 +9,8 @@ const rateLimit = require("express-rate-limit");
 require("dotenv").config();
 
 const app = express();
+app.set("trust proxy", 1); // <-- Add this here
+
 
 // Security middleware
 app.use(helmet());
@@ -69,7 +71,12 @@ process.on('unhandledRejection', (err) => {
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  logger.success(`Server running on port ${PORT}`);
-  logger.info(`Environment: ${process.env.NODE_ENV}`);
+connectDB().then(() => {
+  app.listen(PORT, () => {
+    logger.success(`Server running on port ${PORT}`);
+    logger.info(`Environment: ${process.env.NODE_ENV}`);
+  });
+}).catch((err) => {
+  logger.error("❌ Failed to connect to MongoDB:", err);
+  process.exit(1);
 });
