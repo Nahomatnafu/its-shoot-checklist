@@ -7,6 +7,7 @@ const logger = require("./utils/logger");
 require("dotenv").config();
 
 const app = express();
+connectDB();
 
 const allowedOrigins = [
   "http://localhost:3000",
