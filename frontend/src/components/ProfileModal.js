@@ -23,10 +23,12 @@ export default function ProfileModal({ isOpen, onClose, user, onUpdate }) {
 
   const handleSave = async () => {
     try {
+      const token = localStorage.getItem('authToken');
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/user/profile`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
           userId: user._id,

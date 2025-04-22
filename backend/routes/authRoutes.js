@@ -109,7 +109,7 @@ router.post("/register", protect, isAdmin, async (req, res) => {
 // @route   PUT /api/auth/users/:id
 // @desc    Update user details (Admins Only)
 // @access  Admins Only
-router.put("/users/:id", async (req, res) => {
+router.put("/users/:id", protect, isAdmin, async (req, res) => {
   try {
     const { name, email, position, role } = req.body;
     const updatedUser = await User.findByIdAndUpdate(
@@ -145,7 +145,7 @@ router.get("/user/:email", async (req, res) => {
 // @route   PUT /api/auth/user/profile
 // @desc    Update user profile (password, position, profilePic)
 // @access  Private
-router.put("/user/profile", async (req, res) => {
+router.put("/user/profile", protect, async (req, res) => {
   try {
     const { userId, currentPassword, newPassword, position, profilePic } = req.body;
     const user = await User.findById(userId);
