@@ -147,7 +147,7 @@ export default function ProfileModal({ isOpen, onClose, user, onUpdate }) {
                 const formData = new FormData();
                 formData.append("image", file);
 
-                const uploadResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/upload/profile`, {
+                const uploadResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/upload/profile`, {  // Removed extra 'api'
                   method: 'POST',
                   headers: {
                     'Authorization': `Bearer ${token}`
@@ -159,9 +159,9 @@ export default function ProfileModal({ isOpen, onClose, user, onUpdate }) {
                   const errorData = await uploadResponse.json();
                   throw new Error(errorData.message || 'Upload failed');
                 }
-                
+
                 const uploadResult = await uploadResponse.json();
-                
+
                 // Then, update the profile
                 const updateResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/user/profile`, {
                   method: 'PUT',

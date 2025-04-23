@@ -47,7 +47,7 @@ app.use(express.json({ limit: '10mb' }));
 
 // Routes
 app.use("/api/auth", authRoutes);
-app.use("/api/upload", uploadRoutes);
+app.use("/api/upload", uploadRoutes);  
 app.use("/api/checklist", checklistRoutes);
 
 
