@@ -138,13 +138,16 @@ export default function ProfileModal({ isOpen, onClose, user, onUpdate }) {
             const file = e.target.files[0];
             if (file) {
               try {
-                // Create FormData for file upload
+                const token = localStorage.getItem('authToken');
+                if (!token) {
+                  throw new Error('No authentication token found');
+                }
+
+                // First, upload the image
                 const formData = new FormData();
                 formData.append("image", file);
 
-                // Upload to Cloudinary through our backend
-                const token = localStorage.getItem('authToken');
-                const uploadResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/upload/profile`, {
+                const uploadResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/upload/profile`, {
                   method: 'POST',
                   headers: {
                     'Authorization': `Bearer ${token}`
@@ -152,12 +155,15 @@ export default function ProfileModal({ isOpen, onClose, user, onUpdate }) {
                   body: formData
                 });
 
-                if (!uploadResponse.ok) throw new Error('Upload failed');
+                if (!uploadResponse.ok) {
+                  const errorData = await uploadResponse.json();
+                  throw new Error(errorData.message || 'Upload failed');
+                }
                 
                 const uploadResult = await uploadResponse.json();
                 
-                // Update profile with the Cloudinary URL
-                const updateResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/user/profile`, {
+                // Then, update the profile
+                const updateResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/user/profile`, {
                   method: 'PUT',
                   headers: {
                     'Content-Type': 'application/json',
@@ -169,14 +175,20 @@ export default function ProfileModal({ isOpen, onClose, user, onUpdate }) {
                   })
                 });
 
-                if (!updateResponse.ok) throw new Error('Profile update failed');
+                if (!updateResponse.ok) {
+                  const errorData = await updateResponse.json();
+                  throw new Error(errorData.message || 'Profile update failed');
+                }
 
                 const updateResult = await updateResponse.json();
                 onUpdate(updateResult.user);
                 onClose();
               } catch (error) {
                 console.error('Upload error:', error);
-                setFormData(prev => ({ ...prev, error: "Failed to upload image" }));
+                setFormData(prev => ({ 
+                  ...prev, 
+                  error: error.message || "Failed to upload image" 
+                }));
               }
             }
           }}

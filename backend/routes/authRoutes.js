@@ -154,18 +154,19 @@ router.put("/user/profile", protect, async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // If changing password, verify current password
+    // Update fields if provided
+    if (profilePic) user.profilePic = profilePic;
+    if (position) user.position = position;
     if (newPassword) {
+      if (!currentPassword) {
+        return res.status(400).json({ message: "Current password is required" });
+      }
       const isMatch = await user.matchPassword(currentPassword);
       if (!isMatch) {
         return res.status(400).json({ message: "Current password is incorrect" });
       }
       user.password = newPassword;
     }
-
-    // Update other fields if provided
-    if (position) user.position = position;
-    if (profilePic) user.profilePic = profilePic;
 
     await user.save();
 
