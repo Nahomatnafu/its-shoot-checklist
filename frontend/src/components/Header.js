@@ -83,8 +83,9 @@ export default function Header() {
           const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
           try {
+            // Updated URL to include /api/
             const response = await fetch(
-              `${API_URL}/auth/user/${parsedUser.email}`,
+              `${API_URL}/api/auth/user/${parsedUser.email}`,
               {
                 headers: { Authorization: `Bearer ${authToken}` },
               }
