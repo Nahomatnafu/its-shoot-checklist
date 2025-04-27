@@ -6,14 +6,16 @@ import PopUpModal from "./PopUpModal";
 import { useShootStore } from "../app/store/useShootStore";
 
 export default function ShootTypePage({ title, categories }) {
+  const router = useRouter();
+  const { type } = useParams();
+  // Add the store functions at component level
+  const { setShoots, shoots } = useShootStore();
+  
   const [checkedItems, setCheckedItems] = useState({});
   const [checkedCategories, setCheckedCategories] = useState({});
   const [shootTitle, setShootTitle] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [error, setError] = useState(null);
-
-  const router = useRouter();
-  const { type } = useParams();
 
   // Reset state when type changes
   useEffect(() => {
@@ -88,12 +90,11 @@ export default function ShootTypePage({ title, categories }) {
       const savedShoot = await response.json();
       console.log("Saved shoot successfully:", savedShoot);
 
-      // Update the store with the new shoot
-      const { setShoots, shoots } = useShootStore.getState();
+      // Update the store directly using the hooks we defined at component level
       setShoots([...shoots, savedShoot]);
 
       setShowModal(false);
-      router.push(`/shoots/${savedShoot._id}`); // Use _id instead of id
+      router.push(`/shoots/${savedShoot._id}`);
     } catch (error) {
       console.error("Error saving shoot:", error);
       setError(error.message || "Failed to save shoot");
