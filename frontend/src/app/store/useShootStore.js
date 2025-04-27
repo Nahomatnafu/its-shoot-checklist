@@ -18,7 +18,7 @@ const useShootStore = create((set) => ({
       if (!response.ok) throw new Error('Failed to update shoot');
       
       set((state) => ({
-        shoots: state.shoots.map((s) => (s.id === id ? updatedShoot : s))
+        shoots: state.shoots.map((s) => (s._id === id ? updatedShoot : s))
       }));
     } catch (error) {
       console.error('Failed to update shoot:', error);
@@ -31,7 +31,7 @@ const useShootStore = create((set) => ({
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/shoots/${id}`, {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
         }
       });
 

@@ -66,6 +66,8 @@ export default function ShootTypePage({ title, categories }) {
       const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/shoots`;
 
       console.log("Final request URL:", apiUrl);
+      console.log("Environment API URL:", process.env.NEXT_PUBLIC_API_URL);
+
 
       const response = await fetch(apiUrl, {
         method: "POST",
