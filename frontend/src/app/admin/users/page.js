@@ -47,31 +47,37 @@ export default function UsersPage() {
     const fetchUsers = async () => {
       try {
         const token = localStorage.getItem('authToken');
-        console.log('Authorization Header:', `Bearer ${token}`); // Debug authorization header
+        if (!token) {
+          console.error('No token found in localStorage');
+          router.push('/login');
+          return;
+        }
 
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/users`, {
+        console.log('Token being sent:', token.substring(0, 10) + '...'); // Debug token
+
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/users`, {
+          method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          },
-          credentials: 'include' // Add this to include credentials
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          }
         });
-        
-        if (!res.ok) {
-          const errorData = await res.json();
-          console.error('Error response:', {
-            status: res.status,
-            statusText: res.statusText,
-            data: errorData
-          });
+
+        console.log('Response status:', response.status); // Debug response
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error('Error response:', errorData);
           throw new Error(errorData.message || 'Failed to fetch users');
         }
 
-        const data = await res.json();
+        const data = await response.json();
+        console.log('Users data received:', data); // Debug successful response
         setUsers(data);
       } catch (error) {
         console.error('Fetch error:', error);
-        setModalMessage("Failed to fetch users");
+        setModalMessage(error.message || "Failed to fetch users");
         setShowModal(true);
       }
     };

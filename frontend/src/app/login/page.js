@@ -15,51 +15,46 @@ export default function LoginPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    const API_URL = process.env.NEXT_PUBLIC_API_URL;
-    console.log('Using API URL:', API_URL);
-  
     try {
-      const loginUrl = `${API_URL}/auth/login`;
+      const loginUrl = `${process.env.NEXT_PUBLIC_API_URL}/auth/login`;
       console.log('Attempting login at:', loginUrl);
-  
-      const requestBody = {
-        email: email.trim(),
-        password,
-      };
-  
+
       const response = await fetch(loginUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(requestBody),
-        credentials: 'include',
-        mode: 'cors'
+        body: JSON.stringify({
+          email: email.trim(),
+          password,
+        })
       });
-  
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || 'Login failed');
       }
-  
+
       const data = await response.json();
+      console.log('Login response:', data); // Debug login response
+
       if (data.token) {
         localStorage.setItem('authToken', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
+        console.log('Token stored:', data.token.substring(0, 10) + '...'); // Debug token storage
+      } else {
+        throw new Error('No token received');
       }
-  
+
       setLoginStatus("success");
       setErrorMessage("");
-  
-      // ⏳ Delay navigation to show success color
+
       setTimeout(() => {
-        requestAnimationFrame(() => {
-          router.push("/dashboard");
-        });
+        router.push("/dashboard");
       }, 800);
-  
+
     } catch (error) {
-      console.error('Detailed login error:', error);
+      console.error('Login error:', error);
       setLoginStatus("error");
       setErrorMessage(error.message || 'Connection error');
     }
@@ -131,6 +126,7 @@ export default function LoginPage() {
     </main>
   );
 }
+
 
 
 
