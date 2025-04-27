@@ -23,34 +23,37 @@ export default function ShootTypePage({ title, categories }) {
   }, [type]);
 
   const handleCheckboxChange = (item, type) => {
-    setCheckedItems(prev => ({
+    setCheckedItems((prev) => ({
       ...prev,
-      [item]: { ...prev[item], [type]: !prev[item]?.[type] }
+      [item]: { ...prev[item], [type]: !prev[item]?.[type] },
     }));
   };
 
   const handleCategoryToggle = (categoryName, items) => {
     const newCheckedState = !checkedCategories[categoryName];
-    
-    setCheckedCategories(prev => ({
+
+    setCheckedCategories((prev) => ({
       ...prev,
-      [categoryName]: newCheckedState
+      [categoryName]: newCheckedState,
     }));
 
-    setCheckedItems(prev => {
+    setCheckedItems((prev) => {
       const updated = { ...prev };
-      items.forEach(item => {
+      items.forEach((item) => {
         updated[item.name] = { takeOut: newCheckedState };
       });
       return updated;
     });
   };
+  // Add this console log at the top of your component to debug
+  console.log("API URL:", process.env.NEXT_PUBLIC_API_URL);
+
   const handleSave = async () => {
     try {
-      const token = localStorage.getItem('authToken');
+      const token = localStorage.getItem("authToken");
       if (!token) {
         setError("You must be logged in to save shoots");
-        router.push('/login');
+        router.push("/login");
         return;
       }
 
@@ -60,43 +63,42 @@ export default function ShootTypePage({ title, categories }) {
         return;
       }
 
-      // Log the request details for debugging
-      console.log('Making request to:', `${process.env.NEXT_PUBLIC_API_URL}/api/shoots`);
-      console.log('With token:', token.substring(0, 10) + '...');
+      const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/shoots`;
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/shoots`, {
-        method: 'POST',
+      console.log("Final request URL:", apiUrl);
+
+      const response = await fetch(apiUrl, {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           title: trimmedTitle,
           type: type,
           checklist: checkedItems,
-          template: categories
-        })
+          template: categories,
+        }),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to save shoot');
+        throw new Error(errorData.message || "Failed to save shoot");
       }
 
       const savedShoot = await response.json();
-      console.log('Saved shoot successfully:', savedShoot);
+      console.log("Saved shoot successfully:", savedShoot);
 
       setShowModal(false);
       router.push(`/shoots/${savedShoot._id}`);
     } catch (error) {
-      console.error('Error saving shoot:', error);
+      console.error("Error saving shoot:", error);
       setError(error.message || "Failed to save shoot");
-      if (error.message.includes('authentication')) {
-        router.push('/login');
+      if (error.message.includes("authentication")) {
+        router.push("/login");
       }
     }
   };
-  
 
   return (
     <main className={styles.container}>
@@ -114,13 +116,15 @@ export default function ShootTypePage({ title, categories }) {
                 type="checkbox"
                 className={styles.categoryCheckbox}
                 checked={checkedCategories[category.name] || false}
-                onChange={() => handleCategoryToggle(category.name, category.items)}
+                onChange={() =>
+                  handleCategoryToggle(category.name, category.items)
+                }
               />
               <h2 className={styles.categoryTitle}>{category.name}</h2>
             </div>
 
             <div className={styles.items}>
-              {category.items.map(item => (
+              {category.items.map((item) => (
                 <label
                   key={`${category.name}-${item.name}`}
                   className={styles.item}
@@ -142,10 +146,7 @@ export default function ShootTypePage({ title, categories }) {
         ))}
       </div>
 
-      <button 
-        className={styles.saveButton} 
-        onClick={() => setShowModal(true)}
-      >
+      <button className={styles.saveButton} onClick={() => setShowModal(true)}>
         Save Shoot
       </button>
 
