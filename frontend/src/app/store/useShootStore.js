@@ -6,12 +6,11 @@ const useShootStore = create((set) => ({
 
   addShoot: async (newShoot) => {
     try {
-      // Add error logging to help debug
       console.log('Attempting to save shoot:', newShoot);
       
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('authToken'); // Changed from 'token' to 'authToken'
       if (!token) {
-        throw new Error('No authentication token found');
+        throw new Error('No authentication token found. Please log in again.');
       }
 
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/shoots`, {
@@ -33,8 +32,7 @@ const useShootStore = create((set) => ({
       return savedShoot.id;
     } catch (error) {
       console.error('Failed to save shoot:', error);
-      // Include more details in the error
-      throw new Error(`Failed to save shoot: ${error.message}`);
+      throw error;
     }
   },
 

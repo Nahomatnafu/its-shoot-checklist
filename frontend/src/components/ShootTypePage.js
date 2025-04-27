@@ -49,6 +49,13 @@ export default function ShootTypePage({ title, categories }) {
 
   const handleSave = async () => {
     try {
+      const token = localStorage.getItem('authToken');
+      if (!token) {
+        setError("You must be logged in to save shoots");
+        router.push('/login');
+        return;
+      }
+
       const trimmedTitle = shootTitle.trim();
       if (!trimmedTitle) {
         setError("Title is required");
@@ -67,8 +74,9 @@ export default function ShootTypePage({ title, categories }) {
     } catch (error) {
       console.error('Error saving shoot:', error);
       setError(error.message || "Failed to save shoot");
-      // Optionally keep the modal open to show the error
-      // setShowModal(true);
+      if (error.message.includes('authentication')) {
+        router.push('/login');
+      }
     }
   };
 

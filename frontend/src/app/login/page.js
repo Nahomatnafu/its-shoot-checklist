@@ -17,10 +17,7 @@ export default function LoginPage() {
     setLoginStatus("loading");
     
     try {
-      const loginUrl = `${process.env.NEXT_PUBLIC_API_URL}/auth/login`;
-      console.log('Attempting login at:', loginUrl);
-
-      const response = await fetch(loginUrl, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -37,11 +34,7 @@ export default function LoginPage() {
         throw new Error(data.message || 'Login failed');
       }
 
-      console.log('Login successful, received token:', 
-        data.token ? `${data.token.substring(0, 10)}...` : 'no token');
-
       if (data.token) {
-        console.log('Storing token in localStorage');
         localStorage.setItem('authToken', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
         
@@ -127,6 +120,7 @@ export default function LoginPage() {
     </main>
   );
 }
+
 
 
 
