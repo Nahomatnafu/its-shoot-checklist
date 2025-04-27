@@ -34,20 +34,33 @@ const corsOptions = {
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
+      console.log('Origin not allowed:', origin);
       callback(new Error(`Origin ${origin} not allowed by CORS`));
     }
   },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
+  exposedHeaders: ['Authorization'],
   credentials: true,
   preflightContinue: false,
   optionsSuccessStatus: 204
 };
 
+// Apply CORS middleware
 app.use(cors(corsOptions));
 
-// Add OPTIONS handling for preflight requests
+// Handle preflight requests
 app.options('*', cors(corsOptions));
+
+// Add logging middleware
+app.use((req, res, next) => {
+  console.log('Incoming request:', {
+    method: req.method,
+    path: req.path,
+    headers: req.headers
+  });
+  next();
+});
 
 app.use(express.json({ limit: '10mb' }));
 
