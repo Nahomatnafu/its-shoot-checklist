@@ -18,7 +18,13 @@ export default function UsersPage() {
 
     const fetchUsers = async () => {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/users`);
+        const token = localStorage.getItem('authToken');
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/users`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
         if (!res.ok) throw new Error('Failed to fetch users');
         const data = await res.json();
         setUsers(data);
@@ -41,9 +47,16 @@ export default function UsersPage() {
 
   const confirmDelete = async () => {
     try {
+      const token = localStorage.getItem('authToken');
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/auth/users/${pendingDeleteId}`,
-        { method: "DELETE" }
+        { 
+          method: "DELETE",
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
       );
 
       if (!res.ok) throw new Error('Failed to delete user');
@@ -74,14 +87,15 @@ export default function UsersPage() {
 
   const handleUpdate = async (e) => {
     e.preventDefault();
-
     try {
+      const token = localStorage.getItem('authToken');
       const res = await fetch(
-        `http://localhost:5000/api/auth/users/${editUser._id}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/users/${editUser._id}`,
         {
           method: "PUT",
           headers: {
-            "Content-Type": "application/json",
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
           },
           body: JSON.stringify(updatedUser),
         }

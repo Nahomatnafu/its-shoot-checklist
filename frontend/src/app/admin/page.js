@@ -46,9 +46,13 @@ export default function AdminPage() {
     const newUser = { ...formData, password: "password0000" };
 
     try {
-      const res = await fetch("http://localhost:5000/api/auth/register", {
+      const token = localStorage.getItem('authToken');
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/register`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json' 
+        },
         body: JSON.stringify(newUser),
       });
 

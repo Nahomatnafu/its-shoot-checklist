@@ -43,8 +43,10 @@ export default function LoginPage() {
       }
   
       const data = await response.json();
-      localStorage.setItem("authToken", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
+      if (data.token) {
+        localStorage.setItem('authToken', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+      }
   
       setLoginStatus("success");
       setErrorMessage("");
@@ -129,6 +131,7 @@ export default function LoginPage() {
     </main>
   );
 }
+
 
 
 
