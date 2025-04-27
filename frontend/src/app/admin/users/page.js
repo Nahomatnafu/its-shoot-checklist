@@ -35,15 +35,15 @@ export default function UsersPage() {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
-          }
+          },
+          credentials: 'include',
+          mode: 'cors'
         });
 
         console.log('Request made with headers:', {
           Authorization: `Bearer ${token.substring(0, 10)}...`,
           'Content-Type': 'application/json'
         });
-
-        console.log('Response status:', response.status);
 
         if (!response.ok) {
           const errorData = await response.json();
