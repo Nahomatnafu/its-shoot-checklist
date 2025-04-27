@@ -60,7 +60,10 @@ export default function ShootTypePage({ title, categories }) {
         return;
       }
 
-      // Remove duplicate /api/ in the URL
+      // Log the request details for debugging
+      console.log('Making request to:', `${process.env.NEXT_PUBLIC_API_URL}/api/shoots`);
+      console.log('With token:', token.substring(0, 10) + '...');
+
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/shoots`, {
         method: 'POST',
         headers: {
@@ -81,6 +84,7 @@ export default function ShootTypePage({ title, categories }) {
       }
 
       const savedShoot = await response.json();
+      console.log('Saved shoot successfully:', savedShoot);
 
       setShowModal(false);
       router.push(`/shoots/${savedShoot._id}`);
