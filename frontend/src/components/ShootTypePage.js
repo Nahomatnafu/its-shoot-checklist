@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import styles from "../../styles/ShootTypePage.module.css";
 import PopUpModal from "./PopUpModal";
+import { useShootStore } from "@/store/useShootStore";
 
 export default function ShootTypePage({ title, categories }) {
   const [checkedItems, setCheckedItems] = useState({});
@@ -65,11 +66,6 @@ export default function ShootTypePage({ title, categories }) {
 
       const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/shoots`;
 
-      console.log("Final request URL:", apiUrl);
-      console.log("Environment API URL:", process.env.NEXT_PUBLIC_API_URL);
-      console.log("🌟 Test deploy console log 🌟");
-
-
       const response = await fetch(apiUrl, {
         method: "POST",
         headers: {
@@ -92,8 +88,12 @@ export default function ShootTypePage({ title, categories }) {
       const savedShoot = await response.json();
       console.log("Saved shoot successfully:", savedShoot);
 
+      // Update the store with the new shoot
+      const { setShoots, shoots } = useShootStore.getState();
+      setShoots([...shoots, savedShoot]);
+
       setShowModal(false);
-      router.push(`/shoots/${savedShoot._id}`);
+      router.push(`/shoots/${savedShoot._id}`); // Use _id instead of id
     } catch (error) {
       console.error("Error saving shoot:", error);
       setError(error.message || "Failed to save shoot");

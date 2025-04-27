@@ -6,7 +6,7 @@ const useShootStore = create((set, get) => ({
 
   getShootById: (id) => {
     const { shoots } = get();
-    return shoots.find(shoot => shoot._id === id || shoot.id === id);
+    return shoots.find(shoot => shoot._id === id);
   },
 
   createShoot: async (shootData) => {

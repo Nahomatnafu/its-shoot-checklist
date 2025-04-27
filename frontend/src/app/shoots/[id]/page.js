@@ -7,20 +7,21 @@ import styles from "../../../../styles/ShootTypePage.module.css";
 
 export default function ShootDetailPage() {
   const { id } = useParams();
-  const { getShootById } = useShootStore();
+  const { getShootById, shoots } = useShootStore();
   const [shoot, setShoot] = useState(null);
 
   useEffect(() => {
     if (id) {
-      const foundShoot = getShootById(id);
+      const foundShoot = shoots.find(s => s._id === id);
       setShoot(foundShoot);
     }
-  }, [id, getShootById]);
+  }, [id, shoots]);
 
   if (!shoot) {
     return (
       <main className="p-6">
         <h1 className="text-xl font-bold text-red-600">Shoot not found</h1>
+        <pre>{JSON.stringify({ id, availableShoots: shoots.map(s => s._id) }, null, 2)}</pre>
       </main>
     );
   }
