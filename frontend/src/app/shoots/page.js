@@ -13,7 +13,6 @@ export default function ShootsPage() {
   const [filteredShoots, setFilteredShoots] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedYear, setSelectedYear] = useState("All");
-
   const [showConfirm, setShowConfirm] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
 
@@ -29,22 +28,27 @@ export default function ShootsPage() {
         
         if (!response.ok) throw new Error('Failed to fetch shoots');
         
-        const shoots = await response.json();
-        setShoots(shoots);
-        setFilteredShoots(shoots);
+        const data = await response.json();
+        // Ensure we're setting valid shoot objects
+        const validShoots = data.filter(shoot => shoot && shoot._id);
+        setShoots(validShoots);
+        setFilteredShoots(validShoots);
       } catch (error) {
         console.error('Error loading shoots:', error);
       }
     };
 
     loadShoots();
-  }, [setShoots]);
+  }, []); // Remove setShoots from dependency array
 
   useEffect(() => {
-    let filtered = [...shoots].filter(shoot => shoot && shoot.id);
+    let filtered = [...shoots];
 
     if (selectedYear !== "All") {
-      filtered = filtered.filter((s) => s.date?.includes(selectedYear));
+      filtered = filtered.filter((s) => {
+        const shootDate = new Date(s.date);
+        return shootDate.getFullYear().toString() === selectedYear;
+      });
     }
 
     if (searchTerm.trim()) {

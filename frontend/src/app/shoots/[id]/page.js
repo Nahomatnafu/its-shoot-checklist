@@ -1,11 +1,13 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import useShootStore from "../../store/useShootStore";
 import styles from "../../../../styles/ShootTypePage.module.css";
 
 export default function ShootDetailPage() {
+  const router = useRouter();
   const { id } = useParams();
   const { getShootById, fetchShootById } = useShootStore();
   const [shoot, setShoot] = useState(null);
@@ -18,16 +20,19 @@ export default function ShootDetailPage() {
 
       try {
         setLoading(true);
+        setError(null);
+        
         let foundShoot = getShootById(id);
 
-        if (!foundShoot) {
-          foundShoot = await fetchShootById(id);
+        if (foundShoot) {
+          setShoot(foundShoot);
+        } else {
+          const fetchedShoot = await fetchShootById(id);
+          setShoot(fetchedShoot);
         }
-
-        setShoot(foundShoot);
       } catch (error) {
         console.error("Failed to fetch shoot:", error);
-        setError(error.message);
+        setError(error.message || "Failed to load shoot");
       } finally {
         setLoading(false);
       }
@@ -38,26 +43,36 @@ export default function ShootDetailPage() {
 
   if (loading) {
     return (
-      <main className="p-6">
-        <h1 className="text-xl font-bold text-yellow-600">Loading shoot...</h1>
+      <main className={styles.container}>
+        <h1 className={styles.heading}>Loading shoot...</h1>
       </main>
     );
   }
 
   if (error) {
     return (
-      <main className="p-6">
-        <h1 className="text-xl font-bold text-red-600">Error loading shoot</h1>
-        <p>{error}</p>
+      <main className={styles.container}>
+        <h1 className={styles.heading}>Error: {error}</h1>
+        <button 
+          onClick={() => router.push("/shoots")} 
+          className={styles.backButton}
+        >
+          Back to Shoots
+        </button>
       </main>
     );
   }
 
   if (!shoot) {
     return (
-      <main className="p-6">
-        <h1 className="text-xl font-bold text-red-600">Shoot not found</h1>
-        <p>Could not find shoot with ID: {id}</p>
+      <main className={styles.container}>
+        <h1 className={styles.heading}>Shoot not found</h1>
+        <button 
+          onClick={() => router.push("/shoots")} 
+          className={styles.backButton}
+        >
+          Back to Shoots
+        </button>
       </main>
     );
   }

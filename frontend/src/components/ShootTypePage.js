@@ -4,13 +4,12 @@ import { useRouter, useParams } from "next/navigation";
 import styles from "../../styles/ShootTypePage.module.css";
 import PopUpModal from "./PopUpModal";
 
-import useShootStore from "../app/store/useShootStore";  // Remove the curly braces
+import useShootStore from "../app/store/useShootStore";
 
 export default function ShootTypePage({ title, categories }) {
   const router = useRouter();
   const { type } = useParams();
-  // Use the store hook
-  const { setShoots, shoots } = useShootStore();
+  const { createShoot, shoots } = useShootStore();  // Use createShoot from store
   
   const [checkedItems, setCheckedItems] = useState({});
   const [checkedCategories, setCheckedCategories] = useState({});
@@ -67,32 +66,16 @@ export default function ShootTypePage({ title, categories }) {
         return;
       }
 
-      const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/shoots`;
+      const shootData = {
+        title: trimmedTitle,
+        type: type,
+        checklist: checkedItems,
+        template: categories,
+      };
 
-      const response = await fetch(apiUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          title: trimmedTitle,
-          type: type,
-          checklist: checkedItems,
-          template: categories,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to save shoot");
-      }
-
-      const savedShoot = await response.json();
+      // Use the store's createShoot function instead of direct fetch
+      const savedShoot = await createShoot(shootData);
       console.log("Saved shoot successfully:", savedShoot);
-
-      // Update the store directly using the hooks we defined at component level
-      setShoots([...shoots, savedShoot]);
 
       setShowModal(false);
       router.push(`/shoots/${savedShoot._id}`);

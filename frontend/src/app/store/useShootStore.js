@@ -2,12 +2,13 @@ import { create } from "zustand";
 
 const useShootStore = create((set, get) => ({
   shoots: [],
-
-  setShoots: (shoots) => set({ shoots }),
-
+  setShoots: (shoots) => {
+    console.log("Setting shoots:", shoots);
+    set({ shoots });
+  },
   getShootById: (id) => {
-    const { shoots } = get();
-    return shoots.find((shoot) => shoot._id === id);
+    const state = get();
+    return state.shoots.find((shoot) => shoot._id === id);
   },
 
   fetchShootById: async (id) => {
