@@ -18,11 +18,26 @@ export default function ShootsPage() {
   const [selectedId, setSelectedId] = useState(null);
 
   useEffect(() => {
-    const stored = JSON.parse(localStorage.getItem("savedShoots")) || [];
-    // Ensure all shoots have valid IDs
-    const validShoots = stored.filter(shoot => shoot && shoot.id);
-    setShoots(validShoots);
-    setFilteredShoots(validShoots);
+    const loadShoots = async () => {
+      try {
+        const token = localStorage.getItem("authToken");
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/shoots`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        
+        if (!response.ok) throw new Error('Failed to fetch shoots');
+        
+        const shoots = await response.json();
+        setShoots(shoots);
+        setFilteredShoots(shoots);
+      } catch (error) {
+        console.error('Error loading shoots:', error);
+      }
+    };
+
+    loadShoots();
   }, [setShoots]);
 
   useEffect(() => {
@@ -100,17 +115,17 @@ export default function ShootsPage() {
       ) : (
         <ul className={styles.shootList}>
           {filteredShoots.map((shoot) => (
-            shoot && shoot.id ? (
-              <li key={`shoot-${shoot.id}`} className={styles.shootCard}>
+            shoot && shoot._id ? (
+              <li key={`shoot-${shoot._id}`} className={styles.shootCard}>
                 <div
-                  onClick={() => handleShootClick(shoot.id)}
+                  onClick={() => handleShootClick(shoot._id)}
                   className={styles.shootInfo}
                 >
                   📸 {shoot.title || 'Untitled'}
                   <span className={styles.shootDate}>({shoot.date || 'No date'})</span>
                 </div>
                 <button
-                  onClick={(e) => handleDeleteRequest(shoot.id, e)}
+                  onClick={(e) => handleDeleteRequest(shoot._id, e)}
                   className={styles.deleteButton}
                 >
                   🗑 Delete

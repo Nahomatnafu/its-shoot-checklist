@@ -13,30 +13,7 @@ router.get("/", protect, async (req, res) => {
   }
 });
 
-// Create new shoot
-router.post("/", protect, async (req, res) => {
-  try {
-    console.log("Received shoot data:", req.body);
-
-    const shoot = new Shoot({
-      ...req.body,
-      user: req.user._id,
-    });
-
-    const savedShoot = await shoot.save();
-    console.log("Saved shoot:", savedShoot);
-
-    res.status(201).json(savedShoot);
-  } catch (error) {
-    console.error("Error saving shoot:", error);
-    res.status(500).json({
-      message: "Server error",
-      error: error.message,
-    });
-  }
-});
-
-// Get single shoot by ID (new route)
+// 🔥 NEW: Get a single shoot by ID
 router.get("/:id", protect, async (req, res) => {
   try {
     const shoot = await Shoot.findOne({
@@ -49,6 +26,21 @@ router.get("/:id", protect, async (req, res) => {
     res.json(shoot);
   } catch (error) {
     res.status(500).json({ message: "Server error" });
+  }
+});
+
+// Create new shoot
+router.post("/", protect, async (req, res) => {
+  try {
+    const shoot = new Shoot({
+      ...req.body,
+      user: req.user._id,
+    });
+
+    const savedShoot = await shoot.save();
+    res.status(201).json(savedShoot);
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 });
 

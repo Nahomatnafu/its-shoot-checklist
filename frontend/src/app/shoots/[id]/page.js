@@ -10,25 +10,26 @@ export default function ShootDetailPage() {
   const { getShootById, fetchShootById } = useShootStore();
   const [shoot, setShoot] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     async function loadShoot() {
       if (!id) return;
 
-      let foundShoot = getShootById(id);
+      try {
+        setLoading(true);
+        let foundShoot = getShootById(id);
 
-      if (foundShoot) {
-        setShoot(foundShoot);
-        setLoading(false);
-      } else {
-        try {
-          const fetchedShoot = await fetchShootById(id);
-          setShoot(fetchedShoot);
-        } catch (error) {
-          console.error("Failed to fetch shoot from backend:", error);
-        } finally {
-          setLoading(false);
+        if (!foundShoot) {
+          foundShoot = await fetchShootById(id);
         }
+
+        setShoot(foundShoot);
+      } catch (error) {
+        console.error("Failed to fetch shoot:", error);
+        setError(error.message);
+      } finally {
+        setLoading(false);
       }
     }
 
@@ -43,11 +44,20 @@ export default function ShootDetailPage() {
     );
   }
 
+  if (error) {
+    return (
+      <main className="p-6">
+        <h1 className="text-xl font-bold text-red-600">Error loading shoot</h1>
+        <p>{error}</p>
+      </main>
+    );
+  }
+
   if (!shoot) {
     return (
       <main className="p-6">
         <h1 className="text-xl font-bold text-red-600">Shoot not found</h1>
-        <pre>{JSON.stringify({ id }, null, 2)}</pre>
+        <p>Could not find shoot with ID: {id}</p>
       </main>
     );
   }
