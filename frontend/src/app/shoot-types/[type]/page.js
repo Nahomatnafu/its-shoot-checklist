@@ -3,7 +3,7 @@ import { useParams } from "next/navigation";
 import checklists from "@/data/checklists";
 import ShootTypePage from "@/components/ShootTypePage";
 import Footer from "@/components/Footer";
-
+// Force rebuild to clear cache
 export default function ShootTypeChecklistPage() {
   const { type } = useParams();
   const checklist = checklists[type];
