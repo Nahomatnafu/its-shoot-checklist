@@ -3,6 +3,7 @@ import styles from "../../../../styles/Users.module.css";
 import { useState, useEffect } from "react";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
 import PopUpModal from "@/components/PopUpModal";
+import { useRouter } from 'next/router';
 
 export default function UsersPage() {
   const isAuthorized = useAdminAuth();
@@ -12,43 +13,71 @@ export default function UsersPage() {
   const [showModal, setShowModal] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
   const [pendingDeleteId, setPendingDeleteId] = useState(null);
+  const router = useRouter();
 
   useEffect(() => {
     if (!isAuthorized) return;
 
+    // Check token validity
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+      console.error('No auth token found');
+      router.push('/login');
+      return;
+    }
+
+    // Try to parse the token (it's a JWT)
+    try {
+      const base64Url = token.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const payload = JSON.parse(window.atob(base64));
+      const expirationTime = payload.exp * 1000; // Convert to milliseconds
+      
+      if (Date.now() >= expirationTime) {
+        console.error('Token has expired');
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('user');
+        router.push('/login');
+        return;
+      }
+    } catch (error) {
+      console.error('Token parsing error:', error);
+    }
+
     const fetchUsers = async () => {
       try {
         const token = localStorage.getItem('authToken');
-        console.log('Token:', token); // Debug token
-        console.log('API URL:', `${process.env.NEXT_PUBLIC_API_URL}/auth/users`); // Debug URL
+        console.log('Authorization Header:', `Bearer ${token}`); // Debug authorization header
 
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/users`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
-          }
+          },
+          credentials: 'include' // Add this to include credentials
         });
-        
-        console.log('Response status:', res.status); // Debug response status
         
         if (!res.ok) {
           const errorData = await res.json();
-          console.error('Error data:', errorData); // Debug error response
+          console.error('Error response:', {
+            status: res.status,
+            statusText: res.statusText,
+            data: errorData
+          });
           throw new Error(errorData.message || 'Failed to fetch users');
         }
 
         const data = await res.json();
-        console.log('Fetched users:', data); // Debug successful data
         setUsers(data);
       } catch (error) {
-        console.error('Detailed error:', error); // Debug detailed error
+        console.error('Fetch error:', error);
         setModalMessage("Failed to fetch users");
         setShowModal(true);
       }
     };
 
     fetchUsers();
-  }, [isAuthorized]);
+  }, [isAuthorized, router]);
 
   if (!isAuthorized) return null;
 
