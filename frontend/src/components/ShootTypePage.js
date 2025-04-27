@@ -10,6 +10,7 @@ export default function ShootTypePage({ title, categories }) {
   const [checkedCategories, setCheckedCategories] = useState({});
   const [shootTitle, setShootTitle] = useState("");
   const [showModal, setShowModal] = useState(false);
+  const [error, setError] = useState(null);
 
   const router = useRouter();
   const { type } = useParams();
@@ -19,6 +20,7 @@ export default function ShootTypePage({ title, categories }) {
     setCheckedItems({});
     setCheckedCategories({});
     setShootTitle("");
+    setError(null);
   }, [type]);
 
   const handleCheckboxChange = (item, type) => {
@@ -45,18 +47,29 @@ export default function ShootTypePage({ title, categories }) {
     });
   };
 
-  const handleSave = () => {
-    const trimmedTitle = shootTitle.trim();
-    if (!trimmedTitle) return;
+  const handleSave = async () => {
+    try {
+      const trimmedTitle = shootTitle.trim();
+      if (!trimmedTitle) {
+        setError("Title is required");
+        return;
+      }
 
-    const shootId = saveShootToLocalStorage(
-      trimmedTitle,
-      type,
-      checkedItems,
-      categories
-    );
-    setShowModal(false);
-    router.push(`/shoots/${shootId}`);
+      const shootId = await saveShootToLocalStorage(
+        trimmedTitle,
+        type,
+        checkedItems,
+        categories
+      );
+      
+      setShowModal(false);
+      router.push(`/shoots/${shootId}`);
+    } catch (error) {
+      console.error('Error saving shoot:', error);
+      setError(error.message || "Failed to save shoot");
+      // Optionally keep the modal open to show the error
+      // setShowModal(true);
+    }
   };
 
   return (

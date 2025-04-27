@@ -6,23 +6,35 @@ const useShootStore = create((set) => ({
 
   addShoot: async (newShoot) => {
     try {
+      // Add error logging to help debug
+      console.log('Attempting to save shoot:', newShoot);
+      
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
+
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/shoots`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(newShoot)
       });
       
-      if (!response.ok) throw new Error('Failed to save shoot');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to save shoot');
+      }
       
       const savedShoot = await response.json();
       set((state) => ({ shoots: [...state.shoots, savedShoot] }));
       return savedShoot.id;
     } catch (error) {
       console.error('Failed to save shoot:', error);
-      throw error;
+      // Include more details in the error
+      throw new Error(`Failed to save shoot: ${error.message}`);
     }
   },
 

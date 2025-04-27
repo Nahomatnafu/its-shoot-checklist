@@ -16,14 +16,23 @@ router.get('/', protect, async (req, res) => {
 // Create new shoot
 router.post('/', protect, async (req, res) => {
   try {
+    console.log('Received shoot data:', req.body); // Add logging
+    
     const shoot = new Shoot({
       ...req.body,
       user: req.user._id
     });
+    
     const savedShoot = await shoot.save();
+    console.log('Saved shoot:', savedShoot); // Add logging
+    
     res.status(201).json(savedShoot);
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    console.error('Error saving shoot:', error);
+    res.status(500).json({ 
+      message: 'Server error', 
+      error: error.message 
+    });
   }
 });
 
