@@ -45,6 +45,22 @@ app.use(cors({
 
 app.use(express.json({ limit: '10mb' }));
 
+// Add cache control headers for static resources
+app.use(express.static('public', {
+  maxAge: '1h',
+  setHeaders: function(res, path) {
+    if (path.endsWith('.jpg') || path.endsWith('.png')) {
+      res.setHeader('Cache-Control', 'public, max-age=3600');
+    }
+  }
+}));
+
+// Add caching for API responses where appropriate
+app.get("/api/checklist", (req, res) => {
+  res.set('Cache-Control', 'public, max-age=300'); // Cache for 5 minutes
+  // ... rest of your route handler
+});
+
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/upload", uploadRoutes);  

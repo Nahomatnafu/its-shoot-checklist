@@ -1,10 +1,11 @@
 "use client";
 import { useRouter, usePathname } from "next/navigation";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import ProfileModal from "./ProfileModal";
 import styles from "../../styles/Header.module.css";
+import { debounce } from 'lodash';
 
 export default function Header() {
   const router = useRouter();
@@ -73,6 +74,25 @@ export default function Header() {
   };
 
   if (pathname === "/login" || isLoading) return null;
+
+  // Memoize user state updates
+  const setUserWithCache = useCallback((newUser) => {
+    setUser(newUser);
+    localStorage.setItem("user", JSON.stringify(newUser));
+  }, []);
+
+  // Debounce frequent state updates
+  const debouncedSetActiveDropdown = useCallback(
+    debounce((value) => setActiveDropdown(value), 100),
+    []
+  );
+
+  // Memoize handlers
+  const handleLogout = useCallback(() => {
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("user");
+    router.replace("/login");
+  }, [router]);
 
   return (
     <>
@@ -190,11 +210,7 @@ export default function Header() {
 
           <button
             className={styles.logoutButton}
-            onClick={() => {
-              localStorage.removeItem("authToken");
-              localStorage.removeItem("user");
-              router.replace("/login");
-            }}
+            onClick={handleLogout}
           >
             Logout
           </button>

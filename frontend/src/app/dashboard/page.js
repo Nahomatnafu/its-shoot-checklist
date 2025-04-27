@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Footer from "@/components/Footer";
 import styles from "../../../styles/Dashboard.module.css";
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 const shootTypes = [
   {
@@ -33,11 +34,12 @@ const shootTypes = [
   },
 ];
 
-export default function Dashboard() {
+export default function DashboardPage() {
   const router = useRouter();
   const [user, setUser] = useState(null);
   const [authChecked, setAuthChecked] = useState(false);
-
+  const [isLoading, setIsLoading] = useState(true);
+  
   useEffect(() => {
     const token = localStorage.getItem("authToken");
     const userData = localStorage.getItem("user");
@@ -49,8 +51,11 @@ export default function Dashboard() {
 
     setUser(JSON.parse(userData));
     setAuthChecked(true);
+    setIsLoading(false);
   }, [router]);
 
+  if (isLoading) return <LoadingSpinner />;
+  
   if (!authChecked) return null;
 
   return (
