@@ -16,64 +16,48 @@ export default function UsersPage() {
   const router = useRouter();
 
   useEffect(() => {
-    if (!isAuthorized) return;
+    const checkAuthAndFetchUsers = async () => {
+      if (!isAuthorized) return;
 
-    // Check token validity
-    const token = localStorage.getItem('authToken');
-    if (!token) {
-      console.error('No auth token found');
-      router.push('/login');
-      return;
-    }
+      const token = localStorage.getItem('authToken');
+      console.log('Current token in localStorage:', 
+        token ? `${token.substring(0, 10)}...` : 'no token');
 
-    // Try to parse the token (it's a JWT)
-    try {
-      const base64Url = token.split('.')[1];
-      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-      const payload = JSON.parse(window.atob(base64));
-      const expirationTime = payload.exp * 1000; // Convert to milliseconds
-      
-      if (Date.now() >= expirationTime) {
-        console.error('Token has expired');
-        localStorage.removeItem('authToken');
-        localStorage.removeItem('user');
+      if (!token) {
+        console.error('No auth token found');
         router.push('/login');
         return;
       }
-    } catch (error) {
-      console.error('Token parsing error:', error);
-    }
 
-    const fetchUsers = async () => {
       try {
-        const token = localStorage.getItem('authToken');
-        if (!token) {
-          console.error('No token found in localStorage');
-          router.push('/login');
-          return;
-        }
-
-        console.log('Token being sent:', token.substring(0, 10) + '...'); // Debug token
-
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/users`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
-            'Accept': 'application/json'
           }
         });
 
-        console.log('Response status:', response.status); // Debug response
+        console.log('Request made with headers:', {
+          Authorization: `Bearer ${token.substring(0, 10)}...`,
+          'Content-Type': 'application/json'
+        });
+
+        console.log('Response status:', response.status);
 
         if (!response.ok) {
           const errorData = await response.json();
           console.error('Error response:', errorData);
+          if (response.status === 401) {
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('user');
+            router.push('/login');
+            return;
+          }
           throw new Error(errorData.message || 'Failed to fetch users');
         }
 
         const data = await response.json();
-        console.log('Users data received:', data); // Debug successful response
         setUsers(data);
       } catch (error) {
         console.error('Fetch error:', error);
@@ -82,7 +66,7 @@ export default function UsersPage() {
       }
     };
 
-    fetchUsers();
+    checkAuthAndFetchUsers();
   }, [isAuthorized, router]);
 
   if (!isAuthorized) return null;

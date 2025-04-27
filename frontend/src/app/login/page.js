@@ -36,12 +36,19 @@ export default function LoginPage() {
       }
 
       const data = await response.json();
-      console.log('Login response:', data); // Debug login response
+      console.log('Login response data:', {
+        token: data.token ? `${data.token.substring(0, 10)}...` : 'no token',
+        user: data.user
+      });
 
       if (data.token) {
         localStorage.setItem('authToken', data.token);
+        // Verify token was stored
+        const storedToken = localStorage.getItem('authToken');
+        console.log('Verification - Token in localStorage:', 
+          storedToken ? `${storedToken.substring(0, 10)}...` : 'not found');
+        
         localStorage.setItem('user', JSON.stringify(data.user));
-        console.log('Token stored:', data.token.substring(0, 10) + '...'); // Debug token storage
       } else {
         throw new Error('No token received');
       }
@@ -49,9 +56,9 @@ export default function LoginPage() {
       setLoginStatus("success");
       setErrorMessage("");
 
-      setTimeout(() => {
-        router.push("/dashboard");
-      }, 800);
+      // Add delay to see console logs
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      router.push("/dashboard");
 
     } catch (error) {
       console.error('Login error:', error);
@@ -126,6 +133,7 @@ export default function LoginPage() {
     </main>
   );
 }
+
 
 
 
