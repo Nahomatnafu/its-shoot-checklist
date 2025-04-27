@@ -5,29 +5,50 @@ const useWaiverStore = create((set) => ({
   
   setWaivers: async () => {
     try {
+      const token = localStorage.getItem('authToken'); // Changed from 'token' to 'authToken'
+      if (!token) {
+        console.error('No auth token found');
+        return;
+      }
+
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/waivers`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${token}`
         }
       });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
       const data = await response.json();
-      set({ waivers: data });
+      set({ waivers: Array.isArray(data) ? data : [] }); // Ensure waivers is always an array
     } catch (error) {
       console.error('Failed to fetch waivers:', error);
+      set({ waivers: [] }); // Set empty array on error
     }
   },
 
   addWaiver: async (waiver) => {
     try {
+      const token = localStorage.getItem('authToken');
+      if (!token) {
+        throw new Error('No auth token found');
+      }
+
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/waivers`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(waiver)
       });
       
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
       const savedWaiver = await response.json();
       set((state) => ({ waivers: [...state.waivers, savedWaiver] }));
       return savedWaiver;
