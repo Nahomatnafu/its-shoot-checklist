@@ -53,13 +53,14 @@ export default function ShootTypePage({ title, categories }) {
         router.push('/login');
         return;
       }
-  
+
       const trimmedTitle = shootTitle.trim();
       if (!trimmedTitle) {
         setError("Title is required");
         return;
       }
-  
+
+      // Remove duplicate /api/ in the URL
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/shoots`, {
         method: 'POST',
         headers: {
@@ -73,14 +74,14 @@ export default function ShootTypePage({ title, categories }) {
           template: categories
         })
       });
-  
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || 'Failed to save shoot');
       }
-  
+
       const savedShoot = await response.json();
-  
+
       setShowModal(false);
       router.push(`/shoots/${savedShoot._id}`);
     } catch (error) {
