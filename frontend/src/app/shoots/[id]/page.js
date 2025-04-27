@@ -7,21 +7,47 @@ import styles from "../../../../styles/ShootTypePage.module.css";
 
 export default function ShootDetailPage() {
   const { id } = useParams();
-  const { getShootById, shoots } = useShootStore();
+  const { getShootById, fetchShootById } = useShootStore();
   const [shoot, setShoot] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (id) {
-      const foundShoot = shoots.find(s => s._id === id);
-      setShoot(foundShoot);
+    async function loadShoot() {
+      if (!id) return;
+
+      let foundShoot = getShootById(id);
+
+      if (foundShoot) {
+        setShoot(foundShoot);
+        setLoading(false);
+      } else {
+        try {
+          const fetchedShoot = await fetchShootById(id);
+          setShoot(fetchedShoot);
+        } catch (error) {
+          console.error("Failed to fetch shoot from backend:", error);
+        } finally {
+          setLoading(false);
+        }
+      }
     }
-  }, [id, shoots]);
+
+    loadShoot();
+  }, [id, getShootById, fetchShootById]);
+
+  if (loading) {
+    return (
+      <main className="p-6">
+        <h1 className="text-xl font-bold text-yellow-600">Loading shoot...</h1>
+      </main>
+    );
+  }
 
   if (!shoot) {
     return (
       <main className="p-6">
         <h1 className="text-xl font-bold text-red-600">Shoot not found</h1>
-        <pre>{JSON.stringify({ id, availableShoots: shoots.map(s => s._id) }, null, 2)}</pre>
+        <pre>{JSON.stringify({ id }, null, 2)}</pre>
       </main>
     );
   }
@@ -43,7 +69,8 @@ export default function ShootDetailPage() {
 
             <div className={styles.items}>
               {category.items.map((item, i) => {
-                const isChecked = shoot.checklist?.[item.name]?.takeOut || false;
+                const isChecked =
+                  shoot.checklist?.[item.name]?.takeOut || false;
                 return (
                   <div
                     key={i}

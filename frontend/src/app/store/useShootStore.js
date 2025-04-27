@@ -2,88 +2,118 @@ import { create } from "zustand";
 
 const useShootStore = create((set, get) => ({
   shoots: [],
+
   setShoots: (shoots) => set({ shoots }),
 
   getShootById: (id) => {
     const { shoots } = get();
-    return shoots.find(shoot => shoot._id === id);
+    return shoots.find((shoot) => shoot._id === id);
+  },
+
+  fetchShootById: async (id) => {
+    const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/shoots/${id}`;
+    const token = localStorage.getItem("authToken");
+
+    try {
+      const response = await fetch(apiUrl, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) throw new Error("Failed to fetch shoot by ID");
+
+      const shoot = await response.json();
+      set((state) => ({
+        shoots: [...state.shoots, shoot],
+      }));
+
+      return shoot;
+    } catch (error) {
+      console.error("Error fetching shoot by ID:", error);
+      throw error;
+    }
   },
 
   createShoot: async (shootData) => {
     const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/shoots`;
-    
+    const token = localStorage.getItem("authToken");
+
     try {
       const response = await fetch(apiUrl, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(shootData)
+        body: JSON.stringify(shootData),
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to create shoot');
-      }
+      if (!response.ok) throw new Error("Failed to create shoot");
 
       const newShoot = await response.json();
       set((state) => ({
-        shoots: [...state.shoots, newShoot]
+        shoots: [...state.shoots, newShoot],
       }));
+
       return newShoot;
     } catch (error) {
-      console.error('Error creating shoot:', error);
+      console.error("Error creating shoot:", error);
       throw error;
     }
   },
 
   updateShootById: async (id, updatedShoot) => {
     const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/shoots/${id}`;
-    
+    const token = localStorage.getItem("authToken");
+
     try {
       const response = await fetch(apiUrl, {
-        method: 'PUT',
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(updatedShoot)
+        body: JSON.stringify(updatedShoot),
       });
 
-      if (!response.ok) throw new Error('Failed to update shoot');
-      
+      if (!response.ok) throw new Error("Failed to update shoot");
+
       const updated = await response.json();
       set((state) => ({
-        shoots: state.shoots.map((s) => (s._id === id ? updated : s))
+        shoots: state.shoots.map((s) => (s._id === id ? updated : s)),
       }));
+
       return updated;
     } catch (error) {
-      console.error('Failed to update shoot:', error);
+      console.error("Error updating shoot:", error);
       throw error;
     }
   },
 
   deleteShoot: async (id) => {
     const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/shoots/${id}`;
-    
+    const token = localStorage.getItem("authToken");
+
     try {
       const response = await fetch(apiUrl, {
-        method: 'DELETE',
+        method: "DELETE",
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
 
-      if (!response.ok) throw new Error('Failed to delete shoot');
-      
+      if (!response.ok) throw new Error("Failed to delete shoot");
+
       set((state) => ({
-        shoots: state.shoots.filter((s) => s._id !== id)
+        shoots: state.shoots.filter((s) => s._id !== id),
       }));
     } catch (error) {
-      console.error('Failed to delete shoot:', error);
+      console.error("Error deleting shoot:", error);
       throw error;
     }
-  }
+  },
 }));
 
 export default useShootStore;
