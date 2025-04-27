@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import styles from "../../styles/ShootTypePage.module.css";
 import PopUpModal from "./PopUpModal";
-import { useShootStore } from "@/store/useShootStore";
+import { useShootStore } from "../app/store/useShootStore";
 
 export default function ShootTypePage({ title, categories }) {
   const [checkedItems, setCheckedItems] = useState({});
