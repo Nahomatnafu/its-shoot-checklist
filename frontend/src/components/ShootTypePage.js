@@ -46,7 +46,6 @@ export default function ShootTypePage({ title, categories }) {
       return updated;
     });
   };
-
   const handleSave = async () => {
     try {
       const token = localStorage.getItem('authToken');
@@ -55,22 +54,36 @@ export default function ShootTypePage({ title, categories }) {
         router.push('/login');
         return;
       }
-
+  
       const trimmedTitle = shootTitle.trim();
       if (!trimmedTitle) {
         setError("Title is required");
         return;
       }
-
-      const shootId = await saveShootToLocalStorage(
-        trimmedTitle,
-        type,
-        checkedItems,
-        categories
-      );
-      
+  
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/shoots`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          title: trimmedTitle,
+          type: type,
+          checklist: checkedItems,
+          template: categories
+        })
+      });
+  
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to save shoot');
+      }
+  
+      const savedShoot = await response.json();
+  
       setShowModal(false);
-      router.push(`/shoots/${shootId}`);
+      router.push(`/shoots/${savedShoot._id}`);
     } catch (error) {
       console.error('Error saving shoot:', error);
       setError(error.message || "Failed to save shoot");
@@ -79,6 +92,7 @@ export default function ShootTypePage({ title, categories }) {
       }
     }
   };
+  
 
   return (
     <main className={styles.container}>
