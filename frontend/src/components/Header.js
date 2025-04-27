@@ -6,16 +6,11 @@ import Image from "next/image";
 import ProfileModal from "./ProfileModal";
 import styles from "../../styles/Header.module.css";
 
-// Remove lodash import and create a simple debounce function
 const debounce = (func, wait) => {
   let timeout;
-  return function executedFunction(...args) {
-    const later = () => {
-      clearTimeout(timeout);
-      func(...args);
-    };
+  return (...args) => {
     clearTimeout(timeout);
-    timeout = setTimeout(later, wait);
+    timeout = setTimeout(() => func(...args), wait);
   };
 };
 
@@ -30,7 +25,7 @@ export default function Header() {
   const dropdownRefs = {
     waiver: useRef(null),
     shoot: useRef(null),
-    credits: useRef(null)
+    credits: useRef(null),
   };
 
   const shootTypes = [
@@ -41,38 +36,87 @@ export default function Header() {
     { name: "Photoshoot", path: "/shoot-types/photoshoot" },
   ];
 
+  const setUserWithCache = useMemo(
+    () => (newUser) => {
+      setUser(newUser);
+      localStorage.setItem("user", JSON.stringify(newUser));
+    },
+    []
+  );
+
+  const debouncedSetActiveDropdown = useCallback(
+    debounce((value) => setActiveDropdown(value), 100),
+    []
+  );
+
+  const handleLogout = useCallback(() => {
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("user");
+    router.replace("/login");
+  }, [router]);
+
+  const handleProfileClick = () => {
+    const updatedUser = JSON.parse(localStorage.getItem("user"));
+    if (updatedUser) setUser(updatedUser);
+    setProfileModalOpen(true);
+  };
+
   useEffect(() => {
     const loadUser = async () => {
       try {
+        if (pathname === "/login") {
+          setIsLoading(false);
+          return;
+        }
+
+        const authToken = localStorage.getItem("authToken");
+        if (!authToken) {
+          router.replace("/login");
+          return;
+        }
+
         const storedUser = localStorage.getItem("user");
         if (storedUser) {
           const parsedUser = JSON.parse(storedUser);
-          const response = await fetch(`/api/auth/user/${parsedUser.email}`);
-          if (response.ok) {
-            const updatedUser = await response.json();
-            localStorage.setItem("user", JSON.stringify(updatedUser));
-            setUser(updatedUser);
-          } else {
-            setUser(parsedUser);
+          setUser(parsedUser);
+
+          const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
+          try {
+            const response = await fetch(
+              `${API_URL}/auth/user/${parsedUser.email}`,
+              {
+                headers: { Authorization: `Bearer ${authToken}` },
+              }
+            );
+            if (response.ok) {
+              const updatedUser = await response.json();
+              setUserWithCache(updatedUser);
+            }
+          } catch (error) {
+            console.error("Failed to fetch updated user data:", error);
           }
+        } else {
+          router.replace("/login");
         }
       } catch (error) {
-        setUser(null);
+        console.error("Error loading user:", error);
+        router.replace("/login");
       } finally {
         setIsLoading(false);
       }
     };
 
     loadUser();
-    window.addEventListener("storage", loadUser);
-    return () => window.removeEventListener("storage", loadUser);
-  }, []);
+  }, [pathname, router, setUserWithCache]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (!Object.values(dropdownRefs).some(ref => 
-        ref.current && ref.current.contains(event.target)
-      )) {
+      if (
+        !Object.values(dropdownRefs).some(
+          (ref) => ref.current && ref.current.contains(event.target)
+        )
+      ) {
         setActiveDropdown(null);
       }
     };
@@ -81,30 +125,7 @@ export default function Header() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const toggleDropdown = (name) => {
-    setActiveDropdown(current => current === name ? null : name);
-  };
-
   if (pathname === "/login" || isLoading) return null;
-
-  // Memoize user state updates
-  const setUserWithCache = useMemo(() => (newUser) => {
-    setUser(newUser);
-    localStorage.setItem("user", JSON.stringify(newUser));
-  }, []);
-
-  // Debounce frequent state updates
-  const debouncedSetActiveDropdown = useCallback(
-    debounce((value) => setActiveDropdown(value), 100),
-    []
-  );
-
-  // Memoize handlers
-  const handleLogout = useCallback(() => {
-    localStorage.removeItem("authToken");
-    localStorage.removeItem("user");
-    router.replace("/login");
-  }, [router]);
 
   return (
     <>
@@ -117,11 +138,11 @@ export default function Header() {
             <div className={styles.dropdownContainer} ref={dropdownRefs.waiver}>
               <button
                 className={styles.navButton}
-                onClick={() => toggleDropdown('waiver')}
+                onClick={() => toggleDropdown("waiver")}
               >
                 Image Waiver ▼
               </button>
-              {activeDropdown === 'waiver' && (
+              {activeDropdown === "waiver" && (
                 <div className={styles.dropdownMenu}>
                   <Link
                     href="/image-waiver"
@@ -159,11 +180,11 @@ export default function Header() {
           <div className={styles.dropdownContainer} ref={dropdownRefs.shoot}>
             <button
               className={styles.navButton}
-              onClick={() => toggleDropdown('shoot')}
+              onClick={() => toggleDropdown("shoot")}
             >
               Shoot Type ▼
             </button>
-            {activeDropdown === 'shoot' && (
+            {activeDropdown === "shoot" && (
               <div className={styles.dropdownMenu}>
                 {shootTypes.map((shoot) => (
                   <Link
@@ -182,11 +203,11 @@ export default function Header() {
           <div className={styles.dropdownContainer} ref={dropdownRefs.credits}>
             <button
               className={styles.navButton}
-              onClick={() => toggleDropdown('credits')}
+              onClick={() => toggleDropdown("credits")}
             >
               Credits ▼
             </button>
-            {activeDropdown === 'credits' && (
+            {activeDropdown === "credits" && (
               <div className={styles.dropdownMenu}>
                 <Link
                   href="/credits/create"
@@ -220,10 +241,7 @@ export default function Header() {
             </button>
           )}
 
-          <button
-            className={styles.logoutButton}
-            onClick={handleLogout}
-          >
+          <button className={styles.logoutButton} onClick={handleLogout}>
             Logout
           </button>
 
@@ -234,11 +252,7 @@ export default function Header() {
               width={40}
               height={40}
               className={styles.userImage}
-              onClick={() => {
-                const updatedUser = JSON.parse(localStorage.getItem("user"));
-                setUser(updatedUser);
-                setProfileModalOpen(true);
-              }}
+              onClick={handleProfileClick}
             />
           </div>
         </nav>
@@ -249,10 +263,13 @@ export default function Header() {
         onClose={() => setProfileModalOpen(false)}
         user={user}
         onUpdate={(updatedUser) => {
-          localStorage.setItem("user", JSON.stringify(updatedUser));
-          setUser(updatedUser);
+          setUserWithCache(updatedUser);
         }}
       />
     </>
   );
+
+  function toggleDropdown(name) {
+    debouncedSetActiveDropdown(name);
+  }
 }
