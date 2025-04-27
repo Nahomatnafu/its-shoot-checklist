@@ -52,16 +52,6 @@ app.use(cors(corsOptions));
 // Handle preflight requests
 app.options('*', cors(corsOptions));
 
-// Add logging middleware
-app.use((req, res, next) => {
-  console.log('Incoming request:', {
-    method: req.method,
-    path: req.path,
-    headers: req.headers
-  });
-  next();
-});
-
 app.use(express.json({ limit: '10mb' }));
 
 // Add cache control headers for static resources

@@ -4,45 +4,31 @@ const logger = require('../utils/logger');
 
 const protect = async (req, res, next) => {
   try {
-    console.log('Request headers:', req.headers);
-    console.log('Request method:', req.method);
-    console.log('Request path:', req.path);
-    
     const authHeader = req.headers.authorization;
-    console.log('Auth header received:', authHeader);
 
     if (!authHeader || !authHeader.startsWith("Bearer")) {
-      console.log('No token or invalid format');
       return res.status(401).json({ 
-        message: "Not authorized, no token provided or invalid format",
-        headers: req.headers,
-        method: req.method,
-        path: req.path
+        message: "Not authorized, no token provided or invalid format"
       });
     }
 
     const token = authHeader.split(" ")[1];
-    console.log('Token extracted:', token.substring(0, 10) + '...');
 
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      console.log('Token decoded successfully:', decoded);
-
       const user = await User.findById(decoded.id).select("-password");
+      
       if (!user) {
-        console.log('No user found for decoded token');
         return res.status(401).json({ message: "User no longer exists" });
       }
 
       req.user = user;
       next();
     } catch (error) {
-      console.error("Token verification failed:", error);
       return res.status(401).json({ 
         message: error.name === 'TokenExpiredError' 
           ? "Token has expired" 
-          : "Not authorized, invalid token",
-        error: error.message
+          : "Not authorized, invalid token"
       });
     }
   } catch (error) {

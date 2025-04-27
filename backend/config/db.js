@@ -28,10 +28,10 @@ const connectDB = async () => {
       logger.success('MongoDB reconnected');
     });
 
+    return conn;
   } catch (error) {
-    logger.error("MongoDB Connection Failed", error);
-    // Wait 5 seconds before exiting to allow logs to be written
-    setTimeout(() => process.exit(1), 5000);
+    logger.error('MongoDB Connection Failed:', error);
+    process.exit(1);
   }
 };
 
