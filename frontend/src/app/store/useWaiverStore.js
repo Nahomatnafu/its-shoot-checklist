@@ -1,34 +1,64 @@
 import { create } from "zustand";
-import { nanoid } from "nanoid";
 
 const useWaiverStore = create((set) => ({
   waivers: [],
-  setWaivers: (waivers) =>
-    set(() => {
-      const updated = waivers.map((w) => (w.id ? w : { ...w, id: nanoid(6) }));
-      localStorage.setItem("savedWaivers", JSON.stringify(updated));
-      return { waivers: updated };
-    }),
+  
+  setWaivers: async () => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/waivers`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      const data = await response.json();
+      set({ waivers: data });
+    } catch (error) {
+      console.error('Failed to fetch waivers:', error);
+    }
+  },
 
-  addWaiver: (waiver) =>
-    set((state) => {
-      const newWaiver = { ...waiver, id: nanoid(6) };
-      const updated = [...state.waivers, newWaiver];
-      localStorage.setItem("savedWaivers", JSON.stringify(updated));
-      return { waivers: updated };
-    }),
+  addWaiver: async (waiver) => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/waivers`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify(waiver)
+      });
+      
+      const savedWaiver = await response.json();
+      set((state) => ({ waivers: [...state.waivers, savedWaiver] }));
+      return savedWaiver;
+    } catch (error) {
+      console.error('Failed to save waiver:', error);
+      throw error;
+    }
+  },
 
-  deleteWaiverById: (id) =>
-    set((state) => {
-      const updated = state.waivers.filter((w) => w.id !== id);
-      localStorage.setItem("savedWaivers", JSON.stringify(updated));
-      return { waivers: updated };
-    }),
+  deleteWaiverById: async (id) => {
+    try {
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/waivers/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      
+      set((state) => ({
+        waivers: state.waivers.filter((w) => w.id !== id)
+      }));
+    } catch (error) {
+      console.error('Failed to delete waiver:', error);
+      throw error;
+    }
+  },
 
   getWaiverById: (id) => {
-    const stored = JSON.parse(localStorage.getItem("savedWaivers")) || [];
-    return stored.find((w) => w.id === id);
-  },
+    const state = useWaiverStore.getState();
+    return state.waivers.find((w) => w.id === id);
+  }
 }));
 
 export default useWaiverStore;
