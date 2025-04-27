@@ -131,73 +131,71 @@ export default function ProfileModal({ isOpen, onClose, user, onUpdate }) {
       <span className={styles.backArrow} onClick={() => setActiveModal("main")}>
         ←
       </span>
-      <label className={styles.uploadLabel}>
-        <FaUpload className={styles.uploadIcon} />
-        <input
-          type="file"
-          accept="image/*"
-          onChange={async (e) => {
-            const file = e.target.files[0];
-            if (file) {
-              try {
-                const token = localStorage.getItem('authToken');
-                if (!token) {
-                  throw new Error('No authentication token found');
+      {!previewImage ? (
+        <label className={styles.uploadLabel}>
+          <FaUpload className={styles.uploadIcon} />
+          <input
+            type="file"
+            accept="image/*"
+            onChange={async (e) => {
+              const file = e.target.files[0];
+              if (file) {
+                try {
+                  const token = localStorage.getItem('authToken');
+                  if (!token) {
+                    throw new Error('No authentication token found');
+                  }
+
+                  const formDataUpload = new FormData();
+                  formDataUpload.append("image", file);
+
+                  const uploadResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/upload/profile`, {
+                    method: 'POST',
+                    headers: {
+                      'Authorization': `Bearer ${token}`
+                    },
+                    body: formDataUpload
+                  });
+
+                  if (!uploadResponse.ok) {
+                    const errorData = await uploadResponse.json();
+                    throw new Error(errorData.message || 'Upload failed');
+                  }
+
+                  const uploadResult = await uploadResponse.json();
+                  
+                  setPreviewImage(uploadResult.imageUrl);
+                  setFormData(prev => ({
+                    ...prev,
+                    profilePic: uploadResult.imageUrl,
+                    error: ""
+                  }));
+
+                } catch (error) {
+                  console.error('Upload error:', error);
+                  setFormData(prev => ({
+                    ...prev,
+                    error: error.message || "Failed to upload image"
+                  }));
                 }
-
-                // Create FormData
-                const formDataUpload = new FormData();
-                formDataUpload.append("image", file);
-
-                // Make sure the URL matches your backend route exactly
-                const uploadResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/upload/profile`, {
-                  method: 'POST',
-                  headers: {
-                    'Authorization': `Bearer ${token}`
-                    // Remove Content-Type header - let browser set it with boundary
-                  },
-                  body: formDataUpload
-                });
-
-                if (!uploadResponse.ok) {
-                  const errorData = await uploadResponse.json();
-                  throw new Error(errorData.message || 'Upload failed');
-                }
-
-                const uploadResult = await uploadResponse.json();
-                
-                // Set the preview image and update formData
-                setPreviewImage(uploadResult.imageUrl);
-                setFormData(prev => ({
-                  ...prev,
-                  profilePic: uploadResult.imageUrl,
-                  error: ""
-                }));
-
-              } catch (error) {
-                console.error('Upload error:', error);
-                setFormData(prev => ({
-                  ...prev,
-                  error: error.message || "Failed to upload image"
-                }));
               }
-            }
-          }}
-          className={styles.fileInput}
-        />
-      </label>
-      {formData.error && <p className={styles.error}>{formData.error}</p>}
-      {previewImage && (
+            }}
+            className={styles.fileInput}
+          />
+        </label>
+      ) : (
         <img 
           src={previewImage}
           alt="Preview"
           className={styles.previewImage}
-          style={{ width: '100px', height: '100px', objectFit: 'cover', borderRadius: '50%' }}
         />
       )}
-      <button onClick={handleSave} className={styles.saveButton} style={{ marginTop: "1rem" }}>
-        Save New Profile Picture
-      </button>
+      {formData.error && <p className={styles.error}>{formData.error}</p>}
+      {previewImage && (
+        <button onClick={handleSave} className={styles.saveButton} style={{ marginTop: "1rem" }}>
+          Save
+        </button>
+      )}
     </div>
   );
 
