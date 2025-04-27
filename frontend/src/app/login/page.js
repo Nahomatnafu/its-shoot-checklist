@@ -14,6 +14,7 @@ export default function LoginPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoginStatus("loading");
     
     try {
       const loginUrl = `${process.env.NEXT_PUBLIC_API_URL}/auth/login`;
@@ -30,36 +31,29 @@ export default function LoginPage() {
         })
       });
 
+      const data = await response.json();
+      
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Login failed');
+        throw new Error(data.message || 'Login failed');
       }
 
-      const data = await response.json();
-      console.log('Login response data:', {
-        token: data.token ? `${data.token.substring(0, 10)}...` : 'no token',
-        user: data.user
-      });
+      console.log('Login successful, received token:', 
+        data.token ? `${data.token.substring(0, 10)}...` : 'no token');
 
       if (data.token) {
         localStorage.setItem('authToken', data.token);
-        // Verify token was stored
-        const storedToken = localStorage.getItem('authToken');
-        console.log('Verification - Token in localStorage:', 
-          storedToken ? `${storedToken.substring(0, 10)}...` : 'not found');
-        
         localStorage.setItem('user', JSON.stringify(data.user));
+        
+        // Verify storage
+        const storedToken = localStorage.getItem('authToken');
+        console.log('Verified stored token:', 
+          storedToken ? `${storedToken.substring(0, 10)}...` : 'not found');
       } else {
         throw new Error('No token received');
       }
 
       setLoginStatus("success");
-      setErrorMessage("");
-
-      // Add delay to see console logs
-      await new Promise(resolve => setTimeout(resolve, 1000));
       router.push("/dashboard");
-
     } catch (error) {
       console.error('Login error:', error);
       setLoginStatus("error");
@@ -133,6 +127,8 @@ export default function LoginPage() {
     </main>
   );
 }
+
+
 
 
 

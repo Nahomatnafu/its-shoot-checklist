@@ -3,9 +3,10 @@ import styles from "../../../../styles/Users.module.css";
 import { useState, useEffect } from "react";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
 import PopUpModal from "@/components/PopUpModal";
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 
 export default function UsersPage() {
+  const router = useRouter();
   const isAuthorized = useAdminAuth();
   const [users, setUsers] = useState([]);
   const [editUser, setEditUser] = useState(null);
@@ -13,11 +14,13 @@ export default function UsersPage() {
   const [showModal, setShowModal] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
   const [pendingDeleteId, setPendingDeleteId] = useState(null);
-  const router = useRouter();
 
   useEffect(() => {
     const checkAuthAndFetchUsers = async () => {
-      if (!isAuthorized) return;
+      if (!isAuthorized) {
+        router.push('/login');
+        return;
+      }
 
       const token = localStorage.getItem('authToken');
       console.log('Current token in localStorage:', 
@@ -35,9 +38,7 @@ export default function UsersPage() {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
-          },
-          credentials: 'include',
-          mode: 'cors'
+          }
         });
 
         console.log('Request made with headers:', {
