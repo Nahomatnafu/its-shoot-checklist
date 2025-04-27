@@ -75,30 +75,48 @@
   color: #49306e;
 }
 
+.error {
+  color: red;
+  font-size: 0.9rem;
+  margin: 0.5rem 0;
+  text-align: center;
+}
 .uploadLabel {
-  display: inline-block;
-  background-color: lightyellow;
-  color: white;
-  padding: 0.5rem;
-  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #fef3c7; /* Soft yellow */
+  border: 2px dashed #febd11;
+  padding: 1rem;
+  border-radius: 8px;
   cursor: pointer;
   text-align: center;
   margin-top: 0.5rem;
+  transition: background 0.3s, border-color 0.3s;
+}
+
+.uploadLabel:hover {
+  background-color: #fde68a;
+  border-color: #fbbf24;
 }
 
 .uploadIcon {
-  font-size: 1rem;
-  margin: auto;
-  color: black;
+  font-size: 2rem;
+  color: #49306e;
+  margin-bottom: 0.5rem;
 }
 
 .fileInput {
   display: none;
 }
 
-.error {
-  color: red;
-  font-size: 0.9rem;
-  margin: 0.5rem 0;
-  text-align: center;
+.previewImage {
+  margin-top: 1rem;
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 50%;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  border: 3px solid #febd11;
 }

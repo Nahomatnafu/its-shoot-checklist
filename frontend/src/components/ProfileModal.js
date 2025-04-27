@@ -12,6 +12,7 @@ export default function ProfileModal({ isOpen, onClose, user, onUpdate }) {
     profilePic: "",
     error: ""
   });
+  const [previewImage, setPreviewImage] = useState(null); // New state for newly uploaded image preview
 
   useEffect(() => {
     setFormData(prev => ({
@@ -35,7 +36,7 @@ export default function ProfileModal({ isOpen, onClose, user, onUpdate }) {
           currentPassword: formData.currentPassword,
           newPassword: formData.newPassword,
           position: formData.position,
-          profilePic: formData.profilePic
+          profilePic: previewImage || formData.profilePic // Use new uploaded image if available
         })
       });
 
@@ -45,6 +46,7 @@ export default function ProfileModal({ isOpen, onClose, user, onUpdate }) {
         onUpdate(data.user);
         onClose();
         setFormData(prev => ({ ...prev, activeModal: "main", error: "" }));
+        setPreviewImage(null);
       } else {
         setFormData(prev => ({ ...prev, error: data.message }));
       }
@@ -143,16 +145,16 @@ export default function ProfileModal({ isOpen, onClose, user, onUpdate }) {
                   throw new Error('No authentication token found');
                 }
 
-                // First, upload the image
-                const formData = new FormData();
-                formData.append("image", file);
+                // Upload the selected file
+                const formDataUpload = new FormData();
+                formDataUpload.append("image", file);
 
-                const uploadResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/upload/profile`, {  // Removed extra 'api'
+                const uploadResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/upload/profile`, {
                   method: 'POST',
                   headers: {
                     'Authorization': `Bearer ${token}`
                   },
-                  body: formData
+                  body: formDataUpload
                 });
 
                 if (!uploadResponse.ok) {
@@ -161,33 +163,13 @@ export default function ProfileModal({ isOpen, onClose, user, onUpdate }) {
                 }
 
                 const uploadResult = await uploadResponse.json();
+                setPreviewImage(uploadResult.imageUrl); // Set preview image
 
-                // Then, update the profile
-                const updateResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/user/profile`, {
-                  method: 'PUT',
-                  headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                  },
-                  body: JSON.stringify({
-                    userId: user._id,
-                    profilePic: uploadResult.imageUrl
-                  })
-                });
-
-                if (!updateResponse.ok) {
-                  const errorData = await updateResponse.json();
-                  throw new Error(errorData.message || 'Profile update failed');
-                }
-
-                const updateResult = await updateResponse.json();
-                onUpdate(updateResult.user);
-                onClose();
               } catch (error) {
                 console.error('Upload error:', error);
-                setFormData(prev => ({ 
-                  ...prev, 
-                  error: error.message || "Failed to upload image" 
+                setFormData(prev => ({
+                  ...prev,
+                  error: error.message || "Failed to upload image"
                 }));
               }
             }
@@ -196,14 +178,17 @@ export default function ProfileModal({ isOpen, onClose, user, onUpdate }) {
         />
       </label>
       {formData.error && <p className={styles.error}>{formData.error}</p>}
-      {formData.profilePic && (
+      {previewImage && (
         <img 
-          src={formData.profilePic} 
-          alt="Preview" 
+          src={previewImage}
+          alt="Preview"
           className={styles.previewImage}
           style={{ width: '100px', height: '100px', objectFit: 'cover', borderRadius: '50%' }}
         />
       )}
+      <button onClick={handleSave} className={styles.saveButton} style={{ marginTop: "1rem" }}>
+        Save New Profile Picture
+      </button>
     </div>
   );
 
