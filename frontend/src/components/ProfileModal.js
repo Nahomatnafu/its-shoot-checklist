@@ -145,14 +145,16 @@ export default function ProfileModal({ isOpen, onClose, user, onUpdate }) {
                   throw new Error('No authentication token found');
                 }
 
-                // Upload the selected file
+                // Create FormData
                 const formDataUpload = new FormData();
                 formDataUpload.append("image", file);
 
-                const uploadResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/upload/profile`, {
+                // Make sure the URL matches your backend route exactly
+                const uploadResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/upload/profile`, {
                   method: 'POST',
                   headers: {
                     'Authorization': `Bearer ${token}`
+                    // Remove Content-Type header - let browser set it with boundary
                   },
                   body: formDataUpload
                 });
@@ -163,7 +165,14 @@ export default function ProfileModal({ isOpen, onClose, user, onUpdate }) {
                 }
 
                 const uploadResult = await uploadResponse.json();
-                setPreviewImage(uploadResult.imageUrl); // Set preview image
+                
+                // Set the preview image and update formData
+                setPreviewImage(uploadResult.imageUrl);
+                setFormData(prev => ({
+                  ...prev,
+                  profilePic: uploadResult.imageUrl,
+                  error: ""
+                }));
 
               } catch (error) {
                 console.error('Upload error:', error);

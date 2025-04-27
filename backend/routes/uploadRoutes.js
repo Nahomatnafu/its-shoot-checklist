@@ -37,10 +37,10 @@ router.post("/profile", protect, upload.single("image"), (req, res) => {
     
     res.json({
       imageUrl: req.file.path,
-      public_id: req.file.filename,
+      public_id: req.file.filename
     });
   } catch (error) {
-    console.error("❌ Upload error:", error);
+    console.error("Upload error:", error);
     res.status(500).json({ message: "Upload failed: " + error.message });
   }
 });
