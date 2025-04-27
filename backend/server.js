@@ -75,8 +75,9 @@ app.use("/api/auth", authRoutes);
 app.use("/api/upload", uploadRoutes);  
 app.use("/api/checklist", checklistRoutes);
 app.use("/api/shoots", require("./routes/shootRoutes"));
-app.use("/api/waivers", require("./routes/waiverRoutes"));
-app.use("/api/credits", require("./routes/creditRoutes"));
+// Comment out or remove these until we implement them
+// app.use("/api/waivers", require("./routes/waiverRoutes"));
+// app.use("/api/credits", require("./routes/creditRoutes"));
 
 // Health check endpoint
 app.get("/api/health", (req, res) => {
