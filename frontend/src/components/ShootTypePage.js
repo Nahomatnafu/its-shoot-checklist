@@ -3,12 +3,13 @@ import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import styles from "../../styles/ShootTypePage.module.css";
 import PopUpModal from "./PopUpModal";
-import { useShootStore } from "../app/store/useShootStore";
+
+import useShootStore from "../app/store/useShootStore";  // Remove the curly braces
 
 export default function ShootTypePage({ title, categories }) {
   const router = useRouter();
   const { type } = useParams();
-  // Add the store functions at component level
+  // Use the store hook
   const { setShoots, shoots } = useShootStore();
   
   const [checkedItems, setCheckedItems] = useState({});
