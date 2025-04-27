@@ -1,11 +1,23 @@
 "use client";
 import { useRouter, usePathname } from "next/navigation";
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import ProfileModal from "./ProfileModal";
 import styles from "../../styles/Header.module.css";
-import { debounce } from 'lodash';
+
+// Remove lodash import and create a simple debounce function
+const debounce = (func, wait) => {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+};
 
 export default function Header() {
   const router = useRouter();
@@ -76,7 +88,7 @@ export default function Header() {
   if (pathname === "/login" || isLoading) return null;
 
   // Memoize user state updates
-  const setUserWithCache = useCallback((newUser) => {
+  const setUserWithCache = useMemo(() => (newUser) => {
     setUser(newUser);
     localStorage.setItem("user", JSON.stringify(newUser));
   }, []);
