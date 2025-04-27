@@ -24,25 +24,30 @@ const limiter = rateLimit({
 app.use("/api/", limiter);
 
 // CORS configuration
-const allowedOrigins = [
-  "http://localhost:3000",
-  "https://its-shoot-checklist.vercel.app",
-];
-
-app.use(cors({
+const corsOptions = {
   origin: (origin, callback) => {
+    const allowedOrigins = [
+      "http://localhost:3000",
+      "https://its-shoot-checklist.vercel.app",
+    ];
+    
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'));
+      callback(new Error(`Origin ${origin} not allowed by CORS`));
     }
   },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
-  exposedHeaders: ['Authorization'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
-  maxAge: 86400
-}));
+  preflightContinue: false,
+  optionsSuccessStatus: 204
+};
+
+app.use(cors(corsOptions));
+
+// Add OPTIONS handling for preflight requests
+app.options('*', cors(corsOptions));
 
 app.use(express.json({ limit: '10mb' }));
 

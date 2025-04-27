@@ -1,13 +1,10 @@
 "use client";
 import styles from "../../../../styles/Users.module.css";
 import { useState, useEffect } from "react";
-import { useAdminAuth } from "@/hooks/useAdminAuth";
-import PopUpModal from "@/components/PopUpModal";
 import { useRouter } from 'next/navigation';
 
 export default function UsersPage() {
   const router = useRouter();
-  const isAuthorized = useAdminAuth();
   const [users, setUsers] = useState([]);
   const [editUser, setEditUser] = useState(null);
   const [updatedUser, setUpdatedUser] = useState({});
@@ -16,61 +13,68 @@ export default function UsersPage() {
   const [pendingDeleteId, setPendingDeleteId] = useState(null);
 
   useEffect(() => {
-    const checkAuthAndFetchUsers = async () => {
-      if (!isAuthorized) {
-        router.push('/login');
-        return;
-      }
-
+    const fetchUsers = async () => {
       const token = localStorage.getItem('authToken');
-      console.log('Current token in localStorage:', 
-        token ? `${token.substring(0, 10)}...` : 'no token');
-
+      
       if (!token) {
-        console.error('No auth token found');
+        console.log('No token found, redirecting to login');
         router.push('/login');
         return;
       }
+
+      const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/auth/users`;
+      console.log('Fetching users from:', apiUrl);
+      console.log('Using token:', token.substring(0, 10) + '...');
 
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/users`, {
+        // First, try a preflight request
+        const preflightResponse = await fetch(apiUrl, {
+          method: 'OPTIONS',
+          headers: {
+            'Access-Control-Request-Method': 'GET',
+            'Access-Control-Request-Headers': 'authorization,content-type',
+            'Origin': window.location.origin
+          }
+        });
+
+        console.log('Preflight response:', preflightResponse.status);
+
+        // Then make the actual request
+        const response = await fetch(apiUrl, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/json'
           }
         });
 
-        console.log('Request made with headers:', {
-          Authorization: `Bearer ${token.substring(0, 10)}...`,
-          'Content-Type': 'application/json'
-        });
+        if (response.status === 401) {
+          console.log('Unauthorized - clearing tokens');
+          localStorage.removeItem('authToken');
+          localStorage.removeItem('user');
+          router.push('/login');
+          return;
+        }
 
         if (!response.ok) {
-          const errorData = await response.json();
-          console.error('Error response:', errorData);
-          if (response.status === 401) {
-            localStorage.removeItem('authToken');
-            localStorage.removeItem('user');
-            router.push('/login');
-            return;
-          }
-          throw new Error(errorData.message || 'Failed to fetch users');
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
 
         const data = await response.json();
+        console.log('Fetched users:', data);
         setUsers(data);
       } catch (error) {
-        console.error('Fetch error:', error);
-        setModalMessage(error.message || "Failed to fetch users");
-        setShowModal(true);
+        console.error('Error fetching users:', error);
+        if (error.message.includes('401')) {
+          router.push('/login');
+        }
       }
     };
 
-    checkAuthAndFetchUsers();
-  }, [isAuthorized, router]);
+    fetchUsers();
+  }, [router]);
 
-  if (!isAuthorized) return null;
+  if (!users.length) return null;
 
   const handleDelete = (userId) => {
     setPendingDeleteId(userId);

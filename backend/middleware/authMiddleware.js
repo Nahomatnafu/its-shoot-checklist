@@ -4,7 +4,10 @@ const logger = require('../utils/logger');
 
 const protect = async (req, res, next) => {
   try {
-    console.log('Request headers:', req.headers); // Log all headers
+    console.log('Request headers:', req.headers);
+    console.log('Request method:', req.method);
+    console.log('Request path:', req.path);
+    
     const authHeader = req.headers.authorization;
     console.log('Auth header received:', authHeader);
 
@@ -12,7 +15,9 @@ const protect = async (req, res, next) => {
       console.log('No token or invalid format');
       return res.status(401).json({ 
         message: "Not authorized, no token provided or invalid format",
-        headers: req.headers // Include headers in response for debugging
+        headers: req.headers,
+        method: req.method,
+        path: req.path
       });
     }
 
