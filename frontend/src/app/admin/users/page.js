@@ -5,37 +5,39 @@ import { useRouter } from 'next/navigation';
 export default function UsersPage() {
   const router = useRouter();
   const [users, setUsers] = useState([]);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchUsers = async () => {
-      const token = localStorage.getItem('authToken');
-      
-      if (!token) {
-        console.log('No token found, redirecting to login');
-        router.push('/login');
-        return;
-      }
-
-      const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/auth/users`;
-      console.log('Fetching users from:', apiUrl);
-      console.log('Token available:', !!token);
-
       try {
-        // Make the actual request with proper headers
+        const token = localStorage.getItem('authToken');
+        console.log('Token from localStorage:', token ? 'Found' : 'Not found');
+        
+        if (!token) {
+          console.log('No token found, redirecting to login');
+          router.push('/login');
+          return;
+        }
+
+        const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/auth/users`;
+        console.log('Fetching users from:', apiUrl);
+
+        const headers = {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        };
+        
+        console.log('Request headers:', headers);
+
         const response = await fetch(apiUrl, {
           method: 'GET',
-          credentials: 'include',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-          }
+          headers: headers,
+          credentials: 'include'
         });
 
-        console.log('Response status:', response.status);
-        
         if (response.status === 401) {
-          console.log('Unauthorized - clearing tokens');
+          console.log('Unauthorized access - redirecting to login');
           localStorage.removeItem('authToken');
           localStorage.removeItem('user');
           router.push('/login');
@@ -47,26 +49,29 @@ export default function UsersPage() {
         }
 
         const data = await response.json();
-        console.log('Fetched users:', data);
         setUsers(data);
       } catch (error) {
         console.error('Error fetching users:', error);
-        if (error.message.includes('401')) {
-          router.push('/login');
-        }
+        setError(error.message);
       }
     };
 
     fetchUsers();
   }, [router]);
 
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
   return (
-    <div>
-      <h1>Users</h1>
+    <div className="p-4">
+      <h1 className="text-2xl font-bold mb-4">Users List</h1>
       {users.length > 0 ? (
-        <ul>
+        <ul className="space-y-2">
           {users.map(user => (
-            <li key={user._id}>{user.email}</li>
+            <li key={user._id} className="border p-2 rounded">
+              {user.email} - {user.role}
+            </li>
           ))}
         </ul>
       ) : (

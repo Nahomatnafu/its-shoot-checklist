@@ -41,19 +41,19 @@ export default function LoginPage() {
         data.token ? `${data.token.substring(0, 10)}...` : 'no token');
 
       if (data.token) {
+        console.log('Storing token in localStorage');
         localStorage.setItem('authToken', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
         
         // Verify storage
         const storedToken = localStorage.getItem('authToken');
-        console.log('Verified stored token:', 
-          storedToken ? `${storedToken.substring(0, 10)}...` : 'not found');
+        console.log('Verified stored token exists:', !!storedToken);
+        
+        setLoginStatus("success");
+        router.push("/dashboard");
       } else {
-        throw new Error('No token received');
+        throw new Error('No token received from server');
       }
-
-      setLoginStatus("success");
-      router.push("/dashboard");
     } catch (error) {
       console.error('Login error:', error);
       setLoginStatus("error");
@@ -127,6 +127,7 @@ export default function LoginPage() {
     </main>
   );
 }
+
 
 
 
