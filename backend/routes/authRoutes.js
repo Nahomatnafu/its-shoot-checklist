@@ -21,10 +21,12 @@ const isAdmin = (req, res, next) => {
 // @access  Admins Only
 router.get("/users", protect, isAdmin, async (req, res) => {
   try {
+    console.log('Fetching users, authenticated user:', req.user); // Debug authenticated user
     const users = await User.find().select("-password");
+    console.log('Found users:', users); // Debug found users
     res.json(users);
   } catch (error) {
-    logger.error("Error fetching users:", error);
+    console.error("Error fetching users:", error);
     res.status(500).json({ message: "Server error" });
   }
 });
@@ -41,7 +43,7 @@ router.delete("/users/:id", protect, isAdmin, async (req, res) => {
     await user.deleteOne();
     res.json({ message: "User deleted successfully" });
   } catch (error) {
-    logger.error("Error deleting user:", error);
+    console.error("Error deleting user:", error);
     res.status(500).json({ message: "Server error" });
   }
 });
@@ -101,7 +103,7 @@ router.post("/register", protect, isAdmin, async (req, res) => {
     await user.save();
     res.status(201).json({ message: "User added successfully" });
   } catch (error) {
-    logger.error("Error adding user:", error);
+    console.error("Error adding user:", error);
     res.status(500).json({ message: "Server error" });
   }
 });

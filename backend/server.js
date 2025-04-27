@@ -40,7 +40,7 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
-  maxAge: 86400 // CORS preflight cache 24 hours
+  maxAge: 86400
 }));
 
 app.use(express.json({ limit: '10mb' }));
