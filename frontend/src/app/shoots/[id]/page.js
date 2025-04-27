@@ -12,8 +12,8 @@ export default function ShootDetailPage() {
 
   useEffect(() => {
     if (id) {
-      const found = getShootById(id);
-      setShoot(found);
+      const foundShoot = getShootById(id);
+      setShoot(foundShoot);
     }
   }, [id, getShootById]);
 
@@ -42,8 +42,7 @@ export default function ShootDetailPage() {
 
             <div className={styles.items}>
               {category.items.map((item, i) => {
-                const isChecked =
-                  shoot.checklist?.[item.name]?.takeOut || false;
+                const isChecked = shoot.checklist?.[item.name]?.takeOut || false;
                 return (
                   <div
                     key={i}
