@@ -2,7 +2,6 @@
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import styles from "../../styles/ShootTypePage.module.css";
-import saveShootToLocalStorage from "../app/utils/saveShootToLocalStorage";
 import PopUpModal from "./PopUpModal";
 
 export default function ShootTypePage({ title, categories }) {
