@@ -30,11 +30,12 @@ export default function CreditDetailsPage() {
           setProjectName(credit.projectName);
           setRoles(credit.roles || []);
         } else {
-          throw new Error('Credit not found');
+          console.error('Credit not found:', id);
+          setError('Credit not found');
         }
       } catch (error) {
         console.error('Error loading credit:', error);
-        setError(error.message);
+        setError(error.message || 'Error loading credit');
       } finally {
         setLoading(false);
       }

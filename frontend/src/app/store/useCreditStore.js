@@ -21,7 +21,13 @@ const useCreditStore = create((set, get) => ({
       }
 
       const data = await response.json();
-      set({ credits: Array.isArray(data) ? data : [] });
+      // Ensure each credit has both _id and id properties
+      const processedData = Array.isArray(data) ? data.map(credit => ({
+        ...credit,
+        id: credit._id || credit.id // Ensure we have both id formats
+      })) : [];
+      
+      set({ credits: processedData });
     } catch (error) {
       console.error('Failed to fetch credits:', error);
       set({ credits: [] });
@@ -31,7 +37,7 @@ const useCreditStore = create((set, get) => ({
 
   getCreditById: (id) => {
     const state = get();
-    return state.credits.find(credit => credit._id === id);
+    return state.credits.find(credit => credit._id === id || credit.id === id);
   },
 
   addCredit: async (creditData) => {

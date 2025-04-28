@@ -63,33 +63,13 @@ export default function CreateCredits() {
 
   const handleSubmit = () => {
     try {
-      // Validate data before sending
-      if (!projectName.trim()) {
-        throw new Error("Project name is required");
-      }
-
-      // Filter out roles with empty people arrays
-      const validRoles = roles.filter(role => {
-        const validPeople = role.people.filter(person => person.trim() !== "");
-        return role.role.trim() !== "" && validPeople.length > 0;
-      });
-
-      if (validRoles.length === 0) {
-        throw new Error("At least one role with a person is required");
-      }
-
-      // Clean up the data by removing empty strings from people arrays
-      const cleanedRoles = validRoles.map(role => ({
-        role: role.role,
-        people: role.people.filter(person => person.trim() !== "")
-      }));
-
       const newCredit = { 
         projectName: projectName.trim(), 
-        roles: cleanedRoles 
+        roles: roles 
       };
       
       addCredit(newCredit);
+      setModalMessage("Credits saved successfully!"); // Add this line
       setShowModal(true);
     } catch (error) {
       setModalMessage(error.message);

@@ -8,11 +8,11 @@ const CreditSchema = new mongoose.Schema({
   roles: [{
     role: {
       type: String,
-      required: true
+      required: false
     },
     people: [{
       type: String,
-      required: true
+      required: false
     }]
   }],
   user: {
@@ -27,3 +27,6 @@ const CreditSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 module.exports = mongoose.model('Credit', CreditSchema);
+
+
+
