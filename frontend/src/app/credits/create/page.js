@@ -25,6 +25,7 @@ export default function CreateCredits() {
   ]);
 
   const [showModal, setShowModal] = useState(false); // ✅ For success modal
+  const [modalMessage, setModalMessage] = useState("");
 
   const addRole = () => {
     setRoles([...roles, { role: "", people: [""] }]);
@@ -61,9 +62,39 @@ export default function CreateCredits() {
   };
 
   const handleSubmit = () => {
-    const newCredit = { projectName, roles };
-    addCredit(newCredit);
-    setShowModal(true); // ✅ Show modal and wait
+    try {
+      // Validate data before sending
+      if (!projectName.trim()) {
+        throw new Error("Project name is required");
+      }
+
+      // Filter out roles with empty people arrays
+      const validRoles = roles.filter(role => {
+        const validPeople = role.people.filter(person => person.trim() !== "");
+        return role.role.trim() !== "" && validPeople.length > 0;
+      });
+
+      if (validRoles.length === 0) {
+        throw new Error("At least one role with a person is required");
+      }
+
+      // Clean up the data by removing empty strings from people arrays
+      const cleanedRoles = validRoles.map(role => ({
+        role: role.role,
+        people: role.people.filter(person => person.trim() !== "")
+      }));
+
+      const newCredit = { 
+        projectName: projectName.trim(), 
+        roles: cleanedRoles 
+      };
+      
+      addCredit(newCredit);
+      setShowModal(true);
+    } catch (error) {
+      setModalMessage(error.message);
+      setShowModal(true);
+    }
   };
 
   // When user clicks "Save" in the modal
@@ -113,16 +144,10 @@ export default function CreateCredits() {
                     <input
                       type="text"
                       list="contributors"
-                      placeholder="Person"
+                      placeholder="Person (required)"
                       value={person}
-                      onChange={(e) =>
-                        handlePersonChange(
-                          roleIndex,
-                          personIndex,
-                          e.target.value
-                        )
-                      }
-                      className={styles.input}
+                      onChange={(e) => handlePersonChange(roleIndex, personIndex, e.target.value)}
+                      className={`${styles.input} ${!person.trim() ? styles.required : ''}`}
                     />
                     <button
                       className={`${styles.iconButton} ${styles.addPersonIcon}`}
@@ -172,7 +197,7 @@ export default function CreateCredits() {
       </div>
       {showModal && (
         <PopUpModal
-          message="Credits saved successfully!"
+          message={modalMessage}
           onConfirm={confirmAndRedirect}
           onCancel={() => setShowModal(false)}
         />

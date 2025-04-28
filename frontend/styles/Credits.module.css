@@ -300,3 +300,11 @@
 .backButton:hover {
   background-color: #5b3a8a;
 }
+
+.required {
+  border-color: #ff6b6b;
+}
+
+.required::placeholder {
+  color: #ff6b6b;
+}
