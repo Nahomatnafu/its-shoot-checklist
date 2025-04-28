@@ -4,25 +4,44 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import useCreditStore from "../../store/useCreditStore";
 import styles from "../../../../styles/Credits.module.css";
+import PopUpModal from "../../../components/PopUpModal";
 
 export default function CreditDetailsPage() {
   const { id } = useParams();
   const router = useRouter();
-  const { getCreditById, updateCreditById } = useCreditStore();
+  const { getCreditById, updateCreditById, setCredits } = useCreditStore();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const [projectName, setProjectName] = useState("");
   const [roles, setRoles] = useState([]);
-  const [saveMessage, setSaveMessage] = useState("");
+  const [showModal, setShowModal] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
 
   useEffect(() => {
-    const credit = getCreditById(id);
-    if (credit) {
-      setProjectName(credit.projectName);
-      setRoles(credit.roles);
-    } else {
-      router.replace("/credits");
-    }
-  }, [id]);
+    const loadCredit = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        await setCredits();
+        const credit = getCreditById(id);
+        
+        if (credit) {
+          setProjectName(credit.projectName);
+          setRoles(credit.roles || []);
+        } else {
+          throw new Error('Credit not found');
+        }
+      } catch (error) {
+        console.error('Error loading credit:', error);
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadCredit();
+  }, [id, setCredits, getCreditById]);
 
   const addRole = () => {
     setRoles([...roles, { role: "", people: [""] }]);
@@ -58,20 +77,81 @@ export default function CreditDetailsPage() {
     setRoles(newRoles);
   };
 
-  const handleSave = () => {
-    updateCreditById(id, {
-      id,
-      projectName,
-      roles,
+  const validateForm = () => {
+    if (!projectName.trim()) {
+      throw new Error("Project name is required");
+    }
+
+    if (roles.length === 0) {
+      throw new Error("At least one role is required");
+    }
+
+    roles.forEach((role, index) => {
+      if (!role.role.trim()) {
+        throw new Error(`Role name is required for role #${index + 1}`);
+      }
+      if (role.people.length === 0) {
+        throw new Error(`At least one person is required for role "${role.role}"`);
+      }
+      role.people.forEach((person, personIndex) => {
+        if (!person.trim()) {
+          throw new Error(`Person name is required for role "${role.role}", person #${personIndex + 1}`);
+        }
+      });
     });
-    setSaveMessage("Credits updated successfully!");
-    setTimeout(() => setSaveMessage(""), 3000);
   };
+
+  const handleSave = async () => {
+    try {
+      validateForm();
+
+      await updateCreditById(id, {
+        projectName,
+        roles,
+      });
+
+      setModalMessage("Credits updated successfully!");
+      setShowModal(true);
+    } catch (error) {
+      setModalMessage(error.message || "Failed to update credits");
+      setShowModal(true);
+    }
+  };
+
+  const handleModalConfirm = () => {
+    setShowModal(false);
+    if (!modalMessage.includes("Failed")) {
+      router.push("/credits");
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className={styles.creditsWrapper}>
+        <div className={styles.loadingSpinner}>Loading...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className={styles.creditsWrapper}>
+        <div className={styles.error}>
+          <h2>Error: {error}</h2>
+          <button 
+            className={styles.backButton}
+            onClick={() => router.push("/credits")}
+          >
+            Back to Credits
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.creditsWrapper}>
       <h2 className={styles.title}>Edit Credits</h2>
-      {saveMessage && <p className={styles.saveMessage}>{saveMessage}</p>}
 
       <div className={styles.form}>
         <input
@@ -91,9 +171,7 @@ export default function CreditDetailsPage() {
                     type="text"
                     placeholder="Role"
                     value={role.role}
-                    onChange={(e) =>
-                      handleRoleChange(roleIndex, e.target.value)
-                    }
+                    onChange={(e) => handleRoleChange(roleIndex, e.target.value)}
                     className={styles.input}
                   />
                   <button
@@ -115,15 +193,10 @@ export default function CreditDetailsPage() {
                       placeholder="Person"
                       value={person}
                       onChange={(e) =>
-                        handlePersonChange(
-                          roleIndex,
-                          personIndex,
-                          e.target.value
-                        )
+                        handlePersonChange(roleIndex, personIndex, e.target.value)
                       }
                       className={styles.input}
                     />
-
                     <button
                       className={`${styles.iconButton} ${styles.addPersonIcon}`}
                       onClick={() => addPerson(roleIndex)}
@@ -145,12 +218,21 @@ export default function CreditDetailsPage() {
           ))}
         </div>
 
-        <button className={styles.submitButton} onClick={addRole}>
-          ➕ Add Custom Role
-        </button>
-        <button className={styles.submitButton} onClick={handleSave}>
-          Save Changes
-        </button>
+        <div className={styles.buttonContainer}>
+          <button className={styles.submitButton} onClick={addRole}>
+            ➕ Add Custom Role
+          </button>
+          <button className={styles.submitButton} onClick={handleSave}>
+            Save Changes
+          </button>
+          <button 
+            className={`${styles.submitButton} ${styles.cancelButton}`}
+            onClick={() => router.push("/credits")}
+          >
+            Cancel
+          </button>
+        </div>
+
         <datalist id="contributors">
           {[
             "Connor Kulas",
@@ -169,6 +251,14 @@ export default function CreditDetailsPage() {
             ))}
         </datalist>
       </div>
+
+      {showModal && (
+        <PopUpModal
+          message={modalMessage}
+          onConfirm={handleModalConfirm}
+          onCancel={() => setShowModal(false)}
+        />
+      )}
     </div>
   );
 }

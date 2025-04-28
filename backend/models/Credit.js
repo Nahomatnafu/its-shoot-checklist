@@ -6,13 +6,23 @@ const CreditSchema = new mongoose.Schema({
     required: true
   },
   roles: [{
-    role: String,
-    people: [String]
+    role: {
+      type: String,
+      required: true
+    },
+    people: [{
+      type: String,
+      required: true
+    }]
   }],
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true
+  },
+  date: {
+    type: Date,
+    default: Date.now
   }
 }, { timestamps: true });
 

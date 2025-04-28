@@ -1,14 +1,13 @@
 import { create } from "zustand";
 
-const useCreditStore = create((set) => ({
+const useCreditStore = create((set, get) => ({
   credits: [],
   
   setCredits: async () => {
     try {
       const token = localStorage.getItem('authToken');
       if (!token) {
-        console.error('No auth token found');
-        return;
+        throw new Error('No auth token found');
       }
 
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/credits`, {
@@ -26,15 +25,23 @@ const useCreditStore = create((set) => ({
     } catch (error) {
       console.error('Failed to fetch credits:', error);
       set({ credits: [] });
+      throw error;
     }
   },
 
-  addCredit: async (credit) => {
+  getCreditById: (id) => {
+    const state = get();
+    return state.credits.find(credit => credit._id === id);
+  },
+
+  addCredit: async (creditData) => {
     try {
       const token = localStorage.getItem('authToken');
       if (!token) {
         throw new Error('No auth token found');
       }
+
+      console.log('Sending credit data:', creditData);
 
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/credits`, {
         method: 'POST',
@@ -42,21 +49,86 @@ const useCreditStore = create((set) => ({
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify(credit)
+        body: JSON.stringify(creditData)
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorData = await response.json();
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
       }
 
       const savedCredit = await response.json();
-      set((state) => ({ credits: [...state.credits, savedCredit] }));
+      console.log('Received saved credit:', savedCredit);
+      
+      set((state) => ({
+        credits: [...state.credits, savedCredit]
+      }));
       return savedCredit;
     } catch (error) {
       console.error('Failed to save credit:', error);
       throw error;
     }
   },
+
+  updateCreditById: async (id, creditData) => {
+    try {
+      const token = localStorage.getItem('authToken');
+      if (!token) {
+        throw new Error('No auth token found');
+      }
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/credits/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(creditData)
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const updatedCredit = await response.json();
+      set((state) => ({
+        credits: state.credits.map(credit => 
+          credit._id === id ? updatedCredit : credit
+        )
+      }));
+      return updatedCredit;
+    } catch (error) {
+      console.error('Failed to update credit:', error);
+      throw error;
+    }
+  },
+
+  deleteCreditById: async (id) => {
+    try {
+      const token = localStorage.getItem('authToken');
+      if (!token) {
+        throw new Error('No auth token found');
+      }
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/credits/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      set((state) => ({
+        credits: state.credits.filter(credit => credit._id !== id)
+      }));
+    } catch (error) {
+      console.error('Failed to delete credit:', error);
+      throw error;
+    }
+  }
 }));
 
 export default useCreditStore;

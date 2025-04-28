@@ -9,19 +9,38 @@ import styles from "../../../../styles/SavedImageWaivers.module.css";
 export default function WaiverDetailPage() {
   const { id } = useParams();
   const router = useRouter();
-  const { getWaiverById } = useWaiverStore();
+  const { getWaiverById, setWaivers } = useWaiverStore();
   const [waiver, setWaiver] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const waiverData = getWaiverById(id);
-    if (waiverData) {
-      setWaiver(waiverData);
-    } else {
-      router.push("/saved-image-waivers");
-    }
-  }, [id]);
+    const loadWaiver = async () => {
+      try {
+        // First ensure waivers are loaded
+        await setWaivers();
+        
+        // Then get the specific waiver
+        const waiverData = getWaiverById(id);
+        if (waiverData) {
+          setWaiver(waiverData);
+        } else {
+          console.error('Waiver not found:', id);
+          router.push("/saved-image-waivers");
+        }
+      } catch (error) {
+        console.error('Error loading waiver:', error);
+        router.push("/saved-image-waivers");
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  if (!waiver) return <p>Loading...</p>;
+    loadWaiver();
+  }, [id, setWaivers, getWaiverById, router]);
+
+  if (loading) return <p>Loading...</p>;
+
+  if (!waiver) return null;
 
   return (
     <main className={styles.container}>

@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-const useWaiverStore = create((set) => ({
+const useWaiverStore = create((set, get) => ({
   waivers: [],
   
   setWaivers: async () => {
@@ -29,15 +29,17 @@ const useWaiverStore = create((set) => ({
     }
   },
 
+  getWaiverById: (id) => {
+    const state = get();
+    return state.waivers.find(waiver => waiver._id === id);
+  },
+
   addWaiver: async (waiverData) => {
     try {
       const token = localStorage.getItem('authToken');
       if (!token) {
         throw new Error('No auth token found');
       }
-
-      // Log the data being sent
-      console.log('Sending waiver data:', waiverData);
 
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/waivers`, {
         method: 'POST',
@@ -55,9 +57,6 @@ const useWaiverStore = create((set) => ({
 
       const savedWaiver = await response.json();
       
-      // Log the response
-      console.log('Received saved waiver:', savedWaiver);
-
       set((state) => ({
         waivers: [...state.waivers, savedWaiver]
       }));
