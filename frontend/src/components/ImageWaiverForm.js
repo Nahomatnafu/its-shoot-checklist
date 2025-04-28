@@ -44,6 +44,16 @@ export default function ImageWaiverForm({
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    
+    // Validate required fields
+    const requiredFields = ['projectName', 'projectDate', 'name', 'address', 'phone', 'city', 'state', 'zip', 'signature'];
+    const missingFields = requiredFields.filter(field => !formState[field]);
+    
+    if (missingFields.length > 0) {
+      alert(`Please fill in all required fields: ${missingFields.join(', ')}`);
+      return;
+    }
+
     if (onSave) {
       onSave(formState);
     }

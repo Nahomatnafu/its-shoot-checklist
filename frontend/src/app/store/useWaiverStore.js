@@ -5,7 +5,7 @@ const useWaiverStore = create((set) => ({
   
   setWaivers: async () => {
     try {
-      const token = localStorage.getItem('authToken'); // Changed from 'token' to 'authToken'
+      const token = localStorage.getItem('authToken');
       if (!token) {
         console.error('No auth token found');
         return;
@@ -22,19 +22,22 @@ const useWaiverStore = create((set) => ({
       }
 
       const data = await response.json();
-      set({ waivers: Array.isArray(data) ? data : [] }); // Ensure waivers is always an array
+      set({ waivers: Array.isArray(data) ? data : [] });
     } catch (error) {
       console.error('Failed to fetch waivers:', error);
-      set({ waivers: [] }); // Set empty array on error
+      set({ waivers: [] });
     }
   },
 
-  addWaiver: async (waiver) => {
+  addWaiver: async (waiverData) => {
     try {
       const token = localStorage.getItem('authToken');
       if (!token) {
         throw new Error('No auth token found');
       }
+
+      // Log the data being sent
+      console.log('Sending waiver data:', waiverData);
 
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/waivers`, {
         method: 'POST',
@@ -42,44 +45,28 @@ const useWaiverStore = create((set) => ({
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify(waiver)
+        body: JSON.stringify(waiverData)
       });
-      
+
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorData = await response.json();
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
       }
 
       const savedWaiver = await response.json();
-      set((state) => ({ waivers: [...state.waivers, savedWaiver] }));
+      
+      // Log the response
+      console.log('Received saved waiver:', savedWaiver);
+
+      set((state) => ({
+        waivers: [...state.waivers, savedWaiver]
+      }));
       return savedWaiver;
     } catch (error) {
       console.error('Failed to save waiver:', error);
       throw error;
     }
   },
-
-  deleteWaiverById: async (id) => {
-    try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/waivers/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-      
-      set((state) => ({
-        waivers: state.waivers.filter((w) => w.id !== id)
-      }));
-    } catch (error) {
-      console.error('Failed to delete waiver:', error);
-      throw error;
-    }
-  },
-
-  getWaiverById: (id) => {
-    const state = useWaiverStore.getState();
-    return state.waivers.find((w) => w.id === id);
-  }
 }));
 
 export default useWaiverStore;
