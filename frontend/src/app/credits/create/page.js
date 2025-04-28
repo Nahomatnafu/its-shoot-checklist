@@ -124,10 +124,10 @@ export default function CreateCredits() {
                     <input
                       type="text"
                       list="contributors"
-                      placeholder="Person (required)"
+                      placeholder="Person"
                       value={person}
                       onChange={(e) => handlePersonChange(roleIndex, personIndex, e.target.value)}
-                      className={`${styles.input} ${!person.trim() ? styles.required : ''}`}
+                      className={styles.input}
                     />
                     <button
                       className={`${styles.iconButton} ${styles.addPersonIcon}`}

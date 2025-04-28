@@ -154,18 +154,33 @@
   color: #c9302c;
 }
 
+.buttonContainer {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
 .submitButton {
-  padding: 10px;
   background-color: #49306e;
   color: white;
   border: none;
-  border-radius: 5px;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
   cursor: pointer;
-  margin-top: 15px;
+  font-size: 1rem;
+  transition: background-color 0.2s;
 }
 
 .submitButton:hover {
-  background-color: #402e63;
+  background-color: #5d3d8c;
+}
+
+.cancelButton {
+  background-color: #6c757d;
+}
+
+.cancelButton:hover {
+  background-color: #5a6268;
 }
 
 .saveMessage {

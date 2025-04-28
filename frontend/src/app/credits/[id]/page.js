@@ -6,6 +6,19 @@ import useCreditStore from "../../store/useCreditStore";
 import styles from "../../../../styles/Credits.module.css";
 import PopUpModal from "../../../components/PopUpModal";
 
+const defaultRoles = [
+  { role: "Director/Coordinator", people: [""] },
+  { role: "Written by", people: [""] },
+  { role: "Camera Operators", people: [""] },
+  { role: "Set assistants", people: [""] },
+  { role: "Audio Recording", people: [""] },
+  { role: "Video Editor", people: [""] },
+  { role: "Visual Effects", people: [""] },
+  { role: "Audio Mixing", people: [""] },
+  { role: "Colorist", people: [""] },
+  { role: "Captioned by", people: [""] },
+];
+
 export default function CreditDetailsPage() {
   const { id } = useParams();
   const router = useRouter();
@@ -28,7 +41,18 @@ export default function CreditDetailsPage() {
         
         if (credit) {
           setProjectName(credit.projectName);
-          setRoles(credit.roles || []);
+          
+          // Merge existing roles with default roles
+          const existingRoleNames = credit.roles.map(r => r.role);
+          const mergedRoles = [...credit.roles];
+          
+          defaultRoles.forEach(defaultRole => {
+            if (!existingRoleNames.includes(defaultRole.role)) {
+              mergedRoles.push({ ...defaultRole });
+            }
+          });
+          
+          setRoles(mergedRoles);
         } else {
           console.error('Credit not found:', id);
           setError('Credit not found');
@@ -193,9 +217,7 @@ export default function CreditDetailsPage() {
                       list="contributors"
                       placeholder="Person"
                       value={person}
-                      onChange={(e) =>
-                        handlePersonChange(roleIndex, personIndex, e.target.value)
-                      }
+                      onChange={(e) => handlePersonChange(roleIndex, personIndex, e.target.value)}
                       className={styles.input}
                     />
                     <button
