@@ -16,14 +16,34 @@ router.get('/', protect, async (req, res) => {
 // Create new credit
 router.post('/', protect, async (req, res) => {
   try {
+    console.log('Received credit data:', req.body);
+    console.log('User ID:', req.user._id);
+
+    // Validate required fields
+    if (!req.body.projectName) {
+      return res.status(400).json({ message: 'Project name is required' });
+    }
+
+    if (!Array.isArray(req.body.roles) || req.body.roles.length === 0) {
+      return res.status(400).json({ message: 'At least one role is required' });
+    }
+
+    // Create and save the credit
     const credit = new Credit({
-      ...req.body,
+      projectName: req.body.projectName,
+      roles: req.body.roles,
       user: req.user._id
     });
+
     const savedCredit = await credit.save();
+    console.log('Saved credit:', savedCredit);
     res.status(201).json(savedCredit);
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    console.error('Server error while saving credit:', error);
+    res.status(500).json({ 
+      message: 'Server error', 
+      error: error.message 
+    });
   }
 });
 
@@ -57,3 +77,4 @@ router.delete('/:id', protect, async (req, res) => {
 });
 
 module.exports = router;
+
