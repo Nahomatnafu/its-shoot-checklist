@@ -106,35 +106,15 @@ export default function CreditDetailsPage() {
     if (!projectName.trim()) {
       throw new Error("Project name is required");
     }
-
-    if (roles.length === 0) {
-      throw new Error("At least one role is required");
-    }
-
-    roles.forEach((role, index) => {
-      if (!role.role.trim()) {
-        throw new Error(`Role name is required for role #${index + 1}`);
-      }
-      if (role.people.length === 0) {
-        throw new Error(`At least one person is required for role "${role.role}"`);
-      }
-      role.people.forEach((person, personIndex) => {
-        if (!person.trim()) {
-          throw new Error(`Person name is required for role "${role.role}", person #${personIndex + 1}`);
-        }
-      });
-    });
   };
 
   const handleSave = async () => {
     try {
       validateForm();
-
       await updateCreditById(id, {
         projectName,
         roles,
       });
-
       setModalMessage("Credits updated successfully!");
       setShowModal(true);
     } catch (error) {

@@ -43,7 +43,7 @@ router.post('/', protect, async (req, res) => {
     }
 
     // Clean up the data
-    const cleanedRoles = validRoles.map(role => ({
+    const cleanedRoles = req.body.roles.map(role => ({
       role: role.role.trim(),
       people: role.people.filter(person => person?.trim()).map(person => person.trim())
     }));
@@ -98,5 +98,6 @@ router.delete('/:id', protect, async (req, res) => {
 });
 
 module.exports = router;
+
 
 

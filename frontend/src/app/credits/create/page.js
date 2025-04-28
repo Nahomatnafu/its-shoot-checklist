@@ -69,7 +69,7 @@ export default function CreateCredits() {
       };
       
       addCredit(newCredit);
-      setModalMessage("Credits saved successfully!"); // Add this line
+      setModalMessage("Credits saved successfully!");
       setShowModal(true);
     } catch (error) {
       setModalMessage(error.message);
