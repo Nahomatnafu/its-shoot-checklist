@@ -1,5 +1,6 @@
 const express = require("express");
 const connectDB = require("./config/db");
+const morgan = require("morgan");
 const authRoutes = require("./routes/authRoutes");
 const uploadRoutes = require("./routes/uploadRoutes");
 const checklistRoutes = require("./routes/checklistRoutes");
@@ -17,6 +18,9 @@ app.set("trust proxy", 1);
 
 // Security middleware
 app.use(helmet());
+
+// HTTP request logging
+app.use(morgan("dev"));
 
 // Rate limiting
 const limiter = rateLimit({
