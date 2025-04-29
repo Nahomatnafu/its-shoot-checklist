@@ -134,15 +134,10 @@ export default function UsersPage() {
       <div className={styles.userList}>
         {users.map((user) => (
           <div key={user._id} className={styles.userCard}>
-            <div>
-              <h3 className={styles.userName}>{user.name}</h3>
-              <p>{user.email}</p>
-              <p>{user.position}</p>
-              <p>Role: {user.role}</p>
-              <div className={styles.buttonGroup}>
-                <button className={styles.editButton} onClick={() => handleEdit(user)}>Edit</button>
-                <button className={styles.deleteButton} onClick={() => handleDelete(user._id)}>Delete</button>
-              </div>
+            <h3 className={styles.userName}>{user.name}</h3>
+            <div className={styles.buttonGroup}>
+              <button className={styles.editButton} onClick={() => handleEdit(user)}>Edit</button>
+              <button className={styles.deleteButton} onClick={() => handleDelete(user._id)}>Delete</button>
             </div>
           </div>
         ))}
