@@ -20,7 +20,7 @@ export default function UsersPage() {
       try {
         const token = localStorage.getItem("authToken");
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/auth/users`,
+          `${process.env.NEXT_PUBLIC_API_URL}/api/auth/users`, // Added /api prefix
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -59,7 +59,7 @@ export default function UsersPage() {
     try {
       const token = localStorage.getItem("authToken");
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/auth/users/${editUser._id}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/users/${editUser._id}`,
         {
           method: "PUT",
           headers: {
@@ -99,7 +99,7 @@ export default function UsersPage() {
     try {
       const token = localStorage.getItem("authToken");
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/auth/users/${pendingDeleteId}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/users/${pendingDeleteId}`,
         {
           method: "DELETE",
           headers: {

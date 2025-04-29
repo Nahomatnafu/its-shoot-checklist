@@ -35,7 +35,7 @@ const corsOptions = {
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      console.log("Origin not allowed:", origin);
+      logger.warn("Origin not allowed:", origin);
       callback(new Error(`Origin ${origin} not allowed by CORS`));
     }
   },
@@ -71,6 +71,15 @@ app.get("/api/checklist", (req, res) => {
   res.set("Cache-Control", "public, max-age=300");
 });
 
+// Add request logging middleware before routes
+app.use((req, res, next) => {
+  logger.info(`${req.method} ${req.path}`, {
+    origin: req.get('origin'),
+    ip: req.ip
+  });
+  next();
+});
+
 // Mount routes with correct /api prefix
 app.use("/api/auth", authRoutes);
 app.use("/api/upload", uploadRoutes);
@@ -88,14 +97,19 @@ app.get("/api/health", (req, res) => {
   });
 });
 
-// Error handler
+// Improve error handling middleware
 app.use((err, req, res, next) => {
-  logger.error(`${err.name}: ${err.message}`, err);
+  logger.error(`${err.name}: ${err.message}`, { 
+    path: req.path,
+    method: req.method,
+    error: err.stack 
+  });
+  
   res.status(err.status || 500).json({
-    error:
-      process.env.NODE_ENV === "development"
-        ? err.message
-        : "Internal server error",
+    error: process.env.NODE_ENV === "development" 
+      ? err.message 
+      : "Internal server error",
+    path: req.path
   });
 });
 
