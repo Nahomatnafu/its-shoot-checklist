@@ -47,8 +47,6 @@ const useCreditStore = create((set, get) => ({
         throw new Error('No auth token found');
       }
 
-      console.log('Sending credit data:', JSON.stringify(creditData, null, 2));
-
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/credits`, {
         method: 'POST',
         headers: {
@@ -60,17 +58,10 @@ const useCreditStore = create((set, get) => ({
 
       if (!response.ok) {
         const errorData = await response.json();
-        console.error('Server response:', {
-          status: response.status,
-          statusText: response.statusText,
-          error: errorData
-        });
         throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
       }
 
       const savedCredit = await response.json();
-      
-      // Update the store with the new credit
       set(state => ({
         credits: [...state.credits, savedCredit]
       }));

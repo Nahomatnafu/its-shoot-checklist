@@ -110,10 +110,15 @@ export default function CreditDetailsPage() {
 
   const handleSave = async () => {
     try {
-      validateForm();
+      if (!projectName.trim()) {
+        setModalMessage("Project name is required");
+        setShowModal(true);
+        return;
+      }
+
       await updateCreditById(id, {
         projectName,
-        roles,
+        roles  // Send all roles, even empty ones
       });
       setModalMessage("Credits updated successfully!");
       setShowModal(true);

@@ -61,7 +61,7 @@ export default function CreateCredits() {
     setRoles(newRoles);
   };
 
-  const handleSubmit = async () => {  // Make this async
+  const handleSubmit = async () => {
     try {
       if (!projectName.trim()) {
         setModalMessage("Project name is required");
@@ -69,21 +69,19 @@ export default function CreateCredits() {
         return;
       }
 
-      // Filter out empty roles and people
-      const cleanedRoles = roles.filter(role => role.role.trim() || role.people.some(p => p.trim()));
-
+      // Don't filter roles - send them as is
       const newCredit = { 
         projectName: projectName.trim(), 
-        roles: cleanedRoles
+        roles: roles  // Send all roles, even empty ones
       };
       
-      console.log('Submitting credit:', newCredit); // Debug log
+      console.log('Submitting credit:', newCredit);
       
-      await addCredit(newCredit); // Wait for the response
+      await addCredit(newCredit);
       setModalMessage("Credits saved successfully!");
       setShowModal(true);
     } catch (error) {
-      console.error('Error saving credit:', error); // Debug log
+      console.error('Error saving credit:', error);
       setModalMessage(error.message || "Failed to save credits");
       setShowModal(true);
     }
