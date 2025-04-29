@@ -77,10 +77,9 @@ app.get("/api/checklist", (req, res) => {
 
 // Add request logging middleware before routes
 app.use((req, res, next) => {
-  logger.info(`${req.method} ${req.path}`, {
-    origin: req.get('origin'),
-    ip: req.ip
-  });
+  if (req.path.startsWith('/api/')) {
+    logger.info(`${req.method} ${req.path}`);
+  }
   next();
 });
 
@@ -127,11 +126,10 @@ const PORT = process.env.PORT || 5000;
 connectDB()
   .then(() => {
     app.listen(PORT, () => {
-      logger.success(`🚀 Server running on port ${PORT}`);
-      logger.info(`Environment: ${process.env.NODE_ENV}`);
+      logger.success(`Server running on port ${PORT}`);
     });
   })
   .catch((err) => {
-    logger.error("❌ Failed to connect to MongoDB:", err);
+    logger.error("Failed to connect to MongoDB:", err);
     process.exit(1);
   });

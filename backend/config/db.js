@@ -14,18 +14,14 @@ const connectDB = async () => {
       heartbeatFrequencyMS: 10000,
     });
 
-    logger.success(`MongoDB Connected: ${conn.connection.host}`);
+    logger.success(`MongoDB Connected`);
 
     mongoose.connection.on('error', err => {
       logger.error('MongoDB connection error:', err);
     });
 
     mongoose.connection.on('disconnected', () => {
-      logger.warn('MongoDB disconnected. Attempting to reconnect...');
-    });
-
-    mongoose.connection.on('reconnected', () => {
-      logger.success('MongoDB reconnected');
+      logger.warn('MongoDB disconnected');
     });
 
     return conn;
