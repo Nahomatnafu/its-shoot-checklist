@@ -25,6 +25,7 @@ const protect = async (req, res, next) => {
       req.user = user;
       next();
     } catch (error) {
+      logger.error('Auth token verification failed', { error: error.message });
       return res.status(401).json({ 
         message: error.name === 'TokenExpiredError' 
           ? "Token has expired" 
@@ -32,7 +33,7 @@ const protect = async (req, res, next) => {
       });
     }
   } catch (error) {
-    console.error("Auth middleware error:", error);
+    logger.error('Auth middleware error', { error: error.message });
     return res.status(500).json({ 
       message: "Server error",
       error: error.message 

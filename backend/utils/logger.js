@@ -1,24 +1,25 @@
 const logger = {
-  info: (message) => {
+  info: (message, meta = {}) => {
     if (process.env.NODE_ENV !== 'test') {
-      console.log(`ℹ️ ${message}`);
+      console.log(`ℹ️ ${message}`, meta);
     }
   },
-  warn: (message) => {
+  warn: (message, meta = {}) => {
     if (process.env.NODE_ENV !== 'test') {
-      console.warn(`⚠️ ${message}`);
+      console.warn(`⚠️ ${message}`, meta);
     }
   },
-  error: (message, error) => {
+  error: (message, meta = {}) => {
     if (process.env.NODE_ENV !== 'test') {
-      console.error(`❌ ${message}`, error);
+      console.error(`❌ ${message}`, meta);
     }
   },
-  success: (message) => {
+  success: (message, meta = {}) => {
     if (process.env.NODE_ENV !== 'test') {
-      console.log(`✅ ${message}`);
+      console.log(`✅ ${message}`, meta);
     }
   }
 };
 
 module.exports = logger;
+

@@ -3,8 +3,8 @@ const User = require("../models/User");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const { protect } = require("../middleware/authMiddleware");
+const logger = require("../utils/logger");
 require("dotenv").config();
-const logger = require('morgan');
 
 const router = express.Router();
 
@@ -22,11 +22,11 @@ const isAdmin = (req, res, next) => {
 // @access  Admins Only
 router.get("/users", protect, isAdmin, async (req, res) => {
   try {
-    logger.info('Fetching users, authenticated user:', req.user._id);
+    logger.info('Fetching users', { userId: req.user._id });
     const users = await User.find().select("-password");
     res.json(users);
   } catch (error) {
-    logger.error("Error fetching users:", error);
+    logger.error('Error fetching users', { error: error.message });
     res.status(500).json({ message: "Server error" });
   }
 });
