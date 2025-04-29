@@ -1,4 +1,4 @@
-import { create } from "zustand";
+import { create } from 'zustand';
 
 const useWaiverStore = create((set, get) => ({
   waivers: [],
@@ -7,8 +7,7 @@ const useWaiverStore = create((set, get) => ({
     try {
       const token = localStorage.getItem('authToken');
       if (!token) {
-        console.error('No auth token found');
-        return;
+        throw new Error('No auth token found');
       }
 
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/waivers`, {
@@ -22,16 +21,16 @@ const useWaiverStore = create((set, get) => ({
       }
 
       const data = await response.json();
-      set({ waivers: Array.isArray(data) ? data : [] });
+      set({ waivers: data });
     } catch (error) {
       console.error('Failed to fetch waivers:', error);
       set({ waivers: [] });
+      throw error;
     }
   },
 
   getWaiverById: (id) => {
-    const state = get();
-    return state.waivers.find(waiver => waiver._id === id);
+    return get().waivers.find(waiver => waiver._id === id);
   },
 
   addWaiver: async (waiverData) => {
@@ -51,21 +50,46 @@ const useWaiverStore = create((set, get) => ({
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const savedWaiver = await response.json();
-      
-      set((state) => ({
+      set(state => ({
         waivers: [...state.waivers, savedWaiver]
       }));
       return savedWaiver;
     } catch (error) {
-      console.error('Failed to save waiver:', error);
+      console.error('Failed to add waiver:', error);
       throw error;
     }
   },
+
+  deleteWaiver: async (id) => {
+    try {
+      const token = localStorage.getItem('authToken');
+      if (!token) {
+        throw new Error('No auth token found');
+      }
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/waivers/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      set(state => ({
+        waivers: state.waivers.filter(waiver => waiver._id !== id)
+      }));
+    } catch (error) {
+      console.error('Failed to delete waiver:', error);
+      throw error;
+    }
+  }
 }));
 
 export default useWaiverStore;

@@ -3,14 +3,19 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import useWaiverStore from "../store/useWaiverStore";
+import PopUpModal from "@/components/PopUpModal";
 import styles from "../../../styles/SavedImageWaivers.module.css";
 
 export default function SavedImageWaivers() {
   const router = useRouter();
-  const { waivers, setWaivers } = useWaiverStore();
+  const { waivers, setWaivers, deleteWaiver } = useWaiverStore();
   const [filteredWaivers, setFilteredWaivers] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedYear, setSelectedYear] = useState("All");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedId, setSelectedId] = useState(null);
 
   useEffect(() => {
     async function loadWaivers() {
@@ -29,8 +34,48 @@ export default function SavedImageWaivers() {
   }, [setWaivers]);
 
   useEffect(() => {
-    setFilteredWaivers(waivers || []);
-  }, [waivers]);
+    let filtered = [...(waivers || [])];
+
+    if (selectedYear !== "All") {
+      filtered = filtered.filter((w) => {
+        const waiverDate = new Date(w.date);
+        return waiverDate.getFullYear().toString() === selectedYear;
+      });
+    }
+
+    if (searchTerm.trim()) {
+      filtered = filtered.filter((w) =>
+        (w.projectName?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
+        (w.name?.toLowerCase() || "").includes(searchTerm.toLowerCase())
+      );
+    }
+
+    setFilteredWaivers(filtered);
+  }, [searchTerm, selectedYear, waivers]);
+
+  const getAvailableYears = () => {
+    if (!waivers) return [];
+    const years = waivers.map((w) => new Date(w.date).getFullYear().toString());
+    return Array.from(new Set(years)).sort((a, b) => b - a);
+  };
+
+  const handleDeleteRequest = (id) => {
+    setSelectedId(id);
+    setShowModal(true);
+  };
+
+  const confirmDelete = async () => {
+    if (selectedId) {
+      try {
+        await deleteWaiver(selectedId);
+        setShowModal(false);
+        setSelectedId(null);
+      } catch (error) {
+        console.error('Error deleting waiver:', error);
+        setError('Failed to delete waiver');
+      }
+    }
+  };
 
   if (loading) {
     return <div className={styles.container}>Loading...</div>;
@@ -43,19 +88,41 @@ export default function SavedImageWaivers() {
   return (
     <main className={styles.container}>
       <h1 className={styles.heading}>Saved Image Waivers</h1>
+
+      <div className={styles.filterBar}>
+        <input
+          type="text"
+          placeholder="Search by name or project..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className={styles.searchInput}
+        />
+        <select
+          value={selectedYear}
+          onChange={(e) => setSelectedYear(e.target.value)}
+          className={styles.yearDropdown}
+        >
+          <option value="All">All Years</option>
+          {getAvailableYears().map((year) => (
+            <option key={year} value={year}>
+              {year}
+            </option>
+          ))}
+        </select>
+      </div>
       
-      {(!waivers || waivers.length === 0) ? (
+      {(!filteredWaivers || filteredWaivers.length === 0) ? (
         <p className={styles.noWaivers}>No waivers found.</p>
       ) : (
         <ul className={styles.waiverList}>
-          {waivers.map((waiver) => (
+          {filteredWaivers.map((waiver) => (
             <li
               key={waiver._id}
               className={styles.waiverCard}
               onClick={() => router.push(`/saved-image-waivers/${waiver._id}`)}
             >
               <div className={styles.waiverInfo}>
-                📑 {waiver.projectName} - {waiver.name} - {waiver.date}
+                📑 {waiver.projectName || 'Untitled'} - {waiver.name} - {new Date(waiver.date).toLocaleDateString()}
               </div>
               <button
                 onClick={(e) => {
@@ -77,6 +144,17 @@ export default function SavedImageWaivers() {
       >
         Back
       </button>
+
+      {showModal && (
+        <PopUpModal
+          message="Are you sure you want to delete this waiver?"
+          onConfirm={confirmDelete}
+          onCancel={() => {
+            setShowModal(false);
+            setSelectedId(null);
+          }}
+        />
+      )}
     </main>
   );
 }
