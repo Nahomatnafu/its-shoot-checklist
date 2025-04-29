@@ -43,11 +43,12 @@ export default function AdminPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const newUser = { ...formData, password: "password0000" };
+    const newUser = { ...formData };
 
     try {
       const token = localStorage.getItem('authToken');
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/register`, {
+      // Fix the API endpoint URL by adding /api prefix
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/register`, {
         method: "POST",
         headers: { 
           'Authorization': `Bearer ${token}`,
