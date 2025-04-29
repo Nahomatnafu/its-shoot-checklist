@@ -1,83 +1,76 @@
+.container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.usersHeading {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #49306e;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.userList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.userCard {
+  background: #fff;
+  border-radius: 10px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
+}
+
+.userCard:hover {
+  transform: translateY(-5px);
+}
+
+.userName {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #49306e;
+  margin-bottom: 0.5rem;
+}
+
+.buttonGroup {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
 .editButton {
-  background-color: #febd11; /* Orange */
+  background: #febd11;
   color: #49306e;
   padding: 0.5rem 1rem;
-  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
-  border-radius: 25px;
-  font-weight: lighter;
+  border: none;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  font-weight: 600;
   transition: background 0.2s;
 }
 
 .editButton:hover {
-  background-color: #e0a400; /* Darker Orange */
+  background: #f1ac00;
 }
 
 .deleteButton {
-  background-color: hsl(0, 87%, 67%); /* Red */
-  color: #49306e;
-
+  background: #ef4444;
+  color: white;
   padding: 0.5rem 1rem;
-  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
-  border-radius: 25px;
-  font-weight: lighter;
+  border: none;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  font-weight: 600;
   transition: background 0.2s;
 }
 
 .deleteButton:hover {
-  background-color: #ffb5b5; /* Darker Red */
-}
-
-.usersHeading {
-  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
-  font-size: 36px;
-  color: #49306e;
-  margin-bottom: 20px;
-  padding-top: 20px;
-}
-.userName {
-  font-family: "Franklin Gothic Light", "Arial", sans-serif;
-  font-size: 18px;
-}
-.userCard {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem;
-  border-bottom: 1px solid #ccc;
-  background-color: #f5f5f5;
-  border-radius: 8px;
-  margin-bottom: 0.5rem;
-  transition: transform 0.2s ease, box-shadow 0.2s ease; /* 👈 add smooth transition */
-}
-
-.userCard:hover {
-  transform: translateY(-2px); /* 👈 lift up slightly */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* 👈 soft shadow */
-  background-color: #f0f0f0; /* 👈 even lighter background on hover */
-}
-
-.saveButton {
-  background-color: #22c55e; /* Green */
-  color: white;
-  padding: 0.5rem 1rem;
-  border-radius: 0.375rem;
-  transition: background 0.2s;
-}
-
-.saveButton:hover {
-  background-color: #16a34a; /* Darker Green */
-}
-
-.cancelButton {
-  background-color: #6b7280; /* Gray */
-  color: white;
-  padding: 0.5rem 1rem;
-  border-radius: 0.375rem;
-  transition: background 0.2s;
-}
-
-.cancelButton:hover {
-  background-color: #4b5563; /* Darker Gray */
+  background: #dc2626;
 }
 
 .modalOverlay {
@@ -93,24 +86,24 @@
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  animation: fadeIn 0.3s ease forwards;
 }
 
 .modalCard {
   background: #704da6;
-  padding: 2rem;
+  color: white;
+  padding: 2.5rem;
   border-radius: 1rem;
   width: 90%;
   max-width: 400px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
 }
 
 .modalTitle {
-  font-size: 1.5rem;
+  font-size: 1.75rem;
   font-weight: bold;
-  margin-bottom: 1rem;
-  text-align: center;
+  margin-bottom: 1.5rem;
   color: #febd11;
+  text-align: center;
 }
 
 .modalForm {
@@ -119,30 +112,61 @@
   gap: 1rem;
 }
 
-.modalForm input,
-.modalForm select {
+.input {
   padding: 0.75rem;
   border: 1px solid #ddd;
   border-radius: 0.375rem;
   font-size: 1rem;
-  width: 100%;
-  margin-bottom: 0.5rem;
   background-color: white;
   color: #333;
 }
 
-.modalForm .buttonGroup {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  margin-top: 1rem;
+.input:focus {
+  border-color: #febd11;
+  outline: none;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+.saveButton {
+  background: #febd11;
+  color: #49306e;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.saveButton:hover {
+  background: #f1ac00;
+}
+
+.cancelButton {
+  background: #6b7280;
+  color: white;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.cancelButton:hover {
+  background: #4b5563;
+}
+.selectDropdown {
+  background-color: white !important;
+  color: black !important;
+  border-radius: 6px;
+  padding: 0.5rem;
+  border: none;
+  outline: none;
+  font-weight: 500;
+  width: 100%;
+}
+
+.selectDropdown option {
+  background-color: white;
+  color: black;
 }

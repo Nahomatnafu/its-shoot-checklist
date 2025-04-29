@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
 import PopUpModal from "@/components/PopUpModal";
-import styles from "../../../styles/Users.module.css";
+import styles from "../../../../styles/Users.module.css";
 
 export default function UsersPage() {
   const isAuthorized = useAdminAuth();
