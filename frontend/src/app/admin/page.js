@@ -47,7 +47,7 @@ export default function AdminPage() {
     const newUser = {
       name: formData.name,
       email: formData.email,
-      password: "password0000", // Fixed default password
+      password: "password0000",
       position: formData.position || "Visual Content Producer",
       role: formData.role || "student"
     };
@@ -69,6 +69,10 @@ export default function AdminPage() {
         setFormData({ name: "", email: "", position: "", role: "student" });
         setModalMessage("User added successfully!");
         setShowModal(true);
+        // After a short delay, redirect to the users page
+        setTimeout(() => {
+          router.push("/admin/users");
+        }, 1500); // 1.5 second delay to show the success message
       } else {
         setModalMessage("❌ " + (data.message || "Failed to add user"));
         setShowModal(true);
