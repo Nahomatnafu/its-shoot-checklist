@@ -25,7 +25,7 @@ export default function ProfileModal({ isOpen, onClose, user, onUpdate }) {
   const handleSave = async () => {
     try {
       const token = localStorage.getItem('authToken');
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/user/profile`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/user/profile`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -149,7 +149,7 @@ export default function ProfileModal({ isOpen, onClose, user, onUpdate }) {
                   const formDataUpload = new FormData();
                   formDataUpload.append("image", file);
 
-                  const uploadResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/upload/profile`, {
+                  const uploadResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/upload/profile`, {
                     method: 'POST',
                     headers: {
                       'Authorization': `Bearer ${token}`
