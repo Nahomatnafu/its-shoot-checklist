@@ -179,6 +179,7 @@ export default function UsersPage() {
                 className={styles.input}
               >
                 <option value="student">Student</option>
+                <option value="its-staff">ITS Staff</option>
                 <option value="admin">Admin</option>
               </select>
               <div className={styles.buttonGroup}>

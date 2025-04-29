@@ -26,6 +26,12 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.userCard:hover {
+  transform: scale(1.01);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
 }
 
 .userName {
