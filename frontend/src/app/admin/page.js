@@ -41,20 +41,26 @@ export default function AdminPage() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
+  const handleAddUser = async (e) => {
     e.preventDefault();
-    const newUser = { ...formData };
+    
+    const newUser = {
+      name: formData.name,
+      email: formData.email,
+      password: "password0000", // Fixed default password
+      position: formData.position || "Visual Content Producer",
+      role: formData.role || "student"
+    };
 
     try {
       const token = localStorage.getItem('authToken');
-      // Fix the API endpoint URL by adding /api prefix
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/register`, {
         method: "POST",
         headers: { 
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json' 
         },
-        body: JSON.stringify(newUser),
+        body: JSON.stringify(newUser)
       });
 
       const data = await res.json();
@@ -83,7 +89,7 @@ export default function AdminPage() {
     <main className={styles.container}>
       <div className={styles.card}>
         <h1 className={styles.heading}>Admin Panel</h1>
-        <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+        <form className="flex flex-col gap-4" onSubmit={handleAddUser}>
           {/* Input Fields */}
           <input
             type="text"
