@@ -72,7 +72,7 @@ export default function AdminPage() {
         // After a short delay, redirect to the users page
         setTimeout(() => {
           router.push("/admin/users");
-        }, 1500); // 1.5 second delay to show the success message
+        }, 3500); 
       } else {
         setModalMessage("❌ " + (data.message || "Failed to add user"));
         setShowModal(true);
