@@ -16,13 +16,21 @@ router.get('/', protect, async (req, res) => {
 // Create new waiver
 router.post('/', protect, async (req, res) => {
   try {
+    // Only validate name
+    if (!req.body.name) {
+      return res.status(400).json({ message: 'Name is required' });
+    }
+
     const waiver = new ImageWaiver({
       ...req.body,
-      user: req.user._id
+      user: req.user._id,
+      date: req.body.date || new Date() // Ensure date is set
     });
+    
     const savedWaiver = await waiver.save();
     res.status(201).json(savedWaiver);
   } catch (error) {
+    console.error('Error saving waiver:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
@@ -42,3 +50,4 @@ router.delete('/:id', protect, async (req, res) => {
 });
 
 module.exports = router;
+

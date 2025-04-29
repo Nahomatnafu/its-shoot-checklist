@@ -1,45 +1,22 @@
 const mongoose = require('mongoose');
 
 const ImageWaiverSchema = new mongoose.Schema({
-  projectName: {
-    type: String,
-    required: true
-  },
-  projectDate: {
-    type: String,
-    required: true
-  },
+  projectName: String,
+  projectDate: String,
   name: {
     type: String,
     required: true
   },
-  address: {
-    type: String,
-    required: true
-  },
-  phone: {
-    type: String,
-    required: true
-  },
-  city: {
-    type: String,
-    required: true
-  },
-  state: {
-    type: String,
-    required: true
-  },
-  zip: {
-    type: String,
-    required: true
-  },
-  signature: {
-    type: String,
-    required: true
-  },
+  address: String,
+  phone: String,
+  city: String,
+  state: String,
+  zip: String,
+  signature: String,
   date: {
     type: Date,
-    default: Date.now
+    default: Date.now,
+    required: true
   },
   parentName: String,
   parentSignature: String,
@@ -52,3 +29,4 @@ const ImageWaiverSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 module.exports = mongoose.model('ImageWaiver', ImageWaiverSchema);
+

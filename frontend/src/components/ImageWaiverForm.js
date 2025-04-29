@@ -45,12 +45,12 @@ export default function ImageWaiverForm({
   const handleSubmit = (e) => {
     e.preventDefault();
     
-    // Validate required fields
-    const requiredFields = ['projectName', 'projectDate', 'name', 'address', 'phone', 'city', 'state', 'zip', 'signature'];
+    // Only validate name field
+    const requiredFields = ['name'];
     const missingFields = requiredFields.filter(field => !formState[field]);
     
     if (missingFields.length > 0) {
-      alert(`Please fill in all required fields: ${missingFields.join(', ')}`);
+      alert(`Please fill in required fields: ${missingFields.join(', ')}`);
       return;
     }
 
@@ -123,7 +123,7 @@ export default function ImageWaiverForm({
             name="projectName"
             value={formState.projectName}
             onChange={handleChange}
-            placeholder="Project/Event Name"
+            placeholder="Project/Event Name (optional)"
             className={styles.input}
             readOnly={readOnly}
           />
@@ -132,7 +132,7 @@ export default function ImageWaiverForm({
             name="projectDate"
             value={formState.projectDate}
             onChange={handleChange}
-            placeholder="Project/Event Date"
+            placeholder="Project/Event Date (optional)"
             className={styles.input}
             readOnly={readOnly}
           />
@@ -140,15 +140,16 @@ export default function ImageWaiverForm({
             name="name"
             value={formState.name}
             onChange={handleChange}
-            placeholder="Name"
-            className={styles.input}
+            placeholder="Name (required)"
+            className={`${styles.input} ${styles.required}`}
             readOnly={readOnly}
+            required
           />
           <input
             name="address"
             value={formState.address}
             onChange={handleChange}
-            placeholder="Address"
+            placeholder="Address (optional)"
             className={styles.input}
             readOnly={readOnly}
           />
@@ -156,7 +157,7 @@ export default function ImageWaiverForm({
             name="phone"
             value={formState.phone}
             onChange={handleChange}
-            placeholder="Phone"
+            placeholder="Phone (optional)"
             className={styles.input}
             readOnly={readOnly}
           />
@@ -165,7 +166,7 @@ export default function ImageWaiverForm({
               name="city"
               value={formState.city}
               onChange={handleChange}
-              placeholder="City"
+              placeholder="City (optional)"
               className={styles.cityInput}
               readOnly={readOnly}
             />
@@ -173,7 +174,7 @@ export default function ImageWaiverForm({
               name="state"
               value={formState.state}
               onChange={handleChange}
-              placeholder="State"
+              placeholder="State (optional)"
               className={styles.stateInput}
               readOnly={readOnly}
             />
@@ -181,7 +182,7 @@ export default function ImageWaiverForm({
               name="zip"
               value={formState.zip}
               onChange={handleChange}
-              placeholder="Zip"
+              placeholder="Zip (optional)"
               className={styles.zipInput}
               readOnly={readOnly}
             />
@@ -190,7 +191,7 @@ export default function ImageWaiverForm({
             name="signature"
             value={formState.signature}
             onChange={handleChange}
-            placeholder="Signature (Full Name or Initials)"
+            placeholder="Signature (optional)"
             className={styles.input}
             readOnly={readOnly}
           />
@@ -208,7 +209,7 @@ export default function ImageWaiverForm({
             name="parentName"
             value={formState.parentName}
             onChange={handleChange}
-            placeholder="Parent/Guardian Name"
+            placeholder="Parent/Guardian Name (optional)"
             className={styles.input}
             readOnly={readOnly}
           />
@@ -216,7 +217,7 @@ export default function ImageWaiverForm({
             name="parentSignature"
             value={formState.parentSignature}
             onChange={handleChange}
-            placeholder="Parent/Guardian Signature (Full Name or Initials)"
+            placeholder="Parent/Guardian Signature (optional)"
             className={styles.input}
             readOnly={readOnly}
           />
@@ -224,7 +225,7 @@ export default function ImageWaiverForm({
             name="parentSignatureDate"
             value={formState.parentSignatureDate}
             onChange={handleChange}
-            placeholder="Parent/Guardian Signature Date"
+            placeholder="Parent/Guardian Signature Date (optional)"
             className={styles.input}
             readOnly={readOnly}
           />

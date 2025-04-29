@@ -51,8 +51,14 @@ export default function CreditDetailsPage() {
               mergedRoles.push({ ...defaultRole });
             }
           });
+
+          // Ensure each role has at least one empty person field
+          const rolesWithPeople = mergedRoles.map(role => ({
+            ...role,
+            people: role.people.length > 0 ? role.people : [""]
+          }));
           
-          setRoles(mergedRoles);
+          setRoles(rolesWithPeople);
         } else {
           console.error('Credit not found:', id);
           setError('Credit not found');

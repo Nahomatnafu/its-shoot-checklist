@@ -104,3 +104,19 @@
 .waiverWrapper {
   position: relative;
 }
+
+.required {
+  border-left: 3px solid #f1b40e;
+}
+
+.input::placeholder,
+.cityInput::placeholder,
+.stateInput::placeholder,
+.zipInput::placeholder {
+  color: #999;
+}
+
+.required::placeholder {
+  color: #666;
+  font-weight: 500;
+}

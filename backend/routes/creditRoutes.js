@@ -19,39 +19,15 @@ router.post('/', protect, async (req, res) => {
     console.log('Received credit data:', req.body);
     console.log('User ID:', req.user._id);
 
-    // Validate project name
+    // Only validate project name
     if (!req.body.projectName?.trim()) {
       return res.status(400).json({ message: 'Project name is required' });
     }
 
-    // Validate roles
-    if (!Array.isArray(req.body.roles) || req.body.roles.length === 0) {
-      return res.status(400).json({ message: 'At least one role is required' });
-    }
-
-    // Clean and validate roles data
-    const validRoles = req.body.roles.filter(role => {
-      return role.role?.trim() && 
-             Array.isArray(role.people) && 
-             role.people.some(person => person?.trim());
-    });
-
-    if (validRoles.length === 0) {
-      return res.status(400).json({ 
-        message: 'At least one role with a valid person is required' 
-      });
-    }
-
-    // Clean up the data
-    const cleanedRoles = req.body.roles.map(role => ({
-      role: role.role.trim(),
-      people: role.people.filter(person => person?.trim()).map(person => person.trim())
-    }));
-
-    // Create and save the credit
+    // Create and save the credit with all roles, even empty ones
     const credit = new Credit({
       projectName: req.body.projectName.trim(),
-      roles: cleanedRoles,
+      roles: req.body.roles || [],  // Accept all roles without validation
       user: req.user._id
     });
 
@@ -71,11 +47,20 @@ router.post('/', protect, async (req, res) => {
 // Update credit
 router.put('/:id', protect, async (req, res) => {
   try {
+    // Only validate project name
+    if (!req.body.projectName?.trim()) {
+      return res.status(400).json({ message: 'Project name is required' });
+    }
+
     const credit = await Credit.findOneAndUpdate(
       { _id: req.params.id, user: req.user._id },
-      req.body,
+      {
+        projectName: req.body.projectName.trim(),
+        roles: req.body.roles || []  // Accept all roles without validation
+      },
       { new: true }
     );
+    
     if (!credit) return res.status(404).json({ message: 'Credit not found' });
     res.json(credit);
   } catch (error) {
@@ -98,6 +83,7 @@ router.delete('/:id', protect, async (req, res) => {
 });
 
 module.exports = router;
+
 
 
 
