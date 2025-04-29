@@ -59,7 +59,7 @@ const useCreditStore = create((set, get) => ({
       });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
+        const errorData = await response.json();
         console.error('Server response:', {
           status: response.status,
           statusText: response.statusText,
@@ -69,14 +69,15 @@ const useCreditStore = create((set, get) => ({
       }
 
       const savedCredit = await response.json();
-      console.log('Received saved credit:', savedCredit);
       
-      set((state) => ({
+      // Update the store with the new credit
+      set(state => ({
         credits: [...state.credits, savedCredit]
       }));
+
       return savedCredit;
     } catch (error) {
-      console.error('Failed to save credit:', error);
+      console.error('Failed to add credit:', error);
       throw error;
     }
   },

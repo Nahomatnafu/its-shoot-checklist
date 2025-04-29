@@ -61,18 +61,30 @@ export default function CreateCredits() {
     setRoles(newRoles);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {  // Make this async
     try {
+      if (!projectName.trim()) {
+        setModalMessage("Project name is required");
+        setShowModal(true);
+        return;
+      }
+
+      // Filter out empty roles and people
+      const cleanedRoles = roles.filter(role => role.role.trim() || role.people.some(p => p.trim()));
+
       const newCredit = { 
         projectName: projectName.trim(), 
-        roles: roles 
+        roles: cleanedRoles
       };
       
-      addCredit(newCredit);
+      console.log('Submitting credit:', newCredit); // Debug log
+      
+      await addCredit(newCredit); // Wait for the response
       setModalMessage("Credits saved successfully!");
       setShowModal(true);
     } catch (error) {
-      setModalMessage(error.message);
+      console.error('Error saving credit:', error); // Debug log
+      setModalMessage(error.message || "Failed to save credits");
       setShowModal(true);
     }
   };
@@ -80,7 +92,9 @@ export default function CreateCredits() {
   // When user clicks "Save" in the modal
   const confirmAndRedirect = () => {
     setShowModal(false);
-    router.push("/credits"); // ✅ Redirect manually after confirmation
+    if (!modalMessage.includes("Failed")) {  // Only redirect on success
+      router.push("/credits");
+    }
   };
 
   return (
