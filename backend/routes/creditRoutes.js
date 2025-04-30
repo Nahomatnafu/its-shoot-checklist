@@ -3,10 +3,12 @@ const router = express.Router();
 const Credit = require('../models/Credit');
 const { protect } = require('../middleware/authMiddleware');
 
-// Get all credits for logged-in user
+// Get all credits
 router.get('/', protect, async (req, res) => {
   try {
-    const credits = await Credit.find({ user: req.user._id });
+    const credits = await Credit.find()
+      .populate('user', 'name email')
+      .sort({ createdAt: -1 });
     res.json(credits);
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
@@ -83,6 +85,7 @@ router.delete('/:id', protect, async (req, res) => {
 });
 
 module.exports = router;
+
 
 
 

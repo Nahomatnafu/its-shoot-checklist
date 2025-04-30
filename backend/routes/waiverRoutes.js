@@ -3,10 +3,12 @@ const router = express.Router();
 const ImageWaiver = require('../models/ImageWaiver');
 const { protect } = require('../middleware/authMiddleware');
 
-// Get all waivers for logged-in user
+// Get all waivers (for all users)
 router.get('/', protect, async (req, res) => {
   try {
-    const waivers = await ImageWaiver.find({ user: req.user._id });
+    const waivers = await ImageWaiver.find()
+      .populate('user', 'name email') // Add this to show who created it
+      .sort({ createdAt: -1 }); // Sort by newest first
     res.json(waivers);
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
@@ -50,4 +52,5 @@ router.delete('/:id', protect, async (req, res) => {
 });
 
 module.exports = router;
+
 

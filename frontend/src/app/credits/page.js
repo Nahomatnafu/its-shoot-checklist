@@ -60,6 +60,33 @@ export default function SavedCreditsPage() {
     setSelectedId(null);
   };
 
+  const CreditCard = ({ credit }) => (
+    <div className={styles.creditCard}>
+      <div className={styles.creditInfo}>
+        <h3>{credit.projectName}</h3>
+        <p className={styles.createdBy}>Created by: {credit.user?.name || 'Unknown'}</p>
+        <p className={styles.date}>
+          {new Date(credit.createdAt).toLocaleDateString()}
+        </p>
+      </div>
+      <div
+        onClick={() => handleClick(credit.id)}
+        className={styles.creditInfo}
+      >
+        🎬 {credit.projectName}
+      </div>
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          handleDeleteRequest(credit.id);
+        }}
+        className={styles.deleteButton}
+      >
+        🗑 Delete
+      </button>
+    </div>
+  );
+
   return (
     <main className={styles.container}>
       <h1 className={styles.heading}>Saved Credits</h1>
@@ -91,23 +118,7 @@ export default function SavedCreditsPage() {
       ) : (
         <ul className={styles.creditList}>
           {filteredCredits.map((credit) => (
-            <li key={credit.id} className={styles.creditCard}>
-              <div
-                onClick={() => handleClick(credit.id)}
-                className={styles.creditInfo}
-              >
-                🎬 {credit.projectName}
-              </div>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleDeleteRequest(credit.id);
-                }}
-                className={styles.deleteButton}
-              >
-                🗑 Delete
-              </button>
-            </li>
+            <CreditCard key={credit.id} credit={credit} />
           ))}
         </ul>
       )}

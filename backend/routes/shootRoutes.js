@@ -3,10 +3,12 @@ const router = express.Router();
 const Shoot = require("../models/Shoot");
 const { protect } = require("../middleware/authMiddleware");
 
-// Get all shoots for logged-in user
+// Get all shoots
 router.get("/", protect, async (req, res) => {
   try {
-    const shoots = await Shoot.find({ user: req.user._id });
+    const shoots = await Shoot.find()
+      .populate('user', 'name email')
+      .sort({ date: -1 });
     res.json(shoots);
   } catch (error) {
     res.status(500).json({ message: "Server error" });
@@ -74,3 +76,4 @@ router.delete("/:id", protect, async (req, res) => {
 });
 
 module.exports = router;
+
