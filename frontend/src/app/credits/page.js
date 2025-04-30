@@ -69,12 +69,6 @@ export default function SavedCreditsPage() {
           {new Date(credit.createdAt).toLocaleDateString()}
         </p>
       </div>
-      <div
-        onClick={() => handleClick(credit.id)}
-        className={styles.creditInfo}
-      >
-        🎬 {credit.projectName}
-      </div>
       <button
         onClick={(e) => {
           e.stopPropagation();
