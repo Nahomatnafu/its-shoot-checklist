@@ -120,11 +120,12 @@ export default function ShootsPage() {
         <ul className={styles.shootList}>
           {filteredShoots.map((shoot) => (
             shoot && shoot._id ? (
-              <li key={`shoot-${shoot._id}`} className={styles.shootCard}>
-                <div
-                  onClick={() => handleShootClick(shoot._id)}
-                  className={styles.shootInfo}
-                >
+              <li 
+                key={`shoot-${shoot._id}`} 
+                className={styles.shootCard}
+                onClick={() => handleShootClick(shoot._id)}
+              >
+                <div className={styles.shootInfo}>
                   📸 {shoot.title || 'Untitled'}
                   <span className={styles.shootDate}>({shoot.date || 'No date'})</span>
                 </div>

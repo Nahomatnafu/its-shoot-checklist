@@ -61,7 +61,10 @@ export default function SavedCreditsPage() {
   };
 
   const CreditCard = ({ credit }) => (
-    <div className={styles.creditCard}>
+    <div 
+      className={styles.creditCard}
+      onClick={() => handleClick(credit.id)} // Add this click handler
+    >
       <div className={styles.creditInfo}>
         <h3>{credit.projectName}</h3>
         <p className={styles.createdBy}>Created by: {credit.user?.name || 'Unknown'}</p>
