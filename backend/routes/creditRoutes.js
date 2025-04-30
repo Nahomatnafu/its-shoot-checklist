@@ -54,8 +54,9 @@ router.put('/:id', protect, async (req, res) => {
       return res.status(400).json({ message: 'Project name is required' });
     }
 
-    const credit = await Credit.findOneAndUpdate(
-      { _id: req.params.id, user: req.user._id },
+    // Remove the user check from the query
+    const credit = await Credit.findByIdAndUpdate(
+      req.params.id,  // Only check for credit ID
       {
         projectName: req.body.projectName.trim(),
         roles: req.body.roles || []  // Accept all roles without validation
@@ -85,6 +86,7 @@ router.delete('/:id', protect, async (req, res) => {
 });
 
 module.exports = router;
+
 
 
 
