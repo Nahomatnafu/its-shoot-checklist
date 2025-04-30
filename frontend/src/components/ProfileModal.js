@@ -36,17 +36,25 @@ export default function ProfileModal({ isOpen, onClose, user, onUpdate }) {
           currentPassword: formData.currentPassword,
           newPassword: formData.newPassword,
           position: formData.position,
-          profilePic: previewImage || formData.profilePic // Use new uploaded image if available
+          profilePic: previewImage || formData.profilePic
         })
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        onUpdate(data.user);
-        onClose();
-        setFormData(prev => ({ ...prev, activeModal: "main", error: "" }));
-        setPreviewImage(null);
+        // Add visual feedback by changing button color
+        const button = document.querySelector(`.${styles.saveButton}`);
+        button.style.backgroundColor = '#4CAF50'; // Green color
+        button.textContent = 'Updated!';
+        
+        // Wait for visual feedback, then close
+        setTimeout(() => {
+          onUpdate(data.user);
+          onClose();
+          setFormData(prev => ({ ...prev, activeModal: "main", error: "" }));
+          setPreviewImage(null);
+        }, 1000); // Close after 1 second
       } else {
         setFormData(prev => ({ ...prev, error: data.message }));
       }

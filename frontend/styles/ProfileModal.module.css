@@ -52,6 +52,12 @@
   border-radius: 4px;
   cursor: pointer;
   margin-top: 0.5rem;
+  transition: background-color 0.3s ease;
+}
+
+.saveButton:disabled {
+  background-color: #4CAF50;
+  cursor: not-allowed;
 }
 
 .saveButton:hover {
