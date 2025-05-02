@@ -15,6 +15,10 @@ export default function ShootDetailPage() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    // Add AbortController for timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 8000);
+
     async function loadShoot() {
       if (!id) return;
 
@@ -22,60 +26,40 @@ export default function ShootDetailPage() {
         setLoading(true);
         setError(null);
         
+        // First try to get from store (instant)
         let foundShoot = getShootById(id);
 
         if (foundShoot) {
           setShoot(foundShoot);
+          setLoading(false);
         } else {
-          const fetchedShoot = await fetchShootById(id);
+          // If not in store, fetch with timeout
+          const fetchedShoot = await fetchShootById(id, controller.signal);
           setShoot(fetchedShoot);
         }
       } catch (error) {
         console.error("Failed to fetch shoot:", error);
-        setError(error.message || "Failed to load shoot");
+        setError(error.name === 'AbortError' 
+          ? 'Request timed out. Please try again.' 
+          : error.message || "Failed to load shoot");
       } finally {
         setLoading(false);
+        clearTimeout(timeoutId);
       }
     }
 
     loadShoot();
+    
+    return () => {
+      clearTimeout(timeoutId);
+      controller.abort();
+    };
   }, [id, getShootById, fetchShootById]);
 
-  if (loading) {
-    return (
-      <main className={styles.container}>
-        <h1 className={styles.heading}>Loading shoot...</h1>
-      </main>
-    );
-  }
-
-  if (error) {
-    return (
-      <main className={styles.container}>
-        <h1 className={styles.heading}>Error: {error}</h1>
-        <button 
-          onClick={() => router.push("/shoots")} 
-          className={styles.backButton}
-        >
-          Back to Shoots
-        </button>
-      </main>
-    );
-  }
-
-  if (!shoot) {
-    return (
-      <main className={styles.container}>
-        <h1 className={styles.heading}>Shoot not found</h1>
-        <button 
-          onClick={() => router.push("/shoots")} 
-          className={styles.backButton}
-        >
-          Back to Shoots
-        </button>
-      </main>
-    );
-  }
+  // Add early return for loading state
+  if (loading) return <div className={styles.loading}>Loading shoot details...</div>;
+  if (error) return <div className={styles.error}>{error}</div>;
+  if (!shoot) return <div className={styles.error}>Shoot not found</div>;
 
   return (
     <main className={styles.container}>

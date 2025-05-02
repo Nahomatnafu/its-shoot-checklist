@@ -3,7 +3,7 @@ import { create } from "zustand";
 const useCreditStore = create((set, get) => ({
   credits: [],
   
-  setCredits: async () => {
+  setCredits: async (signal) => {
     try {
       const token = localStorage.getItem('authToken');
       if (!token) {
@@ -12,8 +12,10 @@ const useCreditStore = create((set, get) => ({
 
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/credits`, {
         headers: {
-          'Authorization': `Bearer ${token}`
-        }
+          'Authorization': `Bearer ${token}`,
+          'Cache-Control': 'no-cache' // Force fresh data
+        },
+        signal // Pass AbortController signal
       });
 
       if (!response.ok) {
@@ -30,8 +32,10 @@ const useCreditStore = create((set, get) => ({
       set({ credits: processedData });
     } catch (error) {
       console.error('Failed to fetch credits:', error);
-      set({ credits: [] });
-      throw error;
+      // Don't reset credits to empty array on error
+      if (error.name !== 'AbortError') {
+        throw error;
+      }
     }
   },
 

@@ -19,60 +19,89 @@ const defaultRoles = [
   { role: "Captioned by", people: [""] },
 ];
 
-export default function CreditDetailsPage() {
+export default function CreditDetailPage() {
   const { id } = useParams();
   const router = useRouter();
-  const { getCreditById, updateCreditById, setCredits } = useCreditStore();
+  const { getCreditById, setCredits, updateCreditById } = useCreditStore();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
   const [projectName, setProjectName] = useState("");
   const [roles, setRoles] = useState([]);
-  const [showModal, setShowModal] = useState(false);
-  const [modalMessage, setModalMessage] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
+    // Add AbortController for timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 8000);
+
     const loadCredit = async () => {
       try {
         setLoading(true);
         setError(null);
-        await setCredits();
+        
+        // First check if we already have the credit in store
+        const cachedCredit = getCreditById(id);
+        
+        if (cachedCredit) {
+          initializeForm(cachedCredit);
+          setLoading(false);
+          return;
+        }
+        
+        // If not in store, load all credits (with timeout)
+        await setCredits(controller.signal);
         const credit = getCreditById(id);
         
         if (credit) {
-          setProjectName(credit.projectName);
-          
-          // Merge existing roles with default roles
-          const existingRoleNames = credit.roles.map(r => r.role);
-          const mergedRoles = [...credit.roles];
-          
-          defaultRoles.forEach(defaultRole => {
-            if (!existingRoleNames.includes(defaultRole.role)) {
-              mergedRoles.push({ ...defaultRole });
-            }
-          });
-
-          // Ensure each role has at least one empty person field
-          const rolesWithPeople = mergedRoles.map(role => ({
-            ...role,
-            people: role.people.length > 0 ? role.people : [""]
-          }));
-          
-          setRoles(rolesWithPeople);
+          initializeForm(credit);
         } else {
           console.error('Credit not found:', id);
           setError('Credit not found');
         }
       } catch (error) {
         console.error('Error loading credit:', error);
-        setError(error.message || 'Error loading credit');
+        setError(error.name === 'AbortError' 
+          ? 'Request timed out. Please try again.' 
+          : error.message || 'Failed to load credit');
       } finally {
         setLoading(false);
+        clearTimeout(timeoutId);
       }
     };
 
+    const initializeForm = (credit) => {
+      setProjectName(credit.projectName);
+      
+      // Merge existing roles with default roles
+      const existingRoleNames = credit.roles.map(r => r.role);
+      const mergedRoles = [...credit.roles];
+      
+      defaultRoles.forEach(defaultRole => {
+        if (!existingRoleNames.includes(defaultRole.role)) {
+          mergedRoles.push({ ...defaultRole });
+        }
+      });
+
+      // Ensure each role has at least one empty person field
+      const rolesWithPeople = mergedRoles.map(role => ({
+        ...role,
+        people: role.people.length > 0 ? role.people : [""]
+      }));
+      
+      setRoles(rolesWithPeople);
+    };
+
     loadCredit();
-  }, [id, setCredits, getCreditById]);
+    
+    return () => {
+      clearTimeout(timeoutId);
+      controller.abort();
+    };
+  }, [id, getCreditById, setCredits]);
+
+  // Add early return for loading state
+  if (loading) return <div className={styles.loading}>Loading credit details...</div>;
+  if (error) return <div className={styles.error}>{error}</div>;
 
   const addRole = () => {
     setRoles([...roles, { role: "", people: [""] }]);

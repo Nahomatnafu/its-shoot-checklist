@@ -3,7 +3,7 @@ import { create } from 'zustand';
 const useWaiverStore = create((set, get) => ({
   waivers: [],
   
-  setWaivers: async () => {
+  setWaivers: async (signal) => {
     try {
       const token = localStorage.getItem('authToken');
       if (!token) {
@@ -12,8 +12,10 @@ const useWaiverStore = create((set, get) => ({
 
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/waivers`, {
         headers: {
-          'Authorization': `Bearer ${token}`
-        }
+          'Authorization': `Bearer ${token}`,
+          'Cache-Control': 'no-cache' // Force fresh data
+        },
+        signal // Pass AbortController signal
       });
 
       if (!response.ok) {
@@ -24,8 +26,10 @@ const useWaiverStore = create((set, get) => ({
       set({ waivers: data });
     } catch (error) {
       console.error('Failed to fetch waivers:', error);
-      set({ waivers: [] });
-      throw error;
+      // Don't reset waivers to empty array on error
+      if (error.name !== 'AbortError') {
+        throw error;
+      }
     }
   },
 

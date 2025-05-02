@@ -11,7 +11,7 @@ const useShootStore = create((set, get) => ({
     return state.shoots.find((shoot) => shoot._id === id);
   },
 
-  fetchShootById: async (id) => {
+  fetchShootById: async (id, signal) => {
     const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/shoots/${id}`;
     const token = localStorage.getItem("authToken");
 
@@ -20,15 +20,24 @@ const useShootStore = create((set, get) => ({
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
+          "Cache-Control": "no-cache" // Force fresh data
         },
+        signal // Pass AbortController signal
       });
 
       if (!response.ok) throw new Error("Failed to fetch shoot by ID");
 
       const shoot = await response.json();
-      set((state) => ({
-        shoots: [...state.shoots, shoot],
-      }));
+      
+      // Update store with fetched shoot
+      set((state) => {
+        // Only add if not already in the array
+        const exists = state.shoots.some(s => s._id === shoot._id);
+        if (!exists) {
+          return { shoots: [...state.shoots, shoot] };
+        }
+        return state;
+      });
 
       return shoot;
     } catch (error) {
