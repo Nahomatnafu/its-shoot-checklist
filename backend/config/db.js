@@ -12,6 +12,9 @@ const connectDB = async () => {
       socketTimeoutMS: 45000,
       connectTimeoutMS: 10000,
       heartbeatFrequencyMS: 10000,
+      // Add these optimizations
+      compressors: "zlib",
+      zlibCompressionLevel: 9,
     });
 
     logger.success(`MongoDB Connected`);

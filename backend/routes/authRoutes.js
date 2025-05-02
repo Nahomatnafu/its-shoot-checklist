@@ -53,8 +53,13 @@ router.delete("/users/:id", protect, isAdmin, async (req, res) => {
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
+  if (!email || !password) {
+    return res.status(400).json({ message: "Please provide email and password" });
+  }
+
   try {
-    const user = await User.findOne({ email });
+    // Use lean() for faster query performance
+    const user = await User.findOne({ email }).lean();
 
     if (!user) {
       return res.status(400).json({ message: "Email not found" });
@@ -66,21 +71,19 @@ router.post("/login", async (req, res) => {
       return res.status(400).json({ message: "Incorrect password" });
     }
 
+    // Create token with minimal payload
     const token = jwt.sign(
       { id: user._id, role: user.role },
       process.env.JWT_SECRET,
       { expiresIn: "1d" }
     );
 
+    // Remove password from user object
+    const { password: _, ...userWithoutPassword } = user;
+
     res.json({
       token,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        position: user.position
-      }
+      user: userWithoutPassword
     });
   } catch (error) {
     console.error("Login error:", error);

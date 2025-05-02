@@ -45,10 +45,10 @@ const corsOptions = {
   },
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization", "Accept"],
-  exposedHeaders: ["Authorization"],
   credentials: true,
   preflightContinue: false,
   optionsSuccessStatus: 204,
+  maxAge: 86400 // Add CORS caching - 24 hours
 };
 
 // Apply CORS middleware

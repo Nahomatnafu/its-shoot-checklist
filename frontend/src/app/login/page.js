@@ -17,6 +17,10 @@ export default function LoginPage() {
     setLoginStatus("loading");
     
     try {
+      // Add timeout to prevent hanging requests
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+      
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`, {
         method: "POST",
         headers: {
@@ -25,8 +29,11 @@ export default function LoginPage() {
         body: JSON.stringify({
           email: email.trim(),
           password,
-        })
+        }),
+        signal: controller.signal
       });
+      
+      clearTimeout(timeoutId);
 
       const data = await response.json();
       
@@ -35,14 +42,23 @@ export default function LoginPage() {
       }
 
       if (data.token) {
+        // Store minimal data
         localStorage.setItem('authToken', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
         
-        // Verify storage
-        const storedToken = localStorage.getItem('authToken');
-        console.log('Verified stored token exists:', !!storedToken);
+        // Store only essential user data
+        const essentialUserData = {
+          id: data.user.id,
+          name: data.user.name,
+          email: data.user.email,
+          role: data.user.role,
+          position: data.user.position
+        };
+        localStorage.setItem('user', JSON.stringify(essentialUserData));
         
         setLoginStatus("success");
+        
+        // Prefetch dashboard data
+        router.prefetch('/dashboard');
         router.push("/dashboard");
       } else {
         throw new Error('No token received from server');
@@ -50,7 +66,9 @@ export default function LoginPage() {
     } catch (error) {
       console.error('Login error:', error);
       setLoginStatus("error");
-      setErrorMessage(error.message || 'Connection error');
+      setErrorMessage(error.name === 'AbortError' 
+        ? 'Login request timed out. Please try again.' 
+        : error.message || 'Connection error');
     }
   };
   
@@ -120,6 +138,7 @@ export default function LoginPage() {
     </main>
   );
 }
+
 
 
 
