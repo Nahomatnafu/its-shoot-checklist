@@ -28,11 +28,22 @@ export default function CreditDetailPage() {
   const [projectName, setProjectName] = useState("");
   const [roles, setRoles] = useState([]);
   const [isSaving, setIsSaving] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
 
   useEffect(() => {
-    // Add AbortController for timeout
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 8000);
+    let controller;
+    let timeoutId;
+    
+    try {
+      // Create AbortController only if supported by browser
+      controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+      timeoutId = setTimeout(() => {
+        if (controller) controller.abort();
+      }, 8000);
+    } catch (error) {
+      console.error('AbortController error:', error);
+    }
 
     const loadCredit = async () => {
       try {
@@ -49,7 +60,7 @@ export default function CreditDetailPage() {
         }
         
         // If not in store, load all credits (with timeout)
-        await setCredits(controller.signal);
+        await setCredits(controller?.signal);
         const credit = getCreditById(id);
         
         if (credit) {
@@ -65,7 +76,7 @@ export default function CreditDetailPage() {
           : error.message || 'Failed to load credit');
       } finally {
         setLoading(false);
-        clearTimeout(timeoutId);
+        if (timeoutId) clearTimeout(timeoutId);
       }
     };
 
@@ -94,10 +105,40 @@ export default function CreditDetailPage() {
     loadCredit();
     
     return () => {
-      clearTimeout(timeoutId);
-      controller.abort();
+      if (timeoutId) clearTimeout(timeoutId);
+      if (controller) controller.abort();
     };
   }, [id, getCreditById, setCredits]);
+
+  const handleSave = async () => {
+    try {
+      if (!projectName.trim()) {
+        setModalMessage("Project name is required");
+        setShowModal(true);
+        return;
+      }
+
+      setIsSaving(true);
+      await updateCreditById(id, {
+        projectName,
+        roles  // Send all roles, even empty ones
+      });
+      setModalMessage("Credits updated successfully!");
+      setShowModal(true);
+      setIsSaving(false);
+    } catch (error) {
+      setIsSaving(false);
+      setModalMessage(error.message || "Failed to update credits");
+      setShowModal(true);
+    }
+  };
+
+  const handleModalConfirm = () => {
+    setShowModal(false);
+    if (!modalMessage.includes("Failed")) {
+      router.push("/credits");
+    }
+  };
 
   // Add early return for loading state
   if (loading) return <div className={styles.loading}>Loading credit details...</div>;
@@ -140,33 +181,6 @@ export default function CreditDetailPage() {
   const validateForm = () => {
     if (!projectName.trim()) {
       throw new Error("Project name is required");
-    }
-  };
-
-  const handleSave = async () => {
-    try {
-      if (!projectName.trim()) {
-        setModalMessage("Project name is required");
-        setShowModal(true);
-        return;
-      }
-
-      await updateCreditById(id, {
-        projectName,
-        roles  // Send all roles, even empty ones
-      });
-      setModalMessage("Credits updated successfully!");
-      setShowModal(true);
-    } catch (error) {
-      setModalMessage(error.message || "Failed to update credits");
-      setShowModal(true);
-    }
-  };
-
-  const handleModalConfirm = () => {
-    setShowModal(false);
-    if (!modalMessage.includes("Failed")) {
-      router.push("/credits");
     }
   };
 
