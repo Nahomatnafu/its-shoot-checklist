@@ -15,9 +15,18 @@ export default function WaiverDetailPage() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Add AbortController for timeout
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 8000);
+    let controller;
+    let timeoutId;
+    
+    try {
+      // Create AbortController only if supported by browser
+      controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+      timeoutId = setTimeout(() => {
+        if (controller) controller.abort();
+      }, 8000);
+    } catch (error) {
+      console.error('AbortController error:', error);
+    }
 
     const loadWaiver = async () => {
       try {
@@ -30,8 +39,8 @@ export default function WaiverDetailPage() {
           return;
         }
         
-        // If not in store, load all waivers (with timeout)
-        await setWaivers(controller.signal);
+        // If not in store, load all waivers (with timeout if available)
+        await setWaivers(controller?.signal);
         
         // Then get the specific waiver
         const waiverData = getWaiverById(id);
@@ -48,15 +57,15 @@ export default function WaiverDetailPage() {
           : error.message || 'Failed to load waiver');
       } finally {
         setLoading(false);
-        clearTimeout(timeoutId);
+        if (timeoutId) clearTimeout(timeoutId);
       }
     };
 
     loadWaiver();
     
     return () => {
-      clearTimeout(timeoutId);
-      controller.abort();
+      if (timeoutId) clearTimeout(timeoutId);
+      if (controller) controller.abort();
     };
   }, [id, setWaivers, getWaiverById, router]);
 

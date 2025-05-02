@@ -10,13 +10,18 @@ const useWaiverStore = create((set, get) => ({
         throw new Error('No auth token found');
       }
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/waivers`, {
+      const options = {
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Cache-Control': 'no-cache' // Force fresh data
-        },
-        signal // Pass AbortController signal
-      });
+          'Authorization': `Bearer ${token}`
+        }
+      };
+
+      // Only add signal if it's a valid AbortSignal
+      if (signal instanceof AbortSignal) {
+        options.signal = signal;
+      }
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/waivers`, options);
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);

@@ -15,15 +15,20 @@ const useShootStore = create((set, get) => ({
     const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/shoots/${id}`;
     const token = localStorage.getItem("authToken");
 
+    const options = {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    };
+
+    // Only add signal if it's a valid AbortSignal
+    if (signal instanceof AbortSignal) {
+      options.signal = signal;
+    }
+
     try {
-      const response = await fetch(apiUrl, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Cache-Control": "no-cache" // Force fresh data
-        },
-        signal // Pass AbortController signal
-      });
+      const response = await fetch(apiUrl, options);
 
       if (!response.ok) throw new Error("Failed to fetch shoot by ID");
 
