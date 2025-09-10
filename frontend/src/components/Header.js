@@ -21,6 +21,7 @@ export default function Header() {
   const [isLoading, setIsLoading] = useState(true);
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const dropdownRefs = {
     waiver: useRef(null),
@@ -125,6 +126,18 @@ export default function Header() {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [mobileMenuOpen]);
 
   if (pathname === "/login" || isLoading) return null;
 
@@ -257,7 +270,137 @@ export default function Header() {
             />
           </div>
         </nav>
+
+        <div className={styles.hamburger} onClick={() => setMobileMenuOpen(true)}>
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
       </header>
+
+      {mobileMenuOpen && (
+        <div className={`${styles.mobileMenu} ${mobileMenuOpen ? styles.open : ''}`}>
+          <div className={styles.mobileMenuHeader}>
+            <Image
+              src="/MSU_newLogo.png"
+              alt="MSU Logo"
+              width={60}
+              height={60}
+              className={styles.logo}
+            />
+            <button 
+              className={styles.closeButton}
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              ✕
+            </button>
+          </div>
+          
+          <div className={styles.mobileMenuItems}>
+            <Link 
+              href="/shoots" 
+              className={styles.mobileNavButton}
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Shoots
+            </Link>
+            
+            <div className={styles.mobileDropdownSection}>
+              <div className={styles.mobileDropdownTitle}>Image Waiver</div>
+              <div className={styles.mobileDropdownItems}>
+                <Link
+                  href="/image-waiver"
+                  className={styles.mobileDropdownItem}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Create New
+                </Link>
+                <Link
+                  href="/saved-image-waivers"
+                  className={styles.mobileDropdownItem}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  View Saved
+                </Link>
+              </div>
+            </div>
+
+            <div className={styles.mobileDropdownSection}>
+              <div className={styles.mobileDropdownTitle}>Shoot Type</div>
+              <div className={styles.mobileDropdownItems}>
+                {shootTypes.map((shoot) => (
+                  <Link
+                    key={shoot.name}
+                    href={shoot.path}
+                    className={styles.mobileDropdownItem}
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    {shoot.name}
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            <div className={styles.mobileDropdownSection}>
+              <div className={styles.mobileDropdownTitle}>Credits</div>
+              <div className={styles.mobileDropdownItems}>
+                <Link
+                  href="/credits/create"
+                  className={styles.mobileDropdownItem}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Create New
+                </Link>
+                <Link
+                  href="/credits"
+                  className={styles.mobileDropdownItem}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  View Saved
+                </Link>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.mobileUserSection}>
+            {user?.role === "admin" && (
+              <button
+                className={styles.mobileNavButton}
+                onClick={() => {
+                  router.push("/admin");
+                  setMobileMenuOpen(false);
+                }}
+              >
+                Admin Panel
+              </button>
+            )}
+            
+            <div className={styles.userProfile}>
+              <Image
+                src={user?.profilePic || "/quentin.png"}
+                alt="User Profile"
+                width={50}
+                height={50}
+                className={styles.userImage}
+                onClick={() => {
+                  handleProfileClick();
+                  setMobileMenuOpen(false);
+                }}
+              />
+            </div>
+            
+            <button 
+              className={styles.logoutButton} 
+              onClick={() => {
+                handleLogout();
+                setMobileMenuOpen(false);
+              }}
+            >
+              Logout
+            </button>
+          </div>
+        </div>
+      )}
 
       <ProfileModal
         isOpen={profileModalOpen}
