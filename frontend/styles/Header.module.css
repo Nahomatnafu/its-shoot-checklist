@@ -117,9 +117,18 @@
 
 .mobileMenuHeader {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
   margin-bottom: 2rem;
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  color: #febd11;
+  font-size: 2rem;
+  cursor: pointer;
+  padding: 0.5rem;
 }
 
 .mobileMenuItems {
@@ -192,15 +201,6 @@
   flex-direction: column;
   gap: 1rem;
   align-items: center;
-}
-
-.closeButton {
-  background: none;
-  border: none;
-  color: #febd11;
-  font-size: 2rem;
-  cursor: pointer;
-  padding: 0.5rem;
 }
 
 /* Left Side */

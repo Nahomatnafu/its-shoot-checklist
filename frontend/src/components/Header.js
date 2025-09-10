@@ -281,13 +281,6 @@ export default function Header() {
       {mobileMenuOpen && (
         <div className={`${styles.mobileMenu} ${mobileMenuOpen ? styles.open : ''}`}>
           <div className={styles.mobileMenuHeader}>
-            <Image
-              src="/MSU_newLogo.png"
-              alt="MSU Logo"
-              width={60}
-              height={60}
-              className={styles.logo}
-            />
             <button 
               className={styles.closeButton}
               onClick={() => setMobileMenuOpen(false)}
