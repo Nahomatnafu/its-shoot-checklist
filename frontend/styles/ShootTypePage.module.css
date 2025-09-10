@@ -160,3 +160,82 @@
   position: relative; /* Needed for absolute positioning inside */
   padding-bottom: 5rem; /* Ensure space for button */
 }
+
+/* Mobile responsive - single column stack */
+@media (max-width: 768px) {
+  .container {
+    margin: 0.5rem;
+    padding: 1rem;
+    padding-bottom: 6rem; /* Space for save button */
+  }
+  
+  .heading {
+    font-size: 1.6rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    line-height: 1.2;
+  }
+  
+  /* Single column layout */
+  .grid {
+    grid-template-columns: 1fr !important;
+    gap: 1.5rem;
+  }
+  
+  /* Full width category sections */
+  .categoryWrapper {
+    width: 100%;
+    align-items: stretch;
+  }
+  
+  .category {
+    padding: 0.8rem 1.2rem;
+    border-radius: 25px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  
+  .categoryTitle {
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+  
+  .categoryCheckbox {
+    width: 14px;
+    height: 14px;
+  }
+  
+  /* Items section styling */
+  .items {
+    padding: 1rem;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  
+  .item {
+    padding: 0.6rem 0.8rem;
+    font-size: 0.95rem;
+    margin-bottom: 0.3rem;
+  }
+  
+  .itemText {
+    font-size: 0.9rem;
+    line-height: 1.3;
+  }
+  
+  .optional {
+    font-size: 0.8rem;
+  }
+  
+  /* Full-width save button at bottom */
+  .saveButton {
+    position: fixed;
+    bottom: 1rem;
+    left: 1rem;
+    right: 1rem;
+    width: auto;
+    padding: 1rem;
+    font-size: 1.1rem;
+    z-index: 100;
+  }
+}
