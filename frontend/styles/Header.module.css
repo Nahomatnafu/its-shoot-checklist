@@ -11,21 +11,26 @@
   box-sizing: border-box;
 }
 
-/* Mobile styles */
+/* Mobile styles - hide navigation completely */
 @media (max-width: 768px) {
   .header {
     padding: 0.75rem 1rem;
     font-size: 1rem;
+    justify-content: space-between;
   }
   
-  .leftContainer {
-    display: none;
+  /* Hide left navigation completely on mobile */
+  .leftContainer,
+  .leftNav {
+    display: none !important;
   }
   
+  /* Hide right navigation completely on mobile */
   .rightNav {
-    display: none;
+    display: none !important;
   }
   
+  /* Center the logo on mobile */
   .logoContainer {
     position: static;
     transform: none;
@@ -35,7 +40,13 @@
   }
   
   .logo {
-    max-width: 40px;
+    width: 50px;
+    height: 50px;
+  }
+  
+  /* Show hamburger menu on mobile */
+  .hamburger {
+    display: flex !important;
   }
 }
 
@@ -60,7 +71,7 @@
   }
 }
 
-/* Hamburger menu for mobile */
+/* Hamburger menu styles */
 .hamburger {
   display: none;
   flex-direction: column;
