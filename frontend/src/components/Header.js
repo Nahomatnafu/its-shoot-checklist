@@ -281,6 +281,7 @@ export default function Header() {
       {mobileMenuOpen && (
         <div className={`${styles.mobileMenu} ${mobileMenuOpen ? styles.open : ''}`}>
           <div className={styles.mobileMenuHeader}>
+            <div className={styles.menuPlaceholder}></div>
             <button 
               className={styles.closeButton}
               onClick={() => setMobileMenuOpen(false)}

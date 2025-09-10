@@ -117,9 +117,10 @@
 
 .mobileMenuHeader {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   align-items: center;
   margin-bottom: 2rem;
+  padding: 0 0.5rem;
 }
 
 .closeButton {
@@ -129,6 +130,12 @@
   font-size: 2rem;
   cursor: pointer;
   padding: 0.5rem;
+}
+
+/* Add a placeholder div to balance the layout */
+.menuPlaceholder {
+  width: 25px;
+  height: 25px;
 }
 
 .mobileMenuItems {
