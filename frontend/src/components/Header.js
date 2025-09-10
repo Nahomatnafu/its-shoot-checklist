@@ -1,4 +1,4 @@
-"use client";
+
 import { useRouter, usePathname } from "next/navigation";
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import Link from "next/link";
@@ -271,7 +271,7 @@ export default function Header() {
           </div>
         </nav>
 
-        <div className={styles.hamburger} onClick={() => setMobileMenuOpen(true)}>
+        <div className={styles.hamburger} onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
           <span></span>
           <span></span>
           <span></span>
@@ -280,16 +280,6 @@ export default function Header() {
 
       {mobileMenuOpen && (
         <div className={`${styles.mobileMenu} ${mobileMenuOpen ? styles.open : ''}`}>
-          <div className={styles.mobileMenuHeader}>
-            <div className={styles.menuPlaceholder}></div>
-            <button 
-              className={styles.closeButton}
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              ✕
-            </button>
-          </div>
-          
           <div className={styles.mobileMenuItems}>
             <Link 
               href="/shoots" 
