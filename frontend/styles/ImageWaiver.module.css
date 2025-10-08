@@ -71,13 +71,14 @@
 }
 
 .submitButton {
-  padding: 10px;
+  flex: 1;
+  padding: 0.75rem 1rem;
   background-color: #49306e;
   color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  margin-top: 15px;
+  font-size: 1rem;
 }
 
 .submitButton:hover {
@@ -97,8 +98,9 @@
 }
 
 .buttonContainer {
-  margin-top: 1.5rem;
-  text-align: center;
+  display: flex;
+  gap: 1rem;
+  margin-top: 15px;
 }
 
 .waiverWrapper {
@@ -121,35 +123,23 @@
   font-weight: 500;
 }
 
-.downloadButtonContainer {
-  display: flex;
-  justify-content: center;
-  margin: 2rem 0;
-  padding: 1rem;
-}
-
 .downloadButton {
+  flex: 1;
   background-color: #49306e;
   color: white;
   border: none;
-  border-radius: 8px;
-  padding: 0.75rem 1.5rem;
-  font-size: 16px;
+  border-radius: 5px;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
   font-weight: bold;
   cursor: pointer;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
   transition: background-color 0.2s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .downloadButton:hover {
   background-color: #402e63;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-}
-
-.downloadButton:active {
-  transform: translateY(0);
 }

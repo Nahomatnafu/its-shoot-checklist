@@ -295,9 +295,20 @@ export default function ImageWaiverForm({
             readOnly={readOnly}
           />
           {!readOnly && (
-            <button type="submit" className={styles.submitButton}>
-              Submit Waiver
-            </button>
+            <div className={styles.buttonContainer}>
+              <button type="submit" className={styles.submitButton}>
+                Submit Waiver
+              </button>
+              {isClient && (
+                <button 
+                  onClick={downloadPDF}
+                  className={styles.downloadButton}
+                  type="button"
+                >
+                  📄 Download PDF
+                </button>
+              )}
+            </div>
           )}
         </form>
       </div>
