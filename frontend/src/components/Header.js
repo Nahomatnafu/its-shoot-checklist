@@ -89,7 +89,8 @@ export default function Header() {
             );
             if (response.ok) {
               const updatedUser = await response.json();
-              setUserWithCache(updatedUser);
+              setUser(updatedUser);
+              localStorage.setItem("user", JSON.stringify(updatedUser));
             }
           } catch (error) {
             console.error("Failed to fetch updated user data:", error);
@@ -106,7 +107,7 @@ export default function Header() {
     };
 
     loadUser();
-  }, [pathname, router, setUserWithCache]);
+  }, [pathname, router]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
