@@ -1,6 +1,6 @@
 "use client";
 import styles from "../../styles/ImageWaiver.module.css";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 export default function ImageWaiverForm({
   onSave,
@@ -24,11 +24,15 @@ export default function ImageWaiverForm({
     ...formData, // Pre-fill with saved data if available
   });
 
+  const [isClient, setIsClient] = useState(false);
   const waiverRef = useRef();
 
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   const downloadPDF = async () => {
-    // Only run on client side
-    if (typeof window === 'undefined') return;
+    if (!isClient || typeof window === 'undefined') return;
     
     try {
       const html2canvas = (await import('html2canvas')).default;

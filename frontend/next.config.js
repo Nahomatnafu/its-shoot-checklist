@@ -8,13 +8,16 @@ const nextConfig = {
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     minimumCacheTTL: 60,
   },
-  // Add experimental features for performance
   experimental: {
     optimizeCss: true,
     scrollRestoration: true,
   },
-  // Configure webpack for better performance
   webpack: (config, { dev, isServer }) => {
+    // Exclude problematic packages from server-side bundling
+    if (isServer) {
+      config.externals = [...(config.externals || []), 'html2canvas', 'jspdf'];
+    }
+    
     // Production optimizations
     if (!dev && !isServer) {
       config.optimization.splitChunks.cacheGroups = {
@@ -31,4 +34,5 @@ const nextConfig = {
 }
 
 module.exports = nextConfig
+
 
