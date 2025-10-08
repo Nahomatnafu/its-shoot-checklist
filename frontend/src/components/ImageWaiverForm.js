@@ -1,6 +1,6 @@
 "use client";
 import styles from "../../styles/ImageWaiver.module.css";
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 
 export default function ImageWaiverForm({
   onSave,
@@ -23,6 +23,51 @@ export default function ImageWaiverForm({
     parentSignatureDate: "",
     ...formData, // Pre-fill with saved data if available
   });
+
+  const waiverRef = useRef();
+
+  const downloadPDF = async () => {
+    try {
+      const html2canvas = (await import('html2canvas')).default;
+      const jsPDF = (await import('jspdf')).default;
+      
+      const element = waiverRef.current;
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+      });
+      
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      
+      const imgWidth = 210;
+      const pageHeight = 295;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      let heightLeft = imgHeight;
+      
+      let position = 0;
+      
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+      
+      while (heightLeft >= 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+      
+      const fileName = formState.name 
+        ? `Image_Waiver_${formState.name.replace(/\s+/g, '_')}.pdf`
+        : 'Image_Waiver.pdf';
+      
+      pdf.save(fileName);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      alert('Error generating PDF. Please try again.');
+    }
+  };
 
   const handleChange = (e) => {
     if (!readOnly) {
@@ -61,7 +106,17 @@ export default function ImageWaiverForm({
 
   return (
     <div className={styles.waiverWrapper}>
-      <div className={styles.waiverContainer}>
+      <div className={styles.downloadButtonContainer}>
+        <button 
+          onClick={downloadPDF}
+          className={styles.downloadButton}
+          type="button"
+        >
+          📄 Download PDF
+        </button>
+      </div>
+      
+      <div ref={waiverRef} className={styles.waiverContainer}>
         <div className={styles.logoContainer}>
           <img
             src="/minnesota_state_logo.png"
