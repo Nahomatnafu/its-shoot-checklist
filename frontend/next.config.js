@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  serverExternalPackages: ['html2canvas', 'jspdf'],
   images: {
     domains: ['res.cloudinary.com'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],
@@ -30,3 +31,4 @@ const nextConfig = {
 }
 
 module.exports = nextConfig
+

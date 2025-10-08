@@ -27,9 +27,12 @@ export default function ImageWaiverForm({
   const waiverRef = useRef();
 
   const downloadPDF = async () => {
+    // Only run on client side
+    if (typeof window === 'undefined') return;
+    
     try {
       const html2canvas = (await import('html2canvas')).default;
-      const jsPDF = (await import('jspdf')).default;
+      const { jsPDF } = await import('jspdf');
       
       const element = waiverRef.current;
       const canvas = await html2canvas(element, {
