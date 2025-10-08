@@ -1,6 +1,6 @@
 
 import { useRouter, usePathname } from "next/navigation";
-import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import ProfileModal from "./ProfileModal";
