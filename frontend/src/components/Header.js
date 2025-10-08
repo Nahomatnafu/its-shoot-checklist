@@ -37,18 +37,14 @@ export default function Header() {
     { name: "Photoshoot", path: "/shoot-types/photoshoot" },
   ];
 
-  const setUserWithCache = useMemo(
-    () => (newUser) => {
-      setUser(newUser);
-      localStorage.setItem("user", JSON.stringify(newUser));
-    },
-    []
-  );
-
   const debouncedSetActiveDropdown = useCallback(
     debounce((value) => setActiveDropdown(value), 100),
     []
   );
+
+  const toggleDropdown = useCallback((name) => {
+    setActiveDropdown(activeDropdown === name ? null : name);
+  }, [activeDropdown]);
 
   const handleLogout = useCallback(() => {
     localStorage.removeItem("authToken");
@@ -396,8 +392,4 @@ export default function Header() {
       />
     </>
   );
-
-  function toggleDropdown(name) {
-    debouncedSetActiveDropdown(name);
-  }
 }
