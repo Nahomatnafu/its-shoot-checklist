@@ -113,6 +113,19 @@ export default function ImageWaiverForm({
 
   return (
     <div className={styles.waiverWrapper}>
+      {/* Download button outside the PDF area */}
+      {isClient && (
+        <div className={styles.downloadButtonContainer}>
+          <button 
+            onClick={downloadPDF}
+            className={styles.downloadButton}
+            type="button"
+          >
+            📄 Download PDF
+          </button>
+        </div>
+      )}
+      
       <div ref={waiverRef} className={styles.waiverContainer}>
         <div className={styles.logoContainer}>
           <img
