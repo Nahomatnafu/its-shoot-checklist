@@ -3,10 +3,10 @@ const router = express.Router();
 const Shoot = require("../models/Shoot");
 const { protect } = require("../middleware/authMiddleware");
 
-// Get all shoots
+// Get all shoots for current user
 router.get("/", protect, async (req, res) => {
   try {
-    const shoots = await Shoot.find()
+    const shoots = await Shoot.find({ user: req.user._id })
       .populate('user', 'name email')
       .sort({ date: -1 });
     res.json(shoots);

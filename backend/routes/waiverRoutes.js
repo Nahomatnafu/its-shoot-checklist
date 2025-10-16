@@ -3,10 +3,10 @@ const router = express.Router();
 const ImageWaiver = require('../models/ImageWaiver');
 const { protect } = require('../middleware/authMiddleware');
 
-// Get all waivers (for all users)
+// Get all waivers for current user
 router.get('/', protect, async (req, res) => {
   try {
-    const waivers = await ImageWaiver.find()
+    const waivers = await ImageWaiver.find({ user: req.user._id })
       .populate('user', 'name email') // Add this to show who created it
       .sort({ createdAt: -1 }); // Sort by newest first
     res.json(waivers);

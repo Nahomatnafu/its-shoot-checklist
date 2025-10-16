@@ -3,10 +3,10 @@ const router = express.Router();
 const Credit = require('../models/Credit');
 const { protect } = require('../middleware/authMiddleware');
 
-// Get all credits
+// Get all credits for current user
 router.get('/', protect, async (req, res) => {
   try {
-    const credits = await Credit.find()
+    const credits = await Credit.find({ user: req.user._id })
       .populate('user', 'name email')
       .sort({ createdAt: -1 });
     res.json(credits);
