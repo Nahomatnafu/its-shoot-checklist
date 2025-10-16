@@ -135,7 +135,7 @@ export default function SavedImageWaivers() {
             >
               <div className={styles.waiverInfo}>
                 <h3>📑 {waiver.projectName || 'Untitled'}</h3>
-                <p className={styles.createdBy}>Name: {waiver.name}</p>
+                <p className={styles.createdBy}>Created by: {waiver.user?.name || 'Unknown'}</p>
                 <p className={styles.date}>
                   {new Date(waiver.date).toLocaleDateString()}
                 </p>

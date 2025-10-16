@@ -83,13 +83,18 @@ export default function ShootsPage() {
     }
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (selectedId) {
-      deleteShoot(selectedId);
-      // Update filtered shoots after deletion
-      setFilteredShoots(prevShoots => 
-        prevShoots.filter(shoot => shoot.id !== selectedId)
-      );
+      try {
+        await deleteShoot(selectedId);
+        // Update filtered shoots after deletion
+        setFilteredShoots(prevShoots =>
+          prevShoots.filter(shoot => shoot._id !== selectedId)
+        );
+      } catch (error) {
+        console.error('Error deleting shoot:', error);
+        alert('Failed to delete shoot. Please try again.');
+      }
     }
     setShowConfirm(false);
     setSelectedId(null);
@@ -139,6 +144,7 @@ export default function ShootsPage() {
               >
                 <div className={styles.shootInfo}>
                   <h3>📸 {shoot.title || 'Untitled'}</h3>
+                  <p className={styles.createdBy}>Created by: {shoot.user?.name || 'Unknown'}</p>
                   <p className={styles.shootDate}>
                     {new Date(shoot.date).toLocaleDateString()}
                   </p>
