@@ -327,7 +327,7 @@ export default function ImageWaiverForm({
             )}
             {formState.date && (
               <div className={styles.displayField}>
-                <strong>Date:</strong> {formState.date}
+                <strong>Date:</strong> {new Date(formState.date).toLocaleDateString()}
               </div>
             )}
             <hr className={styles.separator} />

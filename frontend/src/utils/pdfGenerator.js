@@ -8,35 +8,39 @@ export const generateShootPDF = async (shoot) => {
     const html2canvas = (await import('html2canvas')).default;
     const { jsPDF } = await import('jspdf');
 
-    // Create a temporary container with the shoot content
+    // Create a temporary container that mimics the actual form styling
     const container = document.createElement('div');
     container.style.position = 'absolute';
     container.style.left = '-9999px';
-    container.style.width = '1200px';
+    container.style.width = '900px';
     container.style.padding = '40px';
     container.style.backgroundColor = '#ffffff';
-    container.style.fontFamily = 'system-ui, -apple-system, sans-serif';
+    container.style.fontFamily = '"Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif';
 
-    // Build the HTML content
+    // Build the form HTML to match the actual form appearance
     let html = `
-      <div style="font-family: system-ui, -apple-system, sans-serif;">
-        <h1 style="color: #49306e; margin-bottom: 20px; font-size: 28px;">📋 ${shoot.title || 'Untitled Shoot'}</h1>
-        <p style="color: #666; margin-bottom: 30px; font-size: 14px;">
-          <strong>Date:</strong> ${new Date(shoot.date).toLocaleDateString()} ${new Date(shoot.date).toLocaleTimeString()}
+      <div style="max-width: 900px; margin: 20px auto; padding: 40px; background-color: #ffffff; font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">
+        <h1 style="font-size: 2.5rem; font-weight: bold; color: #febd11; text-align: center; margin-bottom: 2rem;">📋 ${shoot.title || 'Untitled Shoot'}</h1>
+        <p style="color: #666; margin-bottom: 30px; font-size: 14px; text-align: center;">
+          <strong>Date:</strong> ${new Date(shoot.date).toLocaleDateString()}
         </p>
+
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem;">
     `;
 
-    // Add categories and items
+    // Add categories and items in 2-column grid
     if (shoot.template && Array.isArray(shoot.template)) {
-      shoot.template.forEach((category) => {
+      shoot.template.forEach((category, index) => {
+        const isYellow = index % 2 === 0;
+        const bgColor = isYellow ? '#FFC107' : '#49306e';
+        const textColor = isYellow ? '#333' : '#ffffff';
+
         html += `
-          <div style="margin-bottom: 25px;">
-            <h2 style="background: linear-gradient(135deg, #FFC107 0%, #FFD54F 100%);
-                       color: #333; padding: 12px 16px; border-radius: 8px;
-                       margin-bottom: 12px; font-size: 18px; font-weight: 600;">
+          <div style="display: flex; flex-direction: column; align-items: center;">
+            <div style="background: ${bgColor}; color: ${textColor}; padding: 12px 16px; border-radius: 8px; margin-bottom: 12px; font-size: 18px; font-weight: 600; width: 100%; text-align: center;">
               ${category.name}
-            </h2>
-            <div style="margin-left: 20px;">
+            </div>
+            <div style="padding: 1rem; width: 100%;">
         `;
 
         if (category.items && Array.isArray(category.items)) {
@@ -59,7 +63,9 @@ export const generateShootPDF = async (shoot) => {
     }
 
     html += `
-        <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; color: #999; font-size: 12px;">
+        </div>
+
+        <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; color: #999; font-size: 12px; text-align: center;">
           Generated on ${new Date().toLocaleDateString()}
         </div>
       </div>
@@ -74,6 +80,7 @@ export const generateShootPDF = async (shoot) => {
       useCORS: true,
       logging: false,
       backgroundColor: '#ffffff',
+      allowTaint: true,
     });
 
     // Remove the temporary container
@@ -121,41 +128,44 @@ export const generateCreditPDF = async (credit) => {
     const html2canvas = (await import('html2canvas')).default;
     const { jsPDF } = await import('jspdf');
 
-    // Create a temporary container with the credit content
+    // Create a temporary container that mimics the actual form styling
     const container = document.createElement('div');
     container.style.position = 'absolute';
     container.style.left = '-9999px';
-    container.style.width = '1200px';
+    container.style.width = '900px';
     container.style.padding = '40px';
     container.style.backgroundColor = '#ffffff';
-    container.style.fontFamily = 'system-ui, -apple-system, sans-serif';
+    container.style.fontFamily = '"Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif';
 
-    // Build the HTML content
+    // Build the form HTML to match the actual form appearance
     let html = `
-      <div style="font-family: system-ui, -apple-system, sans-serif;">
-        <h1 style="color: #49306e; margin-bottom: 20px; font-size: 28px;">🎬 Credits</h1>
-        <p style="color: #666; margin-bottom: 10px; font-size: 14px;">
-          <strong>Project:</strong> ${credit.projectName || 'Untitled'}
-        </p>
-        <p style="color: #666; margin-bottom: 10px; font-size: 14px;">
-          <strong>Created by:</strong> ${credit.user?.name || 'Unknown'}
-        </p>
-        <p style="color: #666; margin-bottom: 30px; font-size: 14px;">
-          <strong>Date:</strong> ${new Date(credit.createdAt).toLocaleDateString()}
-        </p>
+      <div style="max-width: 900px; margin: 20px auto; padding: 40px; background-color: #ffffff; font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">
+        <h1 style="font-size: 2.5rem; font-weight: bold; color: #49306e; text-align: center; margin-bottom: 2rem;">🎬 Credits</h1>
+
+        <div style="margin-bottom: 30px; padding: 15px; background-color: #f5f5f5; border-radius: 4px;">
+          <p style="margin: 10px 0; font-size: 14px;">
+            <strong>Project:</strong> ${credit.projectName || 'Untitled'}
+          </p>
+          <p style="margin: 10px 0; font-size: 14px;">
+            <strong>Created by:</strong> ${credit.user?.name || 'Unknown'}
+          </p>
+          <p style="margin: 10px 0; font-size: 14px;">
+            <strong>Date:</strong> ${new Date(credit.createdAt).toLocaleDateString()}
+          </p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem;">
     `;
 
-    // Add roles and people
+    // Add roles and people in 2-column grid
     if (credit.roles && Array.isArray(credit.roles)) {
       credit.roles.forEach((roleObj) => {
         html += `
-          <div style="margin-bottom: 25px;">
-            <h2 style="background: linear-gradient(135deg, #49306e 0%, #6b4a8f 100%);
-                       color: white; padding: 12px 16px; border-radius: 8px;
-                       margin-bottom: 12px; font-size: 18px; font-weight: 600;">
+          <div style="display: flex; flex-direction: column; align-items: center;">
+            <div style="background: linear-gradient(135deg, #49306e 0%, #6b4a8f 100%); color: white; padding: 12px 16px; border-radius: 8px; margin-bottom: 12px; font-size: 18px; font-weight: 600; width: 100%; text-align: center;">
               ${roleObj.role}
-            </h2>
-            <div style="margin-left: 20px;">
+            </div>
+            <div style="padding: 1rem; width: 100%;">
         `;
 
         if (roleObj.people && Array.isArray(roleObj.people)) {
@@ -176,7 +186,9 @@ export const generateCreditPDF = async (credit) => {
     }
 
     html += `
-        <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; color: #999; font-size: 12px;">
+        </div>
+
+        <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; color: #999; font-size: 12px; text-align: center;">
           Generated on ${new Date().toLocaleDateString()}
         </div>
       </div>
@@ -191,6 +203,7 @@ export const generateCreditPDF = async (credit) => {
       useCORS: true,
       logging: false,
       backgroundColor: '#ffffff',
+      allowTaint: true,
     });
 
     // Remove the temporary container
