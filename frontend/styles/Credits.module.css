@@ -196,7 +196,7 @@
 }
 
 .roleHeader .inputWithIcons .addPersonIcon {
-  right: 50px;
+  right: 75px;
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
@@ -210,7 +210,7 @@
 
 .removeRoleIcon {
   position: absolute;
-  right: 12px;
+  right: 40px;
   top: 50%;
   transform: translateY(-50%);
   color: #d9534f;
