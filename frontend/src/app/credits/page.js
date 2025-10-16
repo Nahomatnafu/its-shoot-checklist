@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import useCreditStore from "../store/useCreditStore";
 import PopUpModal from "../../components/PopUpModal"; // ✅ Import the modal
+import { generateCreditPDF } from "../../utils/pdfGenerator";
 import styles from "../../../styles/Credits.module.css";
 
 export default function SavedCreditsPage() {
@@ -60,8 +61,19 @@ export default function SavedCreditsPage() {
     setSelectedId(null);
   };
 
+  const handleDownloadPDF = async (credit, e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    try {
+      await generateCreditPDF(credit);
+    } catch (error) {
+      console.error('Failed to download PDF:', error);
+      alert('Failed to download PDF. Please try again.');
+    }
+  };
+
   const CreditCard = ({ credit }) => (
-    <div 
+    <div
       className={styles.creditCard}
       onClick={() => handleClick(credit.id)} // Add this click handler
     >
@@ -72,15 +84,24 @@ export default function SavedCreditsPage() {
           {new Date(credit.createdAt).toLocaleDateString()}
         </p>
       </div>
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          handleDeleteRequest(credit.id);
-        }}
-        className={styles.deleteButton}
-      >
-        🗑 Delete
-      </button>
+      <div className={styles.buttonGroup}>
+        <button
+          onClick={(e) => handleDownloadPDF(credit, e)}
+          className={styles.downloadButton}
+          title="Download as PDF"
+        >
+          📥 Download
+        </button>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            handleDeleteRequest(credit.id);
+          }}
+          className={styles.deleteButton}
+        >
+          🗑 Delete
+        </button>
+      </div>
     </div>
   );
 

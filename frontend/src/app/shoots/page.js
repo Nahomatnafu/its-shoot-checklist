@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import useShootStore from "../store/useShootStore";
 import PopUpModal from "../../components/PopUpModal";
+import { generateShootPDF } from "../../utils/pdfGenerator";
 import styles from "../../../styles/ShootsPage.module.css";
 
 export default function ShootsPage() {
@@ -71,6 +72,17 @@ export default function ShootsPage() {
     setShowConfirm(true);
   };
 
+  const handleDownloadPDF = async (shoot, e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    try {
+      await generateShootPDF(shoot);
+    } catch (error) {
+      console.error('Failed to download PDF:', error);
+      alert('Failed to download PDF. Please try again.');
+    }
+  };
+
   const confirmDelete = () => {
     if (selectedId) {
       deleteShoot(selectedId);
@@ -120,8 +132,8 @@ export default function ShootsPage() {
         <ul className={styles.shootList}>
           {filteredShoots.map((shoot) => (
             shoot && shoot._id ? (
-              <li 
-                key={`shoot-${shoot._id}`} 
+              <li
+                key={`shoot-${shoot._id}`}
                 className={styles.shootCard}
                 onClick={() => handleShootClick(shoot._id)}
               >
@@ -129,12 +141,21 @@ export default function ShootsPage() {
                   📸 {shoot.title || 'Untitled'}
                   <span className={styles.shootDate}>({shoot.date || 'No date'})</span>
                 </div>
-                <button
-                  onClick={(e) => handleDeleteRequest(shoot._id, e)}
-                  className={styles.deleteButton}
-                >
-                  🗑 Delete
-                </button>
+                <div className={styles.buttonGroup}>
+                  <button
+                    onClick={(e) => handleDownloadPDF(shoot, e)}
+                    className={styles.downloadButton}
+                    title="Download as PDF"
+                  >
+                    📥 Download
+                  </button>
+                  <button
+                    onClick={(e) => handleDeleteRequest(shoot._id, e)}
+                    className={styles.deleteButton}
+                  >
+                    🗑 Delete
+                  </button>
+                </div>
               </li>
             ) : null
           ))}
