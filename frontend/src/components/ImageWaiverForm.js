@@ -170,137 +170,197 @@ export default function ImageWaiverForm({
           whichever comes first.
         </p>
 
-        <form onSubmit={handleSubmit} className={styles.form}>
-          <input
-            name="projectName"
-            value={formState.projectName}
-            onChange={handleChange}
-            placeholder="Project/Event Name (optional)"
-            className={styles.input}
-            readOnly={readOnly}
-          />
-          <input
-            type="date" // 🔁 change from type="text"
-            name="projectDate"
-            value={formState.projectDate}
-            onChange={handleChange}
-            placeholder="Project/Event Date (optional)"
-            className={styles.input}
-            readOnly={readOnly}
-          />
-          <input
-            name="name"
-            value={formState.name}
-            onChange={handleChange}
-            placeholder="Name (required)"
-            className={`${styles.input} ${styles.required}`}
-            readOnly={readOnly}
-            required
-          />
-          <input
-            name="address"
-            value={formState.address}
-            onChange={handleChange}
-            placeholder="Address (optional)"
-            className={styles.input}
-            readOnly={readOnly}
-          />
-          <input
-            name="phone"
-            value={formState.phone}
-            onChange={handleChange}
-            placeholder="Phone (optional)"
-            className={styles.input}
-            readOnly={readOnly}
-          />
-          <div className={styles.row}>
+        {!readOnly ? (
+          <form onSubmit={handleSubmit} className={styles.form}>
             <input
-              name="city"
-              value={formState.city}
+              name="projectName"
+              value={formState.projectName}
               onChange={handleChange}
-              placeholder="City (optional)"
-              className={styles.cityInput}
+              placeholder="Project/Event Name (optional)"
+              className={styles.input}
               readOnly={readOnly}
             />
             <input
-              name="state"
-              value={formState.state}
+              type="date"
+              name="projectDate"
+              value={formState.projectDate}
               onChange={handleChange}
-              placeholder="State (optional)"
-              className={styles.stateInput}
+              placeholder="Project/Event Date (optional)"
+              className={styles.input}
               readOnly={readOnly}
             />
             <input
-              name="zip"
-              value={formState.zip}
+              name="name"
+              value={formState.name}
               onChange={handleChange}
-              placeholder="Zip (optional)"
-              className={styles.zipInput}
+              placeholder="Name (required)"
+              className={`${styles.input} ${styles.required}`}
+              readOnly={readOnly}
+              required
+            />
+            <input
+              name="address"
+              value={formState.address}
+              onChange={handleChange}
+              placeholder="Address (optional)"
+              className={styles.input}
               readOnly={readOnly}
             />
-          </div>
-          <input
-            name="signature"
-            value={formState.signature}
-            onChange={handleChange}
-            placeholder="Signature (optional)"
-            className={styles.input}
-            readOnly={readOnly}
-          />
-          <input
-            name="date"
-            value={formState.date}
-            onChange={handleChange}
-            placeholder="Date"
-            className={styles.input}
-            readOnly={readOnly}
-          />
-          <hr className={styles.separator} />
-          <h2 className={styles.subTitle}>If under 18:</h2>
-          <input
-            name="parentName"
-            value={formState.parentName}
-            onChange={handleChange}
-            placeholder="Parent/Guardian Name (optional)"
-            className={styles.input}
-            readOnly={readOnly}
-          />
-          <input
-            name="parentSignature"
-            value={formState.parentSignature}
-            onChange={handleChange}
-            placeholder="Parent/Guardian Signature (optional)"
-            className={styles.input}
-            readOnly={readOnly}
-          />
-          <input
-            name="parentSignatureDate"
-            value={formState.parentSignatureDate}
-            onChange={handleChange}
-            placeholder="Parent/Guardian Signature Date (optional)"
-            className={styles.input}
-            readOnly={readOnly}
-          />
-          {!readOnly && (
+            <input
+              name="phone"
+              value={formState.phone}
+              onChange={handleChange}
+              placeholder="Phone (optional)"
+              className={styles.input}
+              readOnly={readOnly}
+            />
+            <div className={styles.row}>
+              <input
+                name="city"
+                value={formState.city}
+                onChange={handleChange}
+                placeholder="City (optional)"
+                className={styles.cityInput}
+                readOnly={readOnly}
+              />
+              <input
+                name="state"
+                value={formState.state}
+                onChange={handleChange}
+                placeholder="State (optional)"
+                className={styles.stateInput}
+                readOnly={readOnly}
+              />
+              <input
+                name="zip"
+                value={formState.zip}
+                onChange={handleChange}
+                placeholder="Zip (optional)"
+                className={styles.zipInput}
+                readOnly={readOnly}
+              />
+            </div>
+            <input
+              name="signature"
+              value={formState.signature}
+              onChange={handleChange}
+              placeholder="Signature (optional)"
+              className={styles.input}
+              readOnly={readOnly}
+            />
+            <input
+              name="date"
+              value={formState.date}
+              onChange={handleChange}
+              placeholder="Date"
+              className={styles.input}
+              readOnly={readOnly}
+            />
+            <hr className={styles.separator} />
+            <h2 className={styles.subTitle}>If under 18:</h2>
+            <input
+              name="parentName"
+              value={formState.parentName}
+              onChange={handleChange}
+              placeholder="Parent/Guardian Name (optional)"
+              className={styles.input}
+              readOnly={readOnly}
+            />
+            <input
+              name="parentSignature"
+              value={formState.parentSignature}
+              onChange={handleChange}
+              placeholder="Parent/Guardian Signature (optional)"
+              className={styles.input}
+              readOnly={readOnly}
+            />
+            <input
+              name="parentSignatureDate"
+              value={formState.parentSignatureDate}
+              onChange={handleChange}
+              placeholder="Parent/Guardian Signature Date (optional)"
+              className={styles.input}
+              readOnly={readOnly}
+            />
             <div className={styles.buttonContainer}>
               <button type="submit" className={styles.submitButton}>
                 Submit Waiver
               </button>
             </div>
-          )}
-          {readOnly && isClient && (
-            <div className={styles.buttonContainer}>
-              <button 
-                onClick={downloadPDF}
-                className={styles.downloadButton}
-                type="button"
-              >
-                📄 Download PDF
-              </button>
-            </div>
-          )}
-        </form>
+          </form>
+        ) : (
+          <div className={styles.displayContainer}>
+            {formState.projectName && (
+              <div className={styles.displayField}>
+                <strong>Project/Event Name:</strong> {formState.projectName}
+              </div>
+            )}
+            {formState.projectDate && (
+              <div className={styles.displayField}>
+                <strong>Project/Event Date:</strong> {formState.projectDate}
+              </div>
+            )}
+            {formState.name && (
+              <div className={styles.displayField}>
+                <strong>Name:</strong> {formState.name}
+              </div>
+            )}
+            {formState.address && (
+              <div className={styles.displayField}>
+                <strong>Address:</strong> {formState.address}
+              </div>
+            )}
+            {formState.phone && (
+              <div className={styles.displayField}>
+                <strong>Phone:</strong> {formState.phone}
+              </div>
+            )}
+            {(formState.city || formState.state || formState.zip) && (
+              <div className={styles.displayField}>
+                <strong>City/State/Zip:</strong> {formState.city} {formState.state} {formState.zip}
+              </div>
+            )}
+            {formState.signature && (
+              <div className={styles.displayField}>
+                <strong>Signature:</strong> {formState.signature}
+              </div>
+            )}
+            {formState.date && (
+              <div className={styles.displayField}>
+                <strong>Date:</strong> {formState.date}
+              </div>
+            )}
+            <hr className={styles.separator} />
+            <h2 className={styles.subTitle}>If under 18:</h2>
+            {formState.parentName && (
+              <div className={styles.displayField}>
+                <strong>Parent/Guardian Name:</strong> {formState.parentName}
+              </div>
+            )}
+            {formState.parentSignature && (
+              <div className={styles.displayField}>
+                <strong>Parent/Guardian Signature:</strong> {formState.parentSignature}
+              </div>
+            )}
+            {formState.parentSignatureDate && (
+              <div className={styles.displayField}>
+                <strong>Parent/Guardian Signature Date:</strong> {formState.parentSignatureDate}
+              </div>
+            )}
+          </div>
+        )}
       </div>
+      {readOnly && isClient && (
+        <div className={styles.buttonContainer}>
+          <button
+            onClick={downloadPDF}
+            className={styles.downloadButton}
+            type="button"
+          >
+            📄 Download PDF
+          </button>
+        </div>
+      )}
     </div>
   );
 }
