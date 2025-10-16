@@ -44,6 +44,27 @@
   flex: 1;
 }
 
+.buttonGroup {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.downloadButton {
+  background-color: #4CAF50;
+  color: white;
+  padding: 0.4rem 1rem;
+  border-radius: 0.4rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  border: none;
+  transition: background 0.2s ease;
+}
+
+.downloadButton:hover {
+  background-color: #45a049;
+}
+
 .deleteButton {
   background-color: #ff4d4d;
   color: white;
@@ -52,7 +73,6 @@
   font-size: 0.9rem;
   cursor: pointer;
   border: none;
-  margin-left: 1rem;
   transition: background 0.2s ease;
 }
 

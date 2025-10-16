@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import useWaiverStore from "../store/useWaiverStore";
 import PopUpModal from "@/components/PopUpModal";
+import { generateWaiverPDF } from "../../utils/pdfGenerator";
 import styles from "../../../styles/SavedImageWaivers.module.css";
 
 export default function SavedImageWaivers() {
@@ -62,6 +63,17 @@ export default function SavedImageWaivers() {
   const handleDeleteRequest = (id) => {
     setSelectedId(id);
     setShowModal(true);
+  };
+
+  const handleDownloadPDF = async (waiver, e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    try {
+      await generateWaiverPDF(waiver);
+    } catch (error) {
+      console.error('Failed to download PDF:', error);
+      alert('Failed to download PDF. Please try again.');
+    }
   };
 
   const confirmDelete = async () => {
@@ -124,15 +136,24 @@ export default function SavedImageWaivers() {
               <div className={styles.waiverInfo}>
                 📑 {waiver.projectName || 'Untitled'} - {waiver.name} - {new Date(waiver.date).toLocaleDateString()}
               </div>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleDeleteRequest(waiver._id);
-                }}
-                className={styles.deleteButton}
-              >
-                🗑 Delete
-              </button>
+              <div className={styles.buttonGroup}>
+                <button
+                  onClick={(e) => handleDownloadPDF(waiver, e)}
+                  className={styles.downloadButton}
+                  title="Download as PDF"
+                >
+                  📥 Download
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDeleteRequest(waiver._id);
+                  }}
+                  className={styles.deleteButton}
+                >
+                  🗑 Delete
+                </button>
+              </div>
             </li>
           ))}
         </ul>
