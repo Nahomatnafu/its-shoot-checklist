@@ -78,11 +78,7 @@ export default function SavedCreditsPage() {
       onClick={() => handleClick(credit.id)} // Add this click handler
     >
       <div className={styles.creditInfo}>
-        <h3>{credit.projectName}</h3>
-        <p className={styles.createdBy}>Created by: {credit.user?.name || 'Unknown'}</p>
-        <p className={styles.date}>
-          {new Date(credit.createdAt).toLocaleDateString()}
-        </p>
+        🎬 {credit.projectName} - Created by: {credit.user?.name || 'Unknown'} - {new Date(credit.createdAt).toLocaleDateString()}
       </div>
       <div className={styles.buttonGroup}>
         <button
