@@ -234,6 +234,13 @@ export default function CreditDetailPage() {
                     className={styles.input}
                   />
                   <button
+                    className={`${styles.iconButton} ${styles.addPersonIcon}`}
+                    onClick={() => addPerson(roleIndex)}
+                    title="Add Person"
+                  >
+                    ➕
+                  </button>
+                  <button
                     className={`${styles.iconButton} ${styles.removeRoleIcon}`}
                     onClick={() => removeRole(roleIndex)}
                     title="Remove Role"
@@ -254,13 +261,6 @@ export default function CreditDetailPage() {
                       onChange={(e) => handlePersonChange(roleIndex, personIndex, e.target.value)}
                       className={styles.input}
                     />
-                    <button
-                      className={`${styles.iconButton} ${styles.addPersonIcon}`}
-                      onClick={() => addPerson(roleIndex)}
-                      title="Add Person"
-                    >
-                      ➕
-                    </button>
                     <button
                       className={`${styles.iconButton} ${styles.removePersonIcon}`}
                       onClick={() => removePerson(roleIndex, personIndex)}

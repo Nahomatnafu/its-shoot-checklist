@@ -51,6 +51,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 10px;
 }
 
 .roleButtons {
@@ -67,7 +68,11 @@
 
 .inputWithIcons input {
   width: 100%;
-  padding-right: 200px;
+  padding-right: 50px;
+}
+
+.roleHeader .inputWithIcons input {
+  padding-right: 100px;
 }
 
 .iconButton {
@@ -143,10 +148,23 @@
   color: #402e63;
 }
 
+.roleHeader .inputWithIcons .addPersonIcon {
+  right: 45px;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #49306e;
+}
+
+.roleHeader .inputWithIcons .addPersonIcon:hover {
+  color: #402e63;
+}
+
 .removeRoleIcon {
   position: absolute;
-  right: 5px;
-  top: 5px;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
   color: #d9534f;
 }
 
