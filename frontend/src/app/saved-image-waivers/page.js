@@ -134,7 +134,11 @@ export default function SavedImageWaivers() {
               onClick={() => router.push(`/saved-image-waivers/${waiver._id}`)}
             >
               <div className={styles.waiverInfo}>
-                📑 {waiver.projectName || 'Untitled'} - {waiver.name} - {new Date(waiver.date).toLocaleDateString()}
+                <h3>📑 {waiver.projectName || 'Untitled'}</h3>
+                <p className={styles.createdBy}>Name: {waiver.name}</p>
+                <p className={styles.date}>
+                  {new Date(waiver.date).toLocaleDateString()}
+                </p>
               </div>
               <div className={styles.buttonGroup}>
                 <button

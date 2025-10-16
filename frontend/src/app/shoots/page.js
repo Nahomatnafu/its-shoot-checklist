@@ -138,8 +138,10 @@ export default function ShootsPage() {
                 onClick={() => handleShootClick(shoot._id)}
               >
                 <div className={styles.shootInfo}>
-                  📸 {shoot.title || 'Untitled'}
-                  <span className={styles.shootDate}>({shoot.date || 'No date'})</span>
+                  <h3>📸 {shoot.title || 'Untitled'}</h3>
+                  <p className={styles.shootDate}>
+                    {new Date(shoot.date).toLocaleDateString()}
+                  </p>
                 </div>
                 <div className={styles.buttonGroup}>
                   <button
