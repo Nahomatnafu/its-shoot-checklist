@@ -74,10 +74,16 @@ router.put('/:id', protect, async (req, res) => {
 // Delete credit
 router.delete('/:id', protect, async (req, res) => {
   try {
-    const credit = await Credit.findOneAndDelete({
+    // Allow deletion if user owns the credit OR record has no user (legacy data)
+    const query = {
       _id: req.params.id,
-      user: req.user._id
-    });
+      $or: [
+        { user: req.user._id },
+        { user: null } // Allow deletion of records with no user (legacy data)
+      ]
+    };
+
+    const credit = await Credit.findOneAndDelete(query);
     if (!credit) return res.status(404).json({ message: 'Credit not found' });
     res.json({ message: 'Credit deleted' });
   } catch (error) {

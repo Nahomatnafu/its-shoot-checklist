@@ -40,10 +40,16 @@ router.post('/', protect, async (req, res) => {
 // Delete waiver
 router.delete('/:id', protect, async (req, res) => {
   try {
-    const waiver = await ImageWaiver.findOneAndDelete({
+    // Allow deletion if user owns the waiver OR record has no user (legacy data)
+    const query = {
       _id: req.params.id,
-      user: req.user._id
-    });
+      $or: [
+        { user: req.user._id },
+        { user: null } // Allow deletion of records with no user (legacy data)
+      ]
+    };
+
+    const waiver = await ImageWaiver.findOneAndDelete(query);
     if (!waiver) return res.status(404).json({ message: 'Waiver not found' });
     res.json({ message: 'Waiver deleted' });
   } catch (error) {
