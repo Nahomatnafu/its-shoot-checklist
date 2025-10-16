@@ -238,63 +238,101 @@ export const generateWaiverPDF = async (waiver) => {
     const html2canvas = (await import('html2canvas')).default;
     const { jsPDF } = await import('jspdf');
 
-    // Create a temporary container with the waiver content
+    // Create a temporary container that mimics the actual form styling
     const container = document.createElement('div');
     container.style.position = 'absolute';
     container.style.left = '-9999px';
-    container.style.width = '1200px';
+    container.style.width = '900px';
     container.style.padding = '40px';
-    container.style.backgroundColor = '#ffffff';
-    container.style.fontFamily = 'system-ui, -apple-system, sans-serif';
+    container.style.backgroundColor = '#f9f9f9';
+    container.style.fontFamily = 'Arial, sans-serif';
+    container.style.border = '1px solid #ccc';
+    container.style.borderRadius = '8px';
 
-    // Build the HTML content
+    // Build the form HTML to match the actual form appearance
     let html = `
-      <div style="font-family: system-ui, -apple-system, sans-serif;">
-        <h1 style="color: #49306e; margin-bottom: 20px; font-size: 28px;">📑 Image Release and Waiver</h1>
-        <p style="color: #666; margin-bottom: 10px; font-size: 14px;">
-          <strong>Name:</strong> ${waiver.name || 'N/A'}
-        </p>
-        ${waiver.projectName ? `<p style="color: #666; margin-bottom: 10px; font-size: 14px;">
-          <strong>Project:</strong> ${waiver.projectName}
-        </p>` : ''}
-        ${waiver.projectDate ? `<p style="color: #666; margin-bottom: 10px; font-size: 14px;">
-          <strong>Project Date:</strong> ${waiver.projectDate}
-        </p>` : ''}
-        <p style="color: #666; margin-bottom: 10px; font-size: 14px;">
-          <strong>Address:</strong> ${waiver.address || 'N/A'}
-        </p>
-        <p style="color: #666; margin-bottom: 10px; font-size: 14px;">
-          <strong>City:</strong> ${waiver.city || 'N/A'}, <strong>State:</strong> ${waiver.state || 'N/A'}, <strong>Zip:</strong> ${waiver.zip || 'N/A'}
-        </p>
-        <p style="color: #666; margin-bottom: 10px; font-size: 14px;">
-          <strong>Phone:</strong> ${waiver.phone || 'N/A'}
-        </p>
-        <p style="color: #666; margin-bottom: 30px; font-size: 14px;">
-          <strong>Date Signed:</strong> ${new Date(waiver.date).toLocaleDateString()}
-        </p>
-
-        <div style="margin-bottom: 25px; padding: 15px; background-color: #f5f5f5; border-left: 4px solid #49306e;">
-          <h2 style="color: #49306e; margin-top: 0; font-size: 16px;">Waiver Details</h2>
-          <p style="color: #333; font-size: 13px; line-height: 1.6;">
-            I hereby grant the Board of Trustees of the Minnesota State Colleges and Universities ("Minnesota State")
-            permission to reproduce my name, likeness, identity, voice, photographic image, videographic image, and
-            oral or recorded statements in any publication by Minnesota State intended for educational, promotional,
-            fund-raising, storytelling or other related use.
-          </p>
+      <div style="max-width: 900px; margin: 20px auto; padding: 40px; border: 1px solid #ccc; border-radius: 8px; background-color: #f9f9f9; font-family: Arial, sans-serif;">
+        <div style="display: flex; justify-content: flex-start; margin-bottom: 10px;">
+          <img src="/minnesota_state_logo.png" alt="Minnesota State Logo" style="height: 80px; width: auto;" />
         </div>
 
-        ${waiver.parentName ? `<div style="margin-bottom: 25px; padding: 15px; background-color: #fff9e6; border-left: 4px solid #f1b40e;">
-          <h2 style="color: #49306e; margin-top: 0; font-size: 16px;">Parent/Guardian Information</h2>
-          <p style="color: #333; font-size: 13px;">
-            <strong>Parent/Guardian Name:</strong> ${waiver.parentName}
-          </p>
-          ${waiver.parentSignatureDate ? `<p style="color: #333; font-size: 13px;">
-            <strong>Signature Date:</strong> ${waiver.parentSignatureDate}
-          </p>` : ''}
-        </div>` : ''}
+        <h1 style="font-size: 24px; font-weight: bold; margin-bottom: 10px; text-align: center;">Image Release and Waiver</h1>
 
-        <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; color: #999; font-size: 12px;">
-          Generated on ${new Date().toLocaleDateString()}
+        <p style="margin: 20px 20px; line-height: 1.5;">
+          I hereby grant the Board of Trustees of the Minnesota State Colleges and Universities ("Minnesota State") permission to reproduce my name, likeness, identity, voice, photographic image, videographic image, and oral or recorded statements (hereinafter "Recordings") from Minnesota State University, Mankato in any publication by Minnesota State intended for educational, promotional, fund-raising, storytelling or other related use, including public display on webpages and web-based publications. I consent to the public release of the Recordings for the above-stated purposes, pursuant to the consent provisions of the Minnesota Government Data Practices Act (Minnesota Statutes Chapter 13) and/or the Family Educational Rights and Privacy Act, 20 U.S.C. 1232 et seq., if applicable.
+        </p>
+
+        <p style="margin: 20px 20px; line-height: 1.5;">
+          By signing this form, I hereby waive and release Minnesota State and its officers, agents, and employees, from any claim or liability relating to the use of my name, likeness, identity, voice, photographic image, videographic image, and oral or recorded statements. I hereby waive any right that I may have to inspect or approve the finished Recordings. I understand that the Recordings and copyright will be the sole property of Minnesota State. I understand I may refuse to be photographed or otherwise recorded, and that there are no known consequences of my refusal to do so.
+        </p>
+
+        <p style="margin: 20px 20px; line-height: 1.5;">
+          I acknowledge that Minnesota State will rely on this waiver and release in producing, broadcasting, and distributing materials containing my name, likeness, identity, voice, photographic image, videographic image or oral or recorded statements, and that I will receive no money or remuneration of any kind from Minnesota State related to the Recordings.
+        </p>
+
+        <div style="margin-top: 30px; padding: 20px; background-color: #fff; border: 1px solid #ccc; border-radius: 4px;">
+          <div style="margin-bottom: 15px;">
+            <label style="display: block; font-weight: bold; margin-bottom: 5px;">Project/Event Name (optional)</label>
+            <div style="padding: 8px; border: 1px solid #ccc; border-radius: 4px; background-color: #f9f9f9;">${waiver.projectName || ''}</div>
+          </div>
+
+          <div style="margin-bottom: 15px;">
+            <label style="display: block; font-weight: bold; margin-bottom: 5px;">Project/Event Date (optional)</label>
+            <div style="padding: 8px; border: 1px solid #ccc; border-radius: 4px; background-color: #f9f9f9;">${waiver.projectDate || ''}</div>
+          </div>
+
+          <div style="margin-bottom: 15px;">
+            <label style="display: block; font-weight: bold; margin-bottom: 5px;">Name (required)</label>
+            <div style="padding: 8px; border: 1px solid #ccc; border-radius: 4px; background-color: #f9f9f9;">${waiver.name || ''}</div>
+          </div>
+
+          <div style="margin-bottom: 15px;">
+            <label style="display: block; font-weight: bold; margin-bottom: 5px;">Address (optional)</label>
+            <div style="padding: 8px; border: 1px solid #ccc; border-radius: 4px; background-color: #f9f9f9;">${waiver.address || ''}</div>
+          </div>
+
+          <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+            <div style="flex: 2;">
+              <label style="display: block; font-weight: bold; margin-bottom: 5px;">City (optional)</label>
+              <div style="padding: 8px; border: 1px solid #ccc; border-radius: 4px; background-color: #f9f9f9;">${waiver.city || ''}</div>
+            </div>
+            <div style="flex: 1;">
+              <label style="display: block; font-weight: bold; margin-bottom: 5px;">State (optional)</label>
+              <div style="padding: 8px; border: 1px solid #ccc; border-radius: 4px; background-color: #f9f9f9;">${waiver.state || ''}</div>
+            </div>
+            <div style="flex: 1;">
+              <label style="display: block; font-weight: bold; margin-bottom: 5px;">Zip (optional)</label>
+              <div style="padding: 8px; border: 1px solid #ccc; border-radius: 4px; background-color: #f9f9f9;">${waiver.zip || ''}</div>
+            </div>
+          </div>
+
+          <div style="margin-bottom: 15px;">
+            <label style="display: block; font-weight: bold; margin-bottom: 5px;">Phone (optional)</label>
+            <div style="padding: 8px; border: 1px solid #ccc; border-radius: 4px; background-color: #f9f9f9;">${waiver.phone || ''}</div>
+          </div>
+
+          <div style="margin-bottom: 15px;">
+            <label style="display: block; font-weight: bold; margin-bottom: 5px;">Date</label>
+            <div style="padding: 8px; border: 1px solid #ccc; border-radius: 4px; background-color: #f9f9f9;">${new Date(waiver.date).toLocaleDateString()}</div>
+          </div>
+
+          ${waiver.parentName ? `
+          <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #ccc;">
+            <h3 style="font-size: 16px; font-weight: bold; margin-bottom: 15px;">Parent/Guardian Information</h3>
+
+            <div style="margin-bottom: 15px;">
+              <label style="display: block; font-weight: bold; margin-bottom: 5px;">Parent/Guardian Name</label>
+              <div style="padding: 8px; border: 1px solid #ccc; border-radius: 4px; background-color: #f9f9f9;">${waiver.parentName || ''}</div>
+            </div>
+
+            ${waiver.parentSignatureDate ? `
+            <div style="margin-bottom: 15px;">
+              <label style="display: block; font-weight: bold; margin-bottom: 5px;">Parent/Guardian Signature Date</label>
+              <div style="padding: 8px; border: 1px solid #ccc; border-radius: 4px; background-color: #f9f9f9;">${waiver.parentSignatureDate || ''}</div>
+            </div>
+            ` : ''}
+          </div>
+          ` : ''}
         </div>
       </div>
     `;
@@ -308,6 +346,7 @@ export const generateWaiverPDF = async (waiver) => {
       useCORS: true,
       logging: false,
       backgroundColor: '#ffffff',
+      allowTaint: true,
     });
 
     // Remove the temporary container
