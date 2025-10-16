@@ -1,86 +1,114 @@
 /**
  * Utility functions for generating PDFs from shoot and credit data
+ * Uses html2canvas to capture the visual appearance exactly as shown on screen
  */
 
 export const generateShootPDF = async (shoot) => {
   try {
+    const html2canvas = (await import('html2canvas')).default;
     const { jsPDF } = await import('jspdf');
-    
-    const pdf = new jsPDF('p', 'mm', 'a4');
-    const pageWidth = pdf.internal.pageSize.getWidth();
-    const pageHeight = pdf.internal.pageSize.getHeight();
-    let yPosition = 15;
-    const margin = 15;
-    const contentWidth = pageWidth - 2 * margin;
-    
-    // Title
-    pdf.setFontSize(20);
-    pdf.setTextColor(73, 48, 110); // Purple color
-    pdf.text('Shoot Checklist', margin, yPosition);
-    yPosition += 12;
-    
-    // Shoot Title
-    pdf.setFontSize(14);
-    pdf.setTextColor(0, 0, 0);
-    pdf.text(`Title: ${shoot.title || 'Untitled'}`, margin, yPosition);
-    yPosition += 8;
-    
-    // Shoot Date
-    pdf.setFontSize(11);
-    pdf.text(`Date: ${shoot.date || 'No date'}`, margin, yPosition);
-    yPosition += 10;
-    
-    // Separator line
-    pdf.setDrawColor(200, 200, 200);
-    pdf.line(margin, yPosition, pageWidth - margin, yPosition);
-    yPosition += 8;
-    
-    // Checklist items
-    pdf.setFontSize(11);
-    
+
+    // Create a temporary container with the shoot content
+    const container = document.createElement('div');
+    container.style.position = 'absolute';
+    container.style.left = '-9999px';
+    container.style.width = '1200px';
+    container.style.padding = '40px';
+    container.style.backgroundColor = '#ffffff';
+    container.style.fontFamily = 'system-ui, -apple-system, sans-serif';
+
+    // Build the HTML content
+    let html = `
+      <div style="font-family: system-ui, -apple-system, sans-serif;">
+        <h1 style="color: #49306e; margin-bottom: 20px; font-size: 28px;">📋 ${shoot.title || 'Untitled Shoot'}</h1>
+        <p style="color: #666; margin-bottom: 30px; font-size: 14px;">
+          <strong>Date:</strong> ${new Date(shoot.date).toLocaleDateString()} ${new Date(shoot.date).toLocaleTimeString()}
+        </p>
+    `;
+
+    // Add categories and items
     if (shoot.template && Array.isArray(shoot.template)) {
       shoot.template.forEach((category) => {
-        // Category header
-        pdf.setFontSize(12);
-        pdf.setTextColor(73, 48, 110);
-        pdf.text(category.name, margin, yPosition);
-        yPosition += 7;
-        
-        // Category items
-        pdf.setFontSize(10);
-        pdf.setTextColor(0, 0, 0);
-        
+        html += `
+          <div style="margin-bottom: 25px;">
+            <h2 style="background: linear-gradient(135deg, #FFC107 0%, #FFD54F 100%);
+                       color: #333; padding: 12px 16px; border-radius: 8px;
+                       margin-bottom: 12px; font-size: 18px; font-weight: 600;">
+              ${category.name}
+            </h2>
+            <div style="margin-left: 20px;">
+        `;
+
         if (category.items && Array.isArray(category.items)) {
           category.items.forEach((item) => {
             const isChecked = shoot.checklist?.[item.name]?.takeOut || false;
-            const status = isChecked ? '✓' : '✗';
-            const itemText = `${status} ${item.name}${item.optional ? ' (Optional)' : ''}`;
-            
-            // Check if we need a new page
-            if (yPosition > pageHeight - 20) {
-              pdf.addPage();
-              yPosition = 15;
-            }
-            
-            pdf.text(itemText, margin + 5, yPosition);
-            yPosition += 6;
+            const checkmark = isChecked ? '✅' : '❌';
+            html += `
+              <div style="padding: 8px 0; font-size: 14px; color: #333;">
+                ${checkmark} ${item.name}${item.optional ? ' <span style="color: #999; font-size: 12px;">(Optional)</span>' : ''}
+              </div>
+            `;
           });
         }
-        
-        yPosition += 3;
+
+        html += `
+            </div>
+          </div>
+        `;
       });
     }
-    
-    // Footer with generation date
-    pdf.setFontSize(9);
-    pdf.setTextColor(150, 150, 150);
-    const generatedDate = new Date().toLocaleDateString();
-    pdf.text(`Generated on ${generatedDate}`, margin, pageHeight - 10);
-    
+
+    html += `
+        <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; color: #999; font-size: 12px;">
+          Generated on ${new Date().toLocaleDateString()}
+        </div>
+      </div>
+    `;
+
+    container.innerHTML = html;
+    document.body.appendChild(container);
+
+    // Capture the container as an image
+    const canvas = await html2canvas(container, {
+      scale: 2,
+      useCORS: true,
+      logging: false,
+      backgroundColor: '#ffffff',
+    });
+
+    // Remove the temporary container
+    document.body.removeChild(container);
+
+    // Create PDF from the canvas
+    const imgData = canvas.toDataURL('image/png');
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
+
+    // Calculate dimensions to fit the image on the page
+    const imgWidth = pageWidth - 20; // 10mm margins
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+    let yPosition = 10;
+    let remainingHeight = imgHeight;
+
+    // Add image to PDF, creating new pages if needed
+    pdf.addImage(imgData, 'PNG', 10, yPosition, imgWidth, imgHeight);
+
+    // If content is longer than one page, add additional pages
+    let currentPage = 1;
+    while (remainingHeight > pageHeight - 20) {
+      pdf.addPage();
+      yPosition = -((currentPage * (pageHeight - 20)) - 10);
+      pdf.addImage(imgData, 'PNG', 10, yPosition, imgWidth, imgHeight);
+      currentPage++;
+      remainingHeight -= (pageHeight - 20);
+    }
+
     // Save the PDF
     const fileName = `Shoot_${shoot.title?.replace(/\s+/g, '_') || 'Checklist'}.pdf`;
     pdf.save(fileName);
-    
+
     return true;
   } catch (error) {
     console.error('Error generating shoot PDF:', error);
@@ -90,84 +118,114 @@ export const generateShootPDF = async (shoot) => {
 
 export const generateCreditPDF = async (credit) => {
   try {
+    const html2canvas = (await import('html2canvas')).default;
     const { jsPDF } = await import('jspdf');
-    
+
+    // Create a temporary container with the credit content
+    const container = document.createElement('div');
+    container.style.position = 'absolute';
+    container.style.left = '-9999px';
+    container.style.width = '1200px';
+    container.style.padding = '40px';
+    container.style.backgroundColor = '#ffffff';
+    container.style.fontFamily = 'system-ui, -apple-system, sans-serif';
+
+    // Build the HTML content
+    let html = `
+      <div style="font-family: system-ui, -apple-system, sans-serif;">
+        <h1 style="color: #49306e; margin-bottom: 20px; font-size: 28px;">🎬 Credits</h1>
+        <p style="color: #666; margin-bottom: 10px; font-size: 14px;">
+          <strong>Project:</strong> ${credit.projectName || 'Untitled'}
+        </p>
+        <p style="color: #666; margin-bottom: 10px; font-size: 14px;">
+          <strong>Created by:</strong> ${credit.user?.name || 'Unknown'}
+        </p>
+        <p style="color: #666; margin-bottom: 30px; font-size: 14px;">
+          <strong>Date:</strong> ${new Date(credit.createdAt).toLocaleDateString()}
+        </p>
+    `;
+
+    // Add roles and people
+    if (credit.roles && Array.isArray(credit.roles)) {
+      credit.roles.forEach((roleObj) => {
+        html += `
+          <div style="margin-bottom: 25px;">
+            <h2 style="background: linear-gradient(135deg, #49306e 0%, #6b4a8f 100%);
+                       color: white; padding: 12px 16px; border-radius: 8px;
+                       margin-bottom: 12px; font-size: 18px; font-weight: 600;">
+              ${roleObj.role}
+            </h2>
+            <div style="margin-left: 20px;">
+        `;
+
+        if (roleObj.people && Array.isArray(roleObj.people)) {
+          roleObj.people.forEach((person) => {
+            html += `
+              <div style="padding: 8px 0; font-size: 14px; color: #333;">
+                • ${person}
+              </div>
+            `;
+          });
+        }
+
+        html += `
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    html += `
+        <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; color: #999; font-size: 12px;">
+          Generated on ${new Date().toLocaleDateString()}
+        </div>
+      </div>
+    `;
+
+    container.innerHTML = html;
+    document.body.appendChild(container);
+
+    // Capture the container as an image
+    const canvas = await html2canvas(container, {
+      scale: 2,
+      useCORS: true,
+      logging: false,
+      backgroundColor: '#ffffff',
+    });
+
+    // Remove the temporary container
+    document.body.removeChild(container);
+
+    // Create PDF from the canvas
+    const imgData = canvas.toDataURL('image/png');
     const pdf = new jsPDF('p', 'mm', 'a4');
     const pageWidth = pdf.internal.pageSize.getWidth();
     const pageHeight = pdf.internal.pageSize.getHeight();
-    let yPosition = 15;
-    const margin = 15;
-    const contentWidth = pageWidth - 2 * margin;
-    
-    // Title
-    pdf.setFontSize(20);
-    pdf.setTextColor(73, 48, 110); // Purple color
-    pdf.text('Credits', margin, yPosition);
-    yPosition += 12;
-    
-    // Project Name
-    pdf.setFontSize(14);
-    pdf.setTextColor(0, 0, 0);
-    pdf.text(`Project: ${credit.projectName || 'Untitled'}`, margin, yPosition);
-    yPosition += 8;
-    
-    // Created By
-    pdf.setFontSize(11);
-    pdf.text(`Created by: ${credit.user?.name || 'Unknown'}`, margin, yPosition);
-    yPosition += 8;
-    
-    // Date
-    const creditDate = new Date(credit.createdAt).toLocaleDateString();
-    pdf.text(`Date: ${creditDate}`, margin, yPosition);
-    yPosition += 10;
-    
-    // Separator line
-    pdf.setDrawColor(200, 200, 200);
-    pdf.line(margin, yPosition, pageWidth - margin, yPosition);
-    yPosition += 8;
-    
-    // Roles and people
-    pdf.setFontSize(11);
-    
-    if (credit.roles && Array.isArray(credit.roles)) {
-      credit.roles.forEach((roleObj) => {
-        // Role header
-        pdf.setFontSize(12);
-        pdf.setTextColor(73, 48, 110);
-        pdf.text(roleObj.role, margin, yPosition);
-        yPosition += 7;
-        
-        // People in this role
-        pdf.setFontSize(10);
-        pdf.setTextColor(0, 0, 0);
-        
-        if (roleObj.people && Array.isArray(roleObj.people)) {
-          roleObj.people.forEach((person) => {
-            // Check if we need a new page
-            if (yPosition > pageHeight - 20) {
-              pdf.addPage();
-              yPosition = 15;
-            }
-            
-            pdf.text(`• ${person}`, margin + 5, yPosition);
-            yPosition += 6;
-          });
-        }
-        
-        yPosition += 3;
-      });
+
+    // Calculate dimensions to fit the image on the page
+    const imgWidth = pageWidth - 20; // 10mm margins
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+    let yPosition = 10;
+    let remainingHeight = imgHeight;
+
+    // Add image to PDF, creating new pages if needed
+    pdf.addImage(imgData, 'PNG', 10, yPosition, imgWidth, imgHeight);
+
+    // If content is longer than one page, add additional pages
+    let currentPage = 1;
+    while (remainingHeight > pageHeight - 20) {
+      pdf.addPage();
+      yPosition = -((currentPage * (pageHeight - 20)) - 10);
+      pdf.addImage(imgData, 'PNG', 10, yPosition, imgWidth, imgHeight);
+      currentPage++;
+      remainingHeight -= (pageHeight - 20);
     }
-    
-    // Footer with generation date
-    pdf.setFontSize(9);
-    pdf.setTextColor(150, 150, 150);
-    const generatedDate = new Date().toLocaleDateString();
-    pdf.text(`Generated on ${generatedDate}`, margin, pageHeight - 10);
-    
+
     // Save the PDF
     const fileName = `Credits_${credit.projectName?.replace(/\s+/g, '_') || 'Project'}.pdf`;
     pdf.save(fileName);
-    
+
     return true;
   } catch (error) {
     console.error('Error generating credit PDF:', error);
