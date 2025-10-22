@@ -10,12 +10,14 @@ export default function ShootTypePage({ title, categories }) {
   const router = useRouter();
   const { type } = useParams();
   const { createShoot, shoots } = useShootStore();  // Use createShoot from store
-  
+
   const [checkedItems, setCheckedItems] = useState({});
   const [checkedCategories, setCheckedCategories] = useState({});
   const [shootTitle, setShootTitle] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [error, setError] = useState(null);
+  const [editingMode, setEditingMode] = useState(false);
+  const [customCategories, setCustomCategories] = useState([]);
 
   // Reset state when type changes
   useEffect(() => {
@@ -23,6 +25,7 @@ export default function ShootTypePage({ title, categories }) {
     setCheckedCategories({});
     setShootTitle("");
     setError(null);
+    setCustomCategories(JSON.parse(JSON.stringify(categories))); // Deep copy
   }, [type]);
 
   const handleCheckboxChange = (item, type) => {
@@ -48,6 +51,56 @@ export default function ShootTypePage({ title, categories }) {
       return updated;
     });
   };
+
+  // Edit category title
+  const handleEditCategoryTitle = (index, newName) => {
+    const updated = [...customCategories];
+    updated[index].name = newName;
+    setCustomCategories(updated);
+  };
+
+  // Edit item name
+  const handleEditItemName = (categoryIndex, itemIndex, newName) => {
+    const updated = [...customCategories];
+    updated[categoryIndex].items[itemIndex].name = newName;
+    setCustomCategories(updated);
+  };
+
+  // Toggle item optional status
+  const handleToggleOptional = (categoryIndex, itemIndex) => {
+    const updated = [...customCategories];
+    updated[categoryIndex].items[itemIndex].optional = !updated[categoryIndex].items[itemIndex].optional;
+    setCustomCategories(updated);
+  };
+
+  // Add new item to category
+  const handleAddItem = (categoryIndex) => {
+    const updated = [...customCategories];
+    updated[categoryIndex].items.push({ name: "New Item", optional: false });
+    setCustomCategories(updated);
+  };
+
+  // Remove item from category
+  const handleRemoveItem = (categoryIndex, itemIndex) => {
+    const updated = [...customCategories];
+    updated[categoryIndex].items.splice(itemIndex, 1);
+    setCustomCategories(updated);
+  };
+
+  // Add new category
+  const handleAddCategory = () => {
+    setCustomCategories([
+      ...customCategories,
+      { name: "New Category", items: [{ name: "New Item", optional: false }] }
+    ]);
+  };
+
+  // Remove category
+  const handleRemoveCategory = (index) => {
+    const updated = customCategories.filter((_, i) => i !== index);
+    setCustomCategories(updated);
+  };
+
   // Add this console log at the top of your component to debug
   console.log("API URL:", process.env.NEXT_PUBLIC_API_URL);
 
@@ -70,7 +123,7 @@ export default function ShootTypePage({ title, categories }) {
         title: trimmedTitle,
         type: type,
         checklist: checkedItems,
-        template: categories,
+        template: customCategories, // Use customCategories instead of original categories
       };
 
       // Use the store's createShoot function instead of direct fetch
@@ -90,49 +143,190 @@ export default function ShootTypePage({ title, categories }) {
 
   return (
     <main className={styles.container}>
-      <h1 className={styles.heading}>📝 {title}</h1>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+        <h1 className={styles.heading}>📝 {title}</h1>
+        <button
+          onClick={() => setEditingMode(!editingMode)}
+          style={{
+            padding: '0.5rem 1rem',
+            backgroundColor: editingMode ? '#ef4444' : '#49306e',
+            color: 'white',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            fontSize: '1rem',
+            fontWeight: 'bold',
+          }}
+        >
+          {editingMode ? '✓ Done Editing' : '✏️ Edit Template'}
+        </button>
+      </div>
 
       <div className={styles.grid}>
-        {categories.map((category, index) => (
-          <div key={category.name} className={styles.categoryWrapper}>
+        {customCategories.map((category, index) => (
+          <div key={`category-${index}`} className={styles.categoryWrapper}>
             <div
               className={`${styles.category} ${
                 index % 2 === 0 ? styles.yellow : styles.purple
               }`}
             >
-              <input
-                type="checkbox"
-                className={styles.categoryCheckbox}
-                checked={checkedCategories[category.name] || false}
-                onChange={() =>
-                  handleCategoryToggle(category.name, category.items)
-                }
-              />
-              <h2 className={styles.categoryTitle}>{category.name}</h2>
+              {editingMode ? (
+                <div style={{ display: 'flex', gap: '0.5rem', width: '100%', alignItems: 'center' }}>
+                  <input
+                    type="text"
+                    value={category.name}
+                    onChange={(e) => handleEditCategoryTitle(index, e.target.value)}
+                    style={{
+                      flex: 1,
+                      padding: '0.5rem',
+                      fontSize: '1.2rem',
+                      fontWeight: 'bold',
+                      border: 'none',
+                      borderRadius: '4px',
+                      backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                      color: index % 2 === 0 ? 'black' : 'white',
+                    }}
+                  />
+                  {customCategories.length > 1 && (
+                    <button
+                      onClick={() => handleRemoveCategory(index)}
+                      style={{
+                        padding: '0.3rem 0.6rem',
+                        backgroundColor: 'rgba(255, 0, 0, 0.7)',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      🗑
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <>
+                  <input
+                    type="checkbox"
+                    className={styles.categoryCheckbox}
+                    checked={checkedCategories[category.name] || false}
+                    onChange={() =>
+                      handleCategoryToggle(category.name, category.items)
+                    }
+                  />
+                  <h2 className={styles.categoryTitle}>{category.name}</h2>
+                </>
+              )}
             </div>
 
             <div className={styles.items}>
-              {category.items.map((item) => (
-                <label
-                  key={`${category.name}-${item.name}`}
-                  className={styles.item}
-                >
-                  <input
-                    type="checkbox"
-                    className={styles.checkbox}
-                    checked={checkedItems[item.name]?.takeOut || false}
-                    onChange={() => handleCheckboxChange(item.name, "takeOut")}
-                  />
-                  <span className={styles.itemText}>{item.name}</span>
-                  {item.optional && (
-                    <span className={styles.optional}>(Optional)</span>
+              {category.items.map((item, itemIndex) => (
+                <div key={`item-${index}-${itemIndex}`}>
+                  {editingMode ? (
+                    <div
+                      style={{
+                        display: 'flex',
+                        gap: '0.5rem',
+                        alignItems: 'center',
+                        padding: '0.5rem',
+                        marginBottom: '0.5rem',
+                        backgroundColor: '#f5f5f5',
+                        borderRadius: '4px',
+                      }}
+                    >
+                      <input
+                        type="text"
+                        value={item.name}
+                        onChange={(e) => handleEditItemName(index, itemIndex, e.target.value)}
+                        style={{
+                          flex: 1,
+                          padding: '0.4rem',
+                          border: '1px solid #ccc',
+                          borderRadius: '4px',
+                        }}
+                      />
+                      <label style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', cursor: 'pointer' }}>
+                        <input
+                          type="checkbox"
+                          checked={item.optional}
+                          onChange={() => handleToggleOptional(index, itemIndex)}
+                        />
+                        <span style={{ fontSize: '0.85rem' }}>Optional</span>
+                      </label>
+                      <button
+                        onClick={() => handleRemoveItem(index, itemIndex)}
+                        style={{
+                          padding: '0.3rem 0.6rem',
+                          backgroundColor: '#ef4444',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        🗑
+                      </button>
+                    </div>
+                  ) : (
+                    <label
+                      className={styles.item}
+                    >
+                      <input
+                        type="checkbox"
+                        className={styles.checkbox}
+                        checked={checkedItems[item.name]?.takeOut || false}
+                        onChange={() => handleCheckboxChange(item.name, "takeOut")}
+                      />
+                      <span className={styles.itemText}>{item.name}</span>
+                      {item.optional && (
+                        <span className={styles.optional}>(Optional)</span>
+                      )}
+                    </label>
                   )}
-                </label>
+                </div>
               ))}
+              {editingMode && (
+                <button
+                  onClick={() => handleAddItem(index)}
+                  style={{
+                    width: '100%',
+                    padding: '0.5rem',
+                    marginTop: '0.5rem',
+                    backgroundColor: '#49306e',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    fontSize: '0.9rem',
+                  }}
+                >
+                  + Add Item
+                </button>
+              )}
             </div>
           </div>
         ))}
       </div>
+
+      {editingMode && (
+        <button
+          onClick={handleAddCategory}
+          style={{
+            width: '100%',
+            padding: '0.75rem',
+            marginTop: '1rem',
+            marginBottom: '1rem',
+            backgroundColor: '#febd11',
+            color: 'black',
+            border: '2px solid #49306e',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            fontSize: '1rem',
+            fontWeight: 'bold',
+          }}
+        >
+          + Add New Category
+        </button>
+      )}
 
       <button className={styles.saveButton} onClick={() => setShowModal(true)}>
         Save Shoot
