@@ -148,17 +148,17 @@ export default function ShootTypePage({ title, categories }) {
         <button
           onClick={() => setEditingMode(!editingMode)}
           style={{
-            padding: '0.5rem 1rem',
-            backgroundColor: editingMode ? '#ef4444' : '#49306e',
-            color: 'white',
+            padding: '0.5rem 0.75rem',
+            backgroundColor: 'transparent',
+            color: editingMode ? '#ef4444' : '#49306e',
             border: 'none',
-            borderRadius: '8px',
             cursor: 'pointer',
-            fontSize: '1rem',
+            fontSize: '1.5rem',
             fontWeight: 'bold',
           }}
+          title={editingMode ? 'Done Editing' : 'Edit Template'}
         >
-          {editingMode ? '✓ Done Editing' : '✏️ Edit Template'}
+          {editingMode ? '✓' : '✏️'}
         </button>
       </div>
 
@@ -192,14 +192,16 @@ export default function ShootTypePage({ title, categories }) {
                       onClick={() => handleRemoveCategory(index)}
                       style={{
                         padding: '0.3rem 0.6rem',
-                        backgroundColor: 'rgba(255, 0, 0, 0.7)',
-                        color: 'white',
+                        backgroundColor: 'transparent',
+                        color: '#ef4444',
                         border: 'none',
-                        borderRadius: '4px',
                         cursor: 'pointer',
+                        fontSize: '1.5rem',
+                        fontWeight: 'bold',
                       }}
+                      title="Remove category"
                     >
-                      🗑
+                      −
                     </button>
                   )}
                 </div>
@@ -244,7 +246,7 @@ export default function ShootTypePage({ title, categories }) {
                           borderRadius: '4px',
                         }}
                       />
-                      <label style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', cursor: 'pointer' }}>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', cursor: 'pointer', whiteSpace: 'nowrap' }}>
                         <input
                           type="checkbox"
                           checked={item.optional}
@@ -256,14 +258,16 @@ export default function ShootTypePage({ title, categories }) {
                         onClick={() => handleRemoveItem(index, itemIndex)}
                         style={{
                           padding: '0.3rem 0.6rem',
-                          backgroundColor: '#ef4444',
-                          color: 'white',
+                          backgroundColor: 'transparent',
+                          color: '#ef4444',
                           border: 'none',
-                          borderRadius: '4px',
                           cursor: 'pointer',
+                          fontSize: '1.2rem',
+                          fontWeight: 'bold',
                         }}
+                        title="Remove item"
                       >
-                        🗑
+                        −
                       </button>
                     </div>
                   ) : (

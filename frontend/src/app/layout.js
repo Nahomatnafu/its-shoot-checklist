@@ -9,7 +9,13 @@ export const metadata = {
   title: "Shoot Checklist App",
   description: "Organize and manage shoot equipment",
   icons: {
-    icon: "/MSU_Logo5.png",
+    icon: [
+      {
+        url: "/MSU_Logo5.png",
+        sizes: "any",
+        type: "image/png",
+      }
+    ],
   },
 };
 
