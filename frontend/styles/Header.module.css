@@ -11,26 +11,26 @@
   box-sizing: border-box;
 }
 
-/* Mobile styles - hide navigation completely */
-@media (max-width: 768px) {
+/* Mobile and Tablet styles - hide navigation completely */
+@media (max-width: 1024px) {
   .header {
     padding: 0.75rem 1rem;
     font-size: 1rem;
     justify-content: space-between;
   }
-  
-  /* Hide left navigation completely on mobile */
+
+  /* Hide left navigation completely on mobile and tablet */
   .leftContainer,
   .leftNav {
     display: none !important;
   }
-  
-  /* Hide right navigation completely on mobile */
+
+  /* Hide right navigation completely on mobile and tablet */
   .rightNav {
     display: none !important;
   }
-  
-  /* Center the logo on mobile */
+
+  /* Center the logo on mobile and tablet */
   .logoContainer {
     position: static;
     transform: none;
@@ -38,36 +38,41 @@
     display: flex;
     justify-content: center;
   }
-  
+
   .logo {
     width: 50px;
     height: 50px;
   }
-  
-  /* Show hamburger menu on mobile */
+
+  /* Show hamburger menu on mobile and tablet */
   .hamburger {
     display: flex !important;
   }
 }
 
-/* Tablet styles */
-@media (min-width: 769px) and (max-width: 1024px) {
+/* Desktop styles - show navigation */
+@media (min-width: 1025px) {
   .header {
-    padding: 0.75rem 1.5rem;
-    font-size: 1.1rem;
+    padding: 1rem;
+    font-size: 1.2rem;
   }
-  
+
   .navButton {
-    padding: 0.2rem 0.8rem;
-    font-size: 16px;
+    padding: 0.25rem 1rem;
+    font-size: 18px;
   }
-  
+
   .leftNav {
-    gap: 0.75rem;
+    gap: 1rem;
   }
-  
+
   .rightNav {
-    gap: 0.75rem;
+    gap: 1rem;
+  }
+
+  /* Hide hamburger menu on desktop */
+  .hamburger {
+    display: none !important;
   }
 }
 
@@ -89,7 +94,7 @@
   border-radius: 2px;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .hamburger {
     display: flex;
   }
