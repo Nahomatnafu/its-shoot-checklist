@@ -143,18 +143,21 @@ export default function ShootTypePage({ title, categories }) {
 
   return (
     <main className={styles.container}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
         <h1 className={styles.heading}>📝 {title}</h1>
         <button
           onClick={() => setEditingMode(!editingMode)}
           style={{
-            padding: '0.5rem 0.75rem',
+            padding: '0.25rem 0.5rem',
             backgroundColor: 'transparent',
             color: editingMode ? '#ef4444' : '#49306e',
             border: 'none',
             cursor: 'pointer',
             fontSize: '1.5rem',
             fontWeight: 'bold',
+            lineHeight: '1',
+            display: 'flex',
+            alignItems: 'center',
           }}
           title={editingMode ? 'Done Editing' : 'Edit Template'}
         >

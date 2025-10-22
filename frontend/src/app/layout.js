@@ -8,15 +8,6 @@ const inter = Inter({ subsets: ['latin'] });
 export const metadata = {
   title: "Shoot Checklist App",
   description: "Organize and manage shoot equipment",
-  icons: {
-    icon: [
-      {
-        url: "/MSU_Logo5.png",
-        sizes: "any",
-        type: "image/png",
-      }
-    ],
-  },
 };
 
 export default function RootLayout({ children }) {
