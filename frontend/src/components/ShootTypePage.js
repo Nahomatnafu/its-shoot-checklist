@@ -158,6 +158,8 @@ export default function ShootTypePage({ title, categories }) {
             lineHeight: '1',
             display: 'flex',
             alignItems: 'center',
+            margin: '10px',
+            marginBottom: '25px',
           }}
           title={editingMode ? 'Done Editing' : 'Edit Template'}
         >
