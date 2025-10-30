@@ -279,15 +279,61 @@ export default function Header() {
 
       {mobileMenuOpen && (
         <div className={`${styles.mobileMenu} ${mobileMenuOpen ? styles.open : ''}`}>
+          {/* Mobile Menu Header */}
+          <div className={styles.mobileMenuHeader}>
+            <div className={styles.hamburger} onClick={() => setMobileMenuOpen(false)}>
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+
+            <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)}>
+              <Image
+                src="/MSU_newLogo.png"
+                alt="MSU Logo"
+                width={60}
+                height={60}
+                className={styles.mobileMenuLogo}
+              />
+            </Link>
+
+            <div className={styles.mobileHeaderRight}>
+              <button
+                className={styles.mobileLogoutButton}
+                onClick={() => {
+                  handleLogout();
+                  setMobileMenuOpen(false);
+                }}
+              >
+                Logout
+              </button>
+
+              <div className={styles.mobileUserProfile}>
+                <Image
+                  src={user?.profilePic || "/quentin.png"}
+                  alt="User Profile"
+                  width={40}
+                  height={40}
+                  className={styles.userImage}
+                  onClick={() => {
+                    handleProfileClick();
+                    setMobileMenuOpen(false);
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Mobile Menu Items */}
           <div className={styles.mobileMenuItems}>
-            <Link 
-              href="/shoots" 
+            <Link
+              href="/shoots"
               className={styles.mobileNavButton}
               onClick={() => setMobileMenuOpen(false)}
             >
               Shoots
             </Link>
-            
+
             <div className={styles.mobileDropdownSection}>
               <div className={styles.mobileDropdownTitle}>Image Waiver</div>
               <div className={styles.mobileDropdownItems}>
@@ -343,44 +389,23 @@ export default function Header() {
                 </Link>
               </div>
             </div>
-          </div>
 
-          <div className={styles.mobileUserSection}>
             {user?.role === "admin" && (
               <button
-                className={styles.mobileNavButton}
+                className={styles.mobileAdminButton}
                 onClick={() => {
                   router.push("/admin");
                   setMobileMenuOpen(false);
                 }}
+                title="Admin Panel"
               >
-                Admin Panel
+                <img
+                  src="/MSU_Logo5.png"
+                  alt="Admin"
+                  className={styles.mobileAdminIcon}
+                />
               </button>
             )}
-            
-            <div className={styles.userProfile}>
-              <Image
-                src={user?.profilePic || "/quentin.png"}
-                alt="User Profile"
-                width={50}
-                height={50}
-                className={styles.userImage}
-                onClick={() => {
-                  handleProfileClick();
-                  setMobileMenuOpen(false);
-                }}
-              />
-            </div>
-            
-            <button 
-              className={styles.logoutButton} 
-              onClick={() => {
-                handleLogout();
-                setMobileMenuOpen(false);
-              }}
-            >
-              Logout
-            </button>
           </div>
         </div>
       )}
