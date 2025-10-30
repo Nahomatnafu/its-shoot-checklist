@@ -54,11 +54,19 @@ export default function Header() {
     router.replace("/login");
   }, [router]);
 
-  const handleProfileClick = () => {
+  const handleProfileClick = (e) => {
+    e?.preventDefault();
+    e?.stopPropagation();
     const updatedUser = JSON.parse(localStorage.getItem("user"));
     if (updatedUser) setUser(updatedUser);
     setProfileModalOpen(true);
   };
+
+  // Close profile modal on page change
+  useEffect(() => {
+    setProfileModalOpen(false);
+    setMobileMenuOpen(false);
+  }, [pathname]);
 
   useEffect(() => {
     const loadUser = async () => {
@@ -275,13 +283,25 @@ export default function Header() {
           <span></span>
           <span></span>
         </div>
+
+        {/* Profile icon for mobile/tablet - visible in main header */}
+        <div className={styles.mobileProfileIcon}>
+          <Image
+            src={user?.profilePic || "/quentin.png"}
+            alt="User Profile"
+            width={40}
+            height={40}
+            className={styles.userImage}
+            onClick={handleProfileClick}
+          />
+        </div>
       </header>
 
       {mobileMenuOpen && (
         <div className={`${styles.mobileMenu} ${mobileMenuOpen ? styles.open : ''}`}>
           {/* Mobile Menu Header */}
           <div className={styles.mobileMenuHeader}>
-            <div className={styles.hamburger} onClick={() => setMobileMenuOpen(false)}>
+            <div className={styles.mobileMenuHamburger} onClick={() => setMobileMenuOpen(false)}>
               <span></span>
               <span></span>
               <span></span>
@@ -291,8 +311,8 @@ export default function Header() {
               <Image
                 src="/MSU_newLogo.png"
                 alt="MSU Logo"
-                width={60}
-                height={60}
+                width={50}
+                height={50}
                 className={styles.mobileMenuLogo}
               />
             </Link>
@@ -315,8 +335,8 @@ export default function Header() {
                   width={40}
                   height={40}
                   className={styles.userImage}
-                  onClick={() => {
-                    handleProfileClick();
+                  onClick={(e) => {
+                    handleProfileClick(e);
                     setMobileMenuOpen(false);
                   }}
                 />

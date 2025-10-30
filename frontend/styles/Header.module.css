@@ -48,6 +48,11 @@
   .hamburger {
     display: flex !important;
   }
+
+  /* Show mobile profile icon on mobile and tablet */
+  .mobileProfileIcon {
+    display: flex !important;
+  }
 }
 
 /* Desktop styles - show navigation */
@@ -74,6 +79,11 @@
   .hamburger {
     display: none !important;
   }
+
+  /* Hide mobile profile icon on desktop */
+  .mobileProfileIcon {
+    display: none !important;
+  }
 }
 
 /* Hamburger menu styles */
@@ -98,6 +108,36 @@
   .hamburger {
     display: flex;
   }
+}
+
+/* Mobile profile icon in main header */
+.mobileProfileIcon {
+  display: none;
+  align-items: center;
+  cursor: pointer;
+}
+
+@media (max-width: 1024px) {
+  .mobileProfileIcon {
+    display: flex;
+  }
+}
+
+/* Mobile menu hamburger (inside mobile menu) */
+.mobileMenuHamburger {
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  padding: 0.5rem;
+}
+
+.mobileMenuHamburger span {
+  width: 25px;
+  height: 3px;
+  background-color: #febd11;
+  margin: 3px 0;
+  transition: 0.3s;
+  border-radius: 2px;
 }
 
 /* Mobile menu overlay */
@@ -136,6 +176,9 @@
 .mobileMenuLogo {
   cursor: pointer;
   transition: filter 0.3s ease-in-out;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .mobileMenuLogo:hover {
