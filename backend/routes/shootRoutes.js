@@ -3,10 +3,10 @@ const router = express.Router();
 const Shoot = require("../models/Shoot");
 const { protect } = require("../middleware/authMiddleware");
 
-// Get all shoots for current user
+// Get all shoots (shared across all users)
 router.get("/", protect, async (req, res) => {
   try {
-    const shoots = await Shoot.find({ user: req.user._id })
+    const shoots = await Shoot.find({})
       .populate('user', 'name email')
       .sort({ date: -1 });
     res.json(shoots);
@@ -15,13 +15,10 @@ router.get("/", protect, async (req, res) => {
   }
 });
 
-// 🔥 NEW: Get a single shoot by ID
+// Get a single shoot by ID (shared across all users)
 router.get("/:id", protect, async (req, res) => {
   try {
-    const shoot = await Shoot.findOne({
-      _id: req.params.id,
-      user: req.user._id,
-    });
+    const shoot = await Shoot.findById(req.params.id);
     if (!shoot) {
       return res.status(404).json({ message: "Shoot not found" });
     }
@@ -46,11 +43,11 @@ router.post("/", protect, async (req, res) => {
   }
 });
 
-// Update shoot
+// Update shoot (shared across all users)
 router.put("/:id", protect, async (req, res) => {
   try {
-    const shoot = await Shoot.findOneAndUpdate(
-      { _id: req.params.id, user: req.user._id },
+    const shoot = await Shoot.findByIdAndUpdate(
+      req.params.id,
       req.body,
       { new: true }
     );
