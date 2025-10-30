@@ -171,6 +171,7 @@
   position: sticky;
   top: 0;
   z-index: 1001;
+  position: relative;
 }
 
 .mobileMenuLogo {
@@ -178,7 +179,8 @@
   transition: filter 0.3s ease-in-out;
   position: absolute;
   left: 50%;
-  transform: translateX(-50%);
+  top: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .mobileMenuLogo:hover {

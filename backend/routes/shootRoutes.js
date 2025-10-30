@@ -58,19 +58,10 @@ router.put("/:id", protect, async (req, res) => {
   }
 });
 
-// Delete shoot
+// Delete shoot (shared - any user can delete)
 router.delete("/:id", protect, async (req, res) => {
   try {
-    // Allow deletion if user owns the shoot OR is an admin
-    const query = {
-      _id: req.params.id,
-      $or: [
-        { user: req.user._id },
-        { user: null } // Allow deletion of records with no user (legacy data)
-      ]
-    };
-
-    const shoot = await Shoot.findOneAndDelete(query);
+    const shoot = await Shoot.findByIdAndDelete(req.params.id);
     if (!shoot) return res.status(404).json({ message: "Shoot not found" });
     res.json({ message: "Shoot deleted" });
   } catch (error) {

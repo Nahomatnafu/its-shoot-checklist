@@ -3,10 +3,10 @@ const router = express.Router();
 const ImageWaiver = require('../models/ImageWaiver');
 const { protect } = require('../middleware/authMiddleware');
 
-// Get all waivers for current user
+// Get all waivers (shared across all users)
 router.get('/', protect, async (req, res) => {
   try {
-    const waivers = await ImageWaiver.find({ user: req.user._id })
+    const waivers = await ImageWaiver.find({})
       .populate('user', 'name email') // Add this to show who created it
       .sort({ createdAt: -1 }); // Sort by newest first
     res.json(waivers);
@@ -37,19 +37,10 @@ router.post('/', protect, async (req, res) => {
   }
 });
 
-// Delete waiver
+// Delete waiver (shared - any user can delete)
 router.delete('/:id', protect, async (req, res) => {
   try {
-    // Allow deletion if user owns the waiver OR record has no user (legacy data)
-    const query = {
-      _id: req.params.id,
-      $or: [
-        { user: req.user._id },
-        { user: null } // Allow deletion of records with no user (legacy data)
-      ]
-    };
-
-    const waiver = await ImageWaiver.findOneAndDelete(query);
+    const waiver = await ImageWaiver.findByIdAndDelete(req.params.id);
     if (!waiver) return res.status(404).json({ message: 'Waiver not found' });
     res.json({ message: 'Waiver deleted' });
   } catch (error) {

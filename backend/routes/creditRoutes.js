@@ -3,10 +3,10 @@ const router = express.Router();
 const Credit = require('../models/Credit');
 const { protect } = require('../middleware/authMiddleware');
 
-// Get all credits for current user
+// Get all credits (shared across all users)
 router.get('/', protect, async (req, res) => {
   try {
-    const credits = await Credit.find({ user: req.user._id })
+    const credits = await Credit.find({})
       .populate('user', 'name email')
       .sort({ createdAt: -1 });
     res.json(credits);
@@ -71,19 +71,10 @@ router.put('/:id', protect, async (req, res) => {
   }
 });
 
-// Delete credit
+// Delete credit (shared - any user can delete)
 router.delete('/:id', protect, async (req, res) => {
   try {
-    // Allow deletion if user owns the credit OR record has no user (legacy data)
-    const query = {
-      _id: req.params.id,
-      $or: [
-        { user: req.user._id },
-        { user: null } // Allow deletion of records with no user (legacy data)
-      ]
-    };
-
-    const credit = await Credit.findOneAndDelete(query);
+    const credit = await Credit.findByIdAndDelete(req.params.id);
     if (!credit) return res.status(404).json({ message: 'Credit not found' });
     res.json({ message: 'Credit deleted' });
   } catch (error) {
