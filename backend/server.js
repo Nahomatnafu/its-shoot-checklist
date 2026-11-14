@@ -13,6 +13,12 @@ const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 require("dotenv").config();
 
+// Fail fast if the JWT signing secret is not configured
+if (!process.env.JWT_SECRET) {
+  logger.error("JWT_SECRET environment variable is not set. Refusing to start.");
+  process.exit(1);
+}
+
 const app = express();
 app.set("trust proxy", 1);
 
