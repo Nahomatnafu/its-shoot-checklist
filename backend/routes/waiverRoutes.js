@@ -37,11 +37,19 @@ router.post('/', protect, async (req, res) => {
   }
 });
 
-// Delete waiver (shared - any user can delete)
+// Delete waiver (creator or admin only)
 router.delete('/:id', protect, async (req, res) => {
   try {
-    const waiver = await ImageWaiver.findByIdAndDelete(req.params.id);
+    const waiver = await ImageWaiver.findById(req.params.id);
     if (!waiver) return res.status(404).json({ message: 'Waiver not found' });
+
+    // Only the creator or an admin may delete
+    const isOwner = waiver.user && waiver.user.equals(req.user._id);
+    if (!isOwner && req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Not authorized to delete this waiver' });
+    }
+
+    await waiver.deleteOne();
     res.json({ message: 'Waiver deleted' });
   } catch (error) {
     res.status(500).json({ message: 'Server error' });

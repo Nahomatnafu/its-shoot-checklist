@@ -58,11 +58,19 @@ router.put("/:id", protect, async (req, res) => {
   }
 });
 
-// Delete shoot (shared - any user can delete)
+// Delete shoot (creator or admin only)
 router.delete("/:id", protect, async (req, res) => {
   try {
-    const shoot = await Shoot.findByIdAndDelete(req.params.id);
+    const shoot = await Shoot.findById(req.params.id);
     if (!shoot) return res.status(404).json({ message: "Shoot not found" });
+
+    // Only the creator or an admin may delete
+    const isOwner = shoot.user && shoot.user.equals(req.user._id);
+    if (!isOwner && req.user.role !== "admin") {
+      return res.status(403).json({ message: "Not authorized to delete this shoot" });
+    }
+
+    await shoot.deleteOne();
     res.json({ message: "Shoot deleted" });
   } catch (error) {
     res.status(500).json({ message: "Server error" });

@@ -61,14 +61,11 @@ router.post("/login", async (req, res) => {
     // Use lean() for faster query performance
     const user = await User.findOne({ email }).lean();
 
-    if (!user) {
-      return res.status(400).json({ message: "Email not found" });
-    }
-
-    const isMatch = await bcrypt.compare(password, user.password);
+    // Use one generic message so responses don't reveal which emails exist
+    const isMatch = user ? await bcrypt.compare(password, user.password) : false;
 
     if (!isMatch) {
-      return res.status(400).json({ message: "Incorrect password" });
+      return res.status(400).json({ message: "Invalid email or password" });
     }
 
     // Create token with minimal payload
@@ -133,9 +130,12 @@ router.put("/users/:id", protect, isAdmin, async (req, res) => {
   }
 });
 
-router.get("/user/:email", async (req, res) => {
+// @route   GET /api/auth/user/:email
+// @desc    Get a user by email (password excluded)
+// @access  Private
+router.get("/user/:email", protect, async (req, res) => {
   try {
-    const user = await User.findOne({ email: req.params.email });
+    const user = await User.findOne({ email: req.params.email }).select("-password");
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -151,8 +151,9 @@ router.get("/user/:email", async (req, res) => {
 // @access  Private
 router.put("/user/profile", protect, async (req, res) => {
   try {
-    const { userId, currentPassword, newPassword, position, profilePic } = req.body;
-    const user = await User.findById(userId);
+    // Always act on the authenticated user; never trust a userId from the body
+    const { currentPassword, newPassword, position, profilePic } = req.body;
+    const user = await User.findById(req.user._id);
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
